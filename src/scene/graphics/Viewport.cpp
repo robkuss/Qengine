@@ -1,6 +1,8 @@
 #ifndef VIEWPORT_C
 #define VIEWPORT_C
 
+#define GLFW_INCLUDE_GLEXT
+
 #define TEXT	// For on-screen debug text (experimental)
 
 #include <cmath>
@@ -102,6 +104,11 @@ private:
 	Vector3 rayStart        = Vector3(-1, -1, -1);
 	Vector3 rayEnd          = Vector3( 1,  1,  1);
 
+	// FPS tracking
+	double previousTime = 0.0;
+	int frameCount = 0;
+	int fps = 0;
+
 	// "Pointers" - Shared resources for viewport state used mainly by the OpenGL library
 	int* viewport			= new int[4];
 	float* projectionMatrix = new float[16];
@@ -121,8 +128,9 @@ private:
 	static void drawAxes();
 	static void drawGrid();
 	void drawMouseRay() const;
-
 	void drawOnScreenText() const;
+
+	void getFPS();
 };
 
 Viewport::Viewport(const std::string &title, const int width, const int height, const SceneManager& sceneManager)
@@ -149,7 +157,6 @@ Viewport::Viewport(const std::string &title, const int width, const int height, 
 
 	glfwMakeContextCurrent(window);
 	glfwSetWindowUserPointer(window, this);
-	glfwSwapInterval(1);      // Enable v-sync
 	glfwShowWindow(window);
 
 	// Set callbacks for keyboard and mouse input
@@ -159,17 +166,9 @@ Viewport::Viewport(const std::string &title, const int width, const int height, 
 	glEnable(GL_DEPTH_TEST);	// Enable depth testing
 	glEnable(GL_MULTISAMPLE);	// Enable multi-sampling (antialiasing)
 
-	aspect = static_cast<float>(width) / static_cast<float>(height);
-	gluPerspective();				// Initialize projection matrix
-	gluLookAt(						// Initialize modelview matrix
-		cameraPosition,
-		lookAt,
-		up
-	);
+	glfwSwapInterval(0);			// Enable v-sync
 
-	#ifdef TEXT
-		initFreeType();					// Initialize FreeType for on-screen text
-	#endif
+	aspect = static_cast<float>(width) / static_cast<float>(height);
 }
 
 Viewport::~Viewport() {
@@ -183,6 +182,19 @@ Viewport::~Viewport() {
 }
 
 void Viewport::start() {
+	// Initialize matrices
+	gluPerspective();				// Initialize projection matrix
+	gluLookAt(						// Initialize modelview matrix
+		cameraPosition,
+		lookAt,
+		up
+	);
+
+	#ifdef TEXT
+		initFreeType();				// Initialize FreeType for on-screen debug text
+	#endif
+
+	// Start rendering the Viewport
 	while (!glfwWindowShouldClose(window)) {
 		render();
 	}
@@ -190,6 +202,9 @@ void Viewport::start() {
 
 /** Viewport rendering loop called every frame */
 void Viewport::render() {
+	glfwGetFramebufferSize(window, &width, &height);
+	glViewport(0, 0, width, height);
+
 	clearColor(BG_COLOR);										// Background color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear the framebuffer
 
@@ -207,7 +222,19 @@ void Viewport::render() {
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
+
+	getFPS();
 }
+
+void Viewport::getFPS() {
+	if (const double currentTime = glfwGetTime(); currentTime - previousTime >= 1.0) {
+		fps = frameCount;
+		frameCount = 0;
+		previousTime = currentTime;
+	}
+	frameCount++;
+}
+
 
 /** Centers the application's window to the middle of the screen. */
 void Viewport::centerWindow() const {
@@ -227,7 +254,7 @@ void Viewport::drawOnScreenText() const {
 		for (int i = 0; i <= 11; i++) {
 			std::ostringstream text;
 			switch (i) {
-				case 0:  /*text << "FPS: " << lastFPS; */break;
+				case 0:  text << "FPS: " << fps; break;
 				case 1:  text << "Camera Pos: " << std::fixed << std::setprecision(3) << cameraPosition.x << " " << cameraPosition.y << " " << cameraPosition.z; break;
 				case 2:  text << "Camera Rot: " << std::fixed << std::setprecision(1) << rotH << " / " << rotV; break;
 				case 3:  text << "Zoom: " << std::fixed << std::setprecision(3) << cameraDistance; break;
@@ -312,12 +339,12 @@ void Viewport::updateCameraPosition() {
 // User input processing / Callback response
 
 void Viewport::windowResize(const int newW, const int newH) {
-	glViewport(0, 0, newW, newH);
 	width = newW;
 	height = newH;
 	aspect = static_cast<float>(width) / static_cast<float>(height);
 
 	// Update viewport
+	glViewport(0, 0, width, height);
 	gluPerspective();
 	render();
 }

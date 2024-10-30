@@ -99,19 +99,18 @@ void fontCleanup() {
         FT_Done_Face(font);
         font = nullptr;     // Optional: set to nullptr to avoid dangling pointer
     }
-
+    // Free the library handle if it was initialized
     if (library) {
         FT_Done_FreeType(library);
         library = nullptr;  // Optional: set to nullptr to indicate it's freed
     }
-
     if (fontTexture) {
         glDeleteTextures(1, &fontTexture);
         fontTexture = 0;    // Optional: set to 0 to avoid accidental reuse
     }
 }
 
-
+/** Line number to screen coordinates */
 float line(const int lineNumber, const float fontScale) {
     return firstLineY * fontScale + static_cast<float>(lineNumber) * fontSize * fontScale * lineSpacing;
 }
@@ -120,13 +119,13 @@ float line(const int lineNumber, const float fontScale) {
  * Draw UI Text somewhere on the screen
  * @param text the String that will be rendered to the screen
  * @param x the x position in screen coordinates where the text will be drawn
- * @param y the y position, represented as an Integer line number
+ * @param lineNum the y position, represented as an Integer line number
  * @param scale scaling factor for the text. It will be drawn with font size [fontSize] * [scale]
  * @param windowW the width of the window
  * @param windowH the height of the window
  * @param color the color that the text will be drawn in
  */
-void renderText(const char* text, const float x, const int y, const float scale, const int windowW, const int windowH, const Color color) {
+void renderText(const char* text, const float x, const int lineNum, const float scale, const int windowW, const int windowH, const Color color) {
     // Save the current matrix state (3D perspective matrix)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -146,11 +145,8 @@ void renderText(const char* text, const float x, const int y, const float scale,
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     color3f(color);
 
-    // Calculate y position as screen coordinates
-    const float yPos = line(y, scale);
-
     // Move to the position where the text should be drawn
-    glTranslatef(x, yPos, 0.0f);
+    glTranslatef(x, line(lineNum, scale), 0.0f);
     glScalef(scale, scale, 1.0f);
 
     // Render the text character by character
@@ -187,7 +183,7 @@ void renderText(const char* text, const float x, const int y, const float scale,
         glEnd();
 
         // Move the cursor to the next position (advance by glyph's advance value)
-        glTranslatef(static_cast<float>(advance) / 64, 0.0f, 0.0f);  // >> 6 to divide by 64
+        glTranslatef(static_cast<float>(advance) / 64, 0.0f, 0.0f);
     }
 
     // Restore settings
