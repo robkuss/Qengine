@@ -12,6 +12,7 @@
 #include "../../Mode.h"
 #include "../../math/Triangle.h"
 
+
 class Mesh : public Object {
 public:
 	std::vector<Vector3> vertices;
@@ -35,7 +36,6 @@ public:
 private:
 	void addEdgeToMap(int, int, int);
 };
-
 
 /** Apply transformations to the object */
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transformation) {

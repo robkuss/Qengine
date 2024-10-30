@@ -12,7 +12,7 @@
 
 #include "../../scene/graphics/color/Color.h"
 
-auto fontPath = "resources/fonts/cour.ttf";
+auto fontPath = "C:/Users/rober/OneDrive/Qengine/Qengine/resources/fonts/cour.ttf";
 constexpr int fontSize = 48;
 
 constexpr float firstLineX = 10.0f;
@@ -27,10 +27,10 @@ struct Character {
 	FT_Pos advance;			    // Offset to advance to next glyph
 };
 
-FT_Face font = nullptr;
-GLuint fontTexture = 0;
-std::map<char, Character> characters;
 FT_Library library;
+FT_Face font;
+GLuint fontTexture;
+std::map<char, Character> characters;
 
 // Function to initialize FreeType and load the font
 void initFreeType() {
@@ -40,7 +40,7 @@ void initFreeType() {
         exit(-1);
     }
 
-    /*// Load the font face
+    // Load the font face
     if (FT_New_Face(library, fontPath, 0, &font)) {
         std::cerr << "ERROR: Could not load font " << fontPath << std::endl;
         exit(-1);
@@ -51,7 +51,7 @@ void initFreeType() {
 
     // Load the first 128 ASCII characters
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
-    for (unsigned char c = 32; c < 127; c++) {
+    for (unsigned char c = 0; c < 128; c++) {
         // Load character glyph
         if (FT_Load_Char(font, c, FT_LOAD_RENDER)) {
             std::cerr << "ERROR: Failed to load Glyph " << c << std::endl;
@@ -65,11 +65,11 @@ void initFreeType() {
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
-            GL_RED,
+            GL_ALPHA,
             static_cast<int>(font->glyph->bitmap.width),
             static_cast<int>(font->glyph->bitmap.rows),
             0,
-            GL_RED,
+            GL_ALPHA,
             GL_UNSIGNED_BYTE,
             font->glyph->bitmap.buffer
         );
@@ -91,7 +91,7 @@ void initFreeType() {
         };
         characters.insert(std::pair<char, Character>(c, character));
     }
-    glBindTexture(GL_TEXTURE_2D, 0);*/
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void fontCleanup() {
