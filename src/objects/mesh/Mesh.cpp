@@ -2,6 +2,7 @@
 #define MESH_C
 
 #include <map>
+#include <cmath>
 #include <string>
 #include <vector>
 #include <utility>  // For std::pair
@@ -61,7 +62,8 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transfor
 			rotation = rotation + transformation;
 
 			// Get the rotation angles in degrees from the transformation vector
-			const Vector3 rotationRadians = transformation * std::numbers::pi / 180.f;
+			constexpr double M_PI = 3.14159265358979323846;
+			const Vector3 rotationRadians = transformation * M_PI / 180.f;
 
 			// Calculate the sine and cosine for the rotation angles
 			const float sinX = std::sin(rotationRadians.x);

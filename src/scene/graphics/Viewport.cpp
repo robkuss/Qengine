@@ -1,6 +1,8 @@
 #ifndef VIEWPORT_C
 #define VIEWPORT_C
 
+#define TEXT	// For on-screen debug text (experimental)
+
 #include <cmath>
 #include <sstream>
 #include <iomanip>
@@ -12,16 +14,21 @@
 #include "../../Qengine.cpp"
 #include "../SceneManager.cpp"
 #include "../../Mode.h"
-#include "../../ui/text/Text.cpp"
 #include "../../math/ray/Ray.cpp"
 #include "../../math/vector/Vector4.cpp"
 #include "../../math/matrix/Matrix4x4.cpp"
+
+#ifdef TEXT
+	#include "../../ui/text/Text.cpp"
+#endif
 
 // Constants
 const auto CAMERA_POSITION_INIT			= Vector3(10, 0, 0);			// Default camera position
 const float CAMERA_DISTANCE_INIT		= CAMERA_POSITION_INIT.length();	// Camera distance from the origin
 const auto LOOK_AT_POINT_INIT			= Vector3(0, 0, 0);			// Default: Looking at origin
 const auto UP_VECTOR_INIT				= Vector3(0, 0, 1);			// Default: Up direction is positive Z
+
+constexpr double M_PI					= 3.14159265358979323846;
 
 constexpr float CAMERA_DISTANCE_MIN		= 0.02f;
 constexpr float CAMERA_DISTANCE_MAX		= 10000.0f;
@@ -32,20 +39,28 @@ constexpr float ZOOM_SENSITIVITY		= 2.0f;
 constexpr float AXES_LENGTH				= 100.0f;
 constexpr float MOUSE_RAY_LENGTH		= 1000.0f;
 
+constexpr int ANTIALIASING_SAMPLES		= 10;
+
 
 class Viewport {
 public:
-	explicit Viewport(const SceneManager& sceneManager);
-	~Viewport() = default;
+	explicit Viewport(const std::string &title, int width, int height, const SceneManager& sceneManager);
+	~Viewport();
 
+	void setCallbacks(GLFWwindow* window);
+
+	void start();
 	void render();
 
-	void windowResize(int width, int height);
+	void centerWindow() const;
+	void windowResize(int newW, int newH);
+
 	void select();
 	void initRotation(bool isRotating);
 	void transform(double mouseX, double mouseY);
 	void zoom(double yoffset);
 	void togglePerspective(float h, float v);
+
 	void toggleViewportMode();
 	void changeTransformMode(Mode::ModeEnum mode);
 	void changeTransformSubMode(SubMode subMode);
@@ -53,6 +68,10 @@ public:
 	void onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
 
 private:
+	GLFWwindow* window;
+	std::string title;
+	int width, height;
+	float aspect;
 	SceneManager sceneManager;
 
 	// Mode
@@ -91,26 +110,56 @@ private:
 	double* mouseY			= new double[1];
 
 	// Functions
-	void gluPerspective();
-	void gluLookAt(Vector3 eye, Vector3 center, Vector3 up);
+	void gluPerspective() const;
+	static void gluLookAt(Vector3 eye, Vector3 center, Vector3 up);
 	void updateCameraPosition();
 
-	Vector3 screenToWorld(double mouseX, double mouseY, float depth);
+	[[nodiscard]] Vector3 screenToWorld(double mouseX, double mouseY, float depth) const;
 	Ray getMouseRay(double mouseX, double mouseY);
 	void handleSelection(double selectX, double selectY);
 
-	void drawAxes();
-	void drawGrid();
-	void drawMouseRay();
+	static void drawAxes();
+	static void drawGrid();
+	void drawMouseRay() const;
 
-	void drawOnScreenText();
+	void drawOnScreenText() const;
 };
 
-Viewport::Viewport(const SceneManager& sceneManager) : sceneManager(sceneManager) {
+Viewport::Viewport(const std::string &title, const int width, const int height, const SceneManager& sceneManager)
+		: title(title), width(width), height(height), sceneManager(sceneManager) {
+	glfwSetErrorCallback([](int, const char *description) {
+		std::cerr << "GLFW Error: " << description << std::endl;
+	});
+
+	if (!glfwInit()) {
+		throw std::runtime_error("Failed to initialize GLFW");
+	}
+
+	glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	glfwWindowHint(GLFW_SAMPLES, ANTIALIASING_SAMPLES);
+
+	window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+	if (!window) {
+		glfwTerminate();
+		throw std::runtime_error("Failed to open window");
+	}
+
+	centerWindow();
+
+	glfwMakeContextCurrent(window);
+	glfwSetWindowUserPointer(window, this);
+	glfwSwapInterval(1);      // Enable v-sync
+	glfwShowWindow(window);
+
+	// Set callbacks for keyboard and mouse input
+	setCallbacks(window);
+
 	// OpenGL setup
 	glEnable(GL_DEPTH_TEST);	// Enable depth testing
 	glEnable(GL_MULTISAMPLE);	// Enable multi-sampling (antialiasing)
 
+	aspect = static_cast<float>(width) / static_cast<float>(height);
 	gluPerspective();				// Initialize projection matrix
 	gluLookAt(						// Initialize modelview matrix
 		cameraPosition,
@@ -118,7 +167,25 @@ Viewport::Viewport(const SceneManager& sceneManager) : sceneManager(sceneManager
 		up
 	);
 
-	initFreeType();					// Initialize FreeType for on-screen text
+	#ifdef TEXT
+		initFreeType();					// Initialize FreeType for on-screen text
+	#endif
+}
+
+Viewport::~Viewport() {
+	// Cleanup
+	glfwDestroyWindow(window);
+	glfwTerminate();
+
+	#ifdef TEXT
+		fontCleanup();
+	#endif
+}
+
+void Viewport::start() {
+	while (!glfwWindowShouldClose(window)) {
+		render();
+	}
 }
 
 /** Viewport rendering loop called every frame */
@@ -142,36 +209,49 @@ void Viewport::render() {
 	glfwPollEvents();
 }
 
-void Viewport::drawOnScreenText() {
-	const auto cube = sceneManager.sceneObjects[0];
-	const auto mouseWorld = screenToWorld(mouseX[0], mouseY[0], 0);
-	for (int i = 0; i <= 11; i++) {
-		std::ostringstream text;
-		switch (i) {
-			case 0:  text << "FPS: " << lastFPS; break;
-			case 1:  text << "Camera Pos: " << std::fixed << std::setprecision(3) << cameraPosition.x << " " << cameraPosition.y << " " << cameraPosition.z; break;
-			case 2:  text << "Camera Rot: " << std::fixed << std::setprecision(1) << rotH << " / " << rotV; break;
-			case 3:  text << "Zoom: " << std::fixed << std::setprecision(3) << cameraDistance; break;
-			case 4:  text << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
-			case 5:  text << "Mouse World: "  << std::fixed << std::setprecision(3) << mouseWorld.x << " " << mouseWorld.y << " " << mouseWorld.z; break;
-			case 6:	 text << "Mode: " << modeToString(viewportMode.mode);
-						  if (transformMode.mode    != Mode::NONE)	  text << " "  << modeToString(transformMode.mode);
-						  if (transformMode.subMode != SubMode::NONE) text << " "  << subModeToString(transformMode.subMode); break;
-			case 7:  text << "Transform: " << std::fixed << std::setprecision(3) << transformation.x << " " << transformation.y << " " << transformation.z; break;
-			case 8:  text << "Cube:"; break;
-			case 9:  text << "    Pos: "   << std::fixed << std::setprecision(3) << cube.position.x  << " " << cube.position.y  << " " << cube.position.z;  break;
-			case 10: text << "    Scale: " << std::fixed << std::setprecision(3) << cube.scale.x     << " " << cube.scale.y     << " " << cube.scale.z;     break;
-			default: text << "    Rot: "   << std::fixed << std::setprecision(3) << cube.rotation.x  << " " << cube.rotation.y  << " " << cube.rotation.z;  break;
+/** Centers the application's window to the middle of the screen. */
+void Viewport::centerWindow() const {
+	const auto monitor = glfwGetPrimaryMonitor();
+	const auto vidMode = glfwGetVideoMode(monitor);
+	const int monitorWidth	 = vidMode->width;
+	const int monitorHeight  = vidMode->height;
+	const int windowPosX	 = (monitorWidth - width) / 2;
+	const int windowPosY	 = (monitorHeight - height) / 2;
+	glfwSetWindowPos(window, windowPosX, windowPosY);
+}
+
+void Viewport::drawOnScreenText() const {
+	#ifdef TEXT
+		const auto cube = sceneManager.sceneObjects[0];
+		const auto mouseWorld = screenToWorld(mouseX[0], mouseY[0], 0);
+		for (int i = 0; i <= 11; i++) {
+			std::ostringstream text;
+			switch (i) {
+				case 0:  /*text << "FPS: " << lastFPS; */break;
+				case 1:  text << "Camera Pos: " << std::fixed << std::setprecision(3) << cameraPosition.x << " " << cameraPosition.y << " " << cameraPosition.z; break;
+				case 2:  text << "Camera Rot: " << std::fixed << std::setprecision(1) << rotH << " / " << rotV; break;
+				case 3:  text << "Zoom: " << std::fixed << std::setprecision(3) << cameraDistance; break;
+				case 4:  text << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
+				case 5:  text << "Mouse World: "  << std::fixed << std::setprecision(3) << mouseWorld.x << " " << mouseWorld.y << " " << mouseWorld.z; break;
+				case 6:	 text << "Mode: " << modeToString(viewportMode.mode);
+							  if (transformMode.mode    != Mode::NONE)	  text << " "  << modeToString(transformMode.mode);
+							  if (transformMode.subMode != SubMode::NONE) text << " "  << subModeToString(transformMode.subMode); break;
+				case 7:  text << "Transform: " << std::fixed << std::setprecision(3) << transformation.x << " " << transformation.y << " " << transformation.z; break;
+				case 8:  text << "Cube:"; break;
+				case 9:  text << "    Pos: "   << std::fixed << std::setprecision(3) << cube.position.x  << " " << cube.position.y  << " " << cube.position.z;  break;
+				case 10: text << "    Scale: " << std::fixed << std::setprecision(3) << cube.scale.x     << " " << cube.scale.y     << " " << cube.scale.z;     break;
+				default: text << "    Rot: "   << std::fixed << std::setprecision(3) << cube.rotation.x  << " " << cube.rotation.y  << " " << cube.rotation.z;  break;
+			}
+			renderText(text.str().c_str(), firstLineX, i, fontScale, width, height, TEXT_COLOR);
 		}
-		renderText(text.str().c_str(), firstLineX, i, fontScale, windowWidth, windowHeight, TEXT_COLOR);
-	}
+	#endif
 }
 
 /**
  * Function to set up a perspective projection matrix, which is essential for rendering 3D scenes
  * in a way that simulates human vision, where objects further away appear smaller than those closer.
  */
-void Viewport::gluPerspective() {
+void Viewport::gluPerspective() const {
 	glMatrixMode(GL_PROJECTION);	// Subsequent matrix operations will affect the projection matrix
 
 	const double fh = tan(FOV_Y * M_PI / 360) * Z_NEAR;	// Height of the Near Clipping Plane
@@ -231,13 +311,15 @@ void Viewport::updateCameraPosition() {
 
 // User input processing / Callback response
 
-void Viewport::windowResize(const int width, const int height) {
-	glViewport(0, 0, width, height);
-	windowWidth = width;
-	windowHeight = height;
+void Viewport::windowResize(const int newW, const int newH) {
+	glViewport(0, 0, newW, newH);
+	width = newW;
+	height = newH;
 	aspect = static_cast<float>(width) / static_cast<float>(height);
+
+	// Update viewport
 	gluPerspective();
-	render();	// Update viewport
+	render();
 }
 
 void Viewport::select() {
@@ -279,7 +361,7 @@ void Viewport::transform(const double mouseX, const double mouseY) {
 			break;
 		}
 		case Mode::GRAB: {
-			Vector3 worldPos = screenToWorld(mouseX, mouseY, 0);	// Ray from the mouse position
+			const Vector3 worldPos = screenToWorld(mouseX, mouseY, 0);	// Ray from the mouse position
 
 			// Truncate world position vector based on the selected direction (Transformation Sub Mode)
 			Vector3 wpDirectional = Vector3::ZERO;
@@ -292,10 +374,10 @@ void Viewport::transform(const double mouseX, const double mouseY) {
 			}
 
 			const float grabZ = (sceneManager.selectedObject.value().position - cameraPosition).length();	// Distance of the object from the camera
-			lastTransform = lastTransform == Vector3::ZERO ? wpDirectional : lastTransform;					// Ensure last transformation is non-zero
+			lastTransform  = lastTransform == Vector3::ZERO ? wpDirectional : lastTransform;				// Ensure last transformation is non-zero
 			transformation = (wpDirectional - lastTransform) * grabZ;										// Calculate transformation vector
 			dynamic_cast<Mesh*>(&sceneManager.selectedObject.value())->applyTransformation(transformMode.mode, transformation);
-			lastTransform = wpDirectional;
+			lastTransform  = wpDirectional;
 			break;
 		}
 		case Mode::SCALE: {
@@ -373,7 +455,7 @@ void Viewport::changeTransformSubMode(const SubMode subMode) {
  *
  * @return the world space coordinates for the given mouse position as a Vector3
  */
-Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const float depth) {
+Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const float depth) const {
 	// Get viewport, projection, and modelview matrices
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix);
@@ -404,7 +486,7 @@ Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const 
  * @return A [Ray] object representing the origin and direction of the ray in world space.
  */
 Ray Viewport::getMouseRay(const double mouseX, const double mouseY) {
-	return Ray(cameraPosition, screenToWorld(mouseX, mouseY, 1).normalize());
+	return {cameraPosition, screenToWorld(mouseX, mouseY, 1).normalize()};
 }
 
 /**
@@ -488,7 +570,7 @@ void Viewport::drawGrid() {
 /**
 	 * Draw the [Ray] that's created when the user clicks anywhere in the Viewport
 	 */
-void Viewport::drawMouseRay() {
+void Viewport::drawMouseRay() const {
 	glPointSize(5);
 	glBegin(GL_POINTS);
 	color3f(RED);
@@ -501,6 +583,102 @@ void Viewport::drawMouseRay() {
 	glVertex3f(rayStart.x, rayStart.y, rayStart.z);
 	glVertex3f(rayEnd.x, rayEnd.y, rayEnd.z);
 	glEnd();
+}
+
+
+// Controls
+
+/**
+ * Initialization function to set callbacks for events:
+ *   - Window resizing
+ *   - Mouse:
+ *      - Left mouse button:
+ *          - Select object
+ *      - Middle mouse button:
+ *          - Hold and drag: Rotate Viewport around the origin
+ *          - Scroll: Zoom in and out of the Viewport
+ *   - Keys:
+ *      - Number keys:
+ *          - Toggle perspective
+ *      - TAB
+ *          - Toggle Object/Edit Mode
+ *      - Object transformation:
+ *          - G: Grab
+ *          - S: Scale
+ *          - R: Rotate
+ *          - E: Extrude
+ *          - F: Fill
+ *          - M: Merge
+ */
+void Viewport::setCallbacks(GLFWwindow* window) {
+	// Window resize callback
+	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* cbWindow, const int width, const int height) {
+		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow)))
+			vp->windowResize(width, height);
+	});
+
+	// Mouse button callbacks
+	glfwSetMouseButtonCallback(window, [](GLFWwindow* cbWindow, const int button, const int action, const int) {
+		const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow));
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+			vp->select();
+		}
+		else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+			vp->initRotation(action == GLFW_PRESS);
+		}
+	});
+
+	// Cursor position callback
+	glfwSetCursorPosCallback(window, [](GLFWwindow* cbWindow, const double xPos, const double yPos) {
+		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow)))
+			vp->transform(xPos, yPos);
+	});
+
+	// Mouse scroll callback
+	glfwSetScrollCallback(window, [](GLFWwindow* cbWindow, const double, const double yOffset) {
+		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow)))
+			vp->zoom(yOffset);
+	});
+
+	// Key callbacks
+	glfwSetKeyCallback(window, [](GLFWwindow *cbWindow, const int key, const int scancode, const int action, int const mods) {
+		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow)))
+			vp->onKeyboardInput(cbWindow, key, scancode, action, mods);
+	});
+
+	// Set the user pointer to the Viewport instance
+	glfwSetWindowUserPointer(window, this);
+}
+
+/** Key callbacks */
+void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
+	if (action != GLFW_PRESS) return;
+	switch (key) {
+		case GLFW_KEY_TAB : toggleViewportMode();					// TAB -> Toggle Object/Edit Mode
+
+		// Number keys for perspective toggling
+		case GLFW_KEY_1	  : togglePerspective(  0,  0);			// 1 -> Front View  (towards negative X)
+		case GLFW_KEY_2   : togglePerspective(-90,  0);			// 2 -> Right View  (towards negative Y)
+		case GLFW_KEY_3   : togglePerspective(  0, 90);			// 3 -> Top View    (towards negative Z)
+		case GLFW_KEY_4   : togglePerspective(180,  0);			// 4 -> Back View   (towards positive X)
+		case GLFW_KEY_5   : togglePerspective( 90,  0);			// 5 -> Left View   (towards positive Y)
+		case GLFW_KEY_6   : togglePerspective(  0,-90);			// 6 -> Bottom View (towards positive Z)
+
+		// Change Transform Mode
+		case GLFW_KEY_G	  : changeTransformMode(Mode::GRAB);		// G -> Grab
+		case GLFW_KEY_S	  : changeTransformMode(Mode::SCALE);		// S -> Scale
+		case GLFW_KEY_R   : changeTransformMode(Mode::ROTATE);  	// R -> Rotate
+		case GLFW_KEY_E	  : changeTransformMode(Mode::EXTRUDE);		// E -> Extrude
+		case GLFW_KEY_F	  : changeTransformMode(Mode::FILL);		// F -> Fill
+		case GLFW_KEY_M   : changeTransformMode(Mode::MERGE);		// M -> Merge
+
+		// Change Transform SubMode
+		case GLFW_KEY_X   : changeTransformSubMode(SubMode::X);		// X -> Snap transformation to X direction
+		case GLFW_KEY_Y   : changeTransformSubMode(SubMode::Y);		// Y -> Snap transformation to Y direction
+		case GLFW_KEY_Z   : changeTransformSubMode(SubMode::Z);		// Z -> Snap transformation to Z direction
+
+		default: throw std::invalid_argument("Invalid key");
+	}
 }
 
 

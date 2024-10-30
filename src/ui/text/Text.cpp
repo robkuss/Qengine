@@ -40,7 +40,7 @@ void initFreeType() {
         exit(-1);
     }
 
-    // Load the font face
+    /*// Load the font face
     if (FT_New_Face(library, fontPath, 0, &font)) {
         std::cerr << "ERROR: Could not load font " << fontPath << std::endl;
         exit(-1);
@@ -91,7 +91,7 @@ void initFreeType() {
         };
         characters.insert(std::pair<char, Character>(c, character));
     }
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);*/
 }
 
 void fontCleanup() {

@@ -1,33 +1,32 @@
 #ifndef QENGINE_C
 #define QENGINE_C
 
-#include <GLFW/glfw3.h>
-
 #include <chrono>
 #include <iostream>
 
-// Constants
-constexpr int WIDTH_INIT  = 1920;
-constexpr int HEIGHT_INIT = 1080;
+#include "scene/graphics/Viewport.cpp"
+#include "scene/graphics/MeshRenderer.cpp"
+#include "scene/SceneManager.cpp"
 
-constexpr int ANTIALIASING_SAMPLES = 10;
 
-// Initial values
-static GLFWwindow* window = nullptr;
-
-int windowWidth    = WIDTH_INIT;
-int windowHeight   = HEIGHT_INIT;
-float aspect       = static_cast<float>(WIDTH_INIT) / static_cast<float>(HEIGHT_INIT);
-
-int lastFPS        = 0;
-int runTimer       = 0;
+int lastFPS         = 0;
+int runTimer        = 0;
 auto lastResetTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();    // Current time in ms
 
 
 int main() {
-    std::cout << "Hello World!" << std::endl;
+    try {
+        // Initialize Mesh Renderer, Scene Manager and Viewport
+        constexpr auto meshRenderer = MeshRenderer();
+        const auto sceneManager     = SceneManager(meshRenderer);
+        auto viewport               = Viewport("Qengine", 1920, 1080, sceneManager);
+        viewport.start();
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 #endif // QENGINE_C
