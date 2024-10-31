@@ -6,40 +6,41 @@
 
 #include <optional>
 #include <algorithm>
+#include <iostream>
 
 
 class SceneManager {
 public:
-	std::vector<Object> sceneObjects;
+	std::vector<std::shared_ptr<Object>> sceneObjects;
 	std::optional<Object> selectedObject = std::nullopt;
 
 	// Constructor & Destructor
 	explicit SceneManager(const MeshRenderer meshRenderer) : meshRenderer(meshRenderer) {
 		// Add Default Cube to scene
 		addObject(
-			Cube("Cube", Vector3(.5f, .5f, .5f), 1.0f)
+			std::make_shared<Cube>("Cube", Vector3(.5f, .5f, .5f), 1.0f)
 		);
 	}
 	~SceneManager() = default;
 
-	void render(Mode mode, Vector3 camPos);
+	void render(Mode mode, Vector3 camPos) const;
 
-	void addObject(const Object& obj) { sceneObjects.push_back(obj); }
-	void removeObject(const Object& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
+	void addObject(const std::shared_ptr<Object>& obj) { sceneObjects.push_back(obj); }
+	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
 	void selectObject(const std::optional<Object>& obj) { selectedObject = obj; }
 
 private:
 	MeshRenderer meshRenderer;
 };
 
-inline void SceneManager::render(const Mode mode, const Vector3 camPos) {
+inline void SceneManager::render(const Mode mode, const Vector3 camPos) const {
 	// Loop through the sceneObjects and render Mesh instances
-	for (Object& obj : sceneObjects) {
-		// Check if selectedObject is not null and if it matches the current obj
-		const bool isSelected = selectedObject.has_value() && *selectedObject == obj;
+	for (const auto& objPtr : sceneObjects) {
+		// Check if the current Object is selected
+		const bool isSelected = selectedObject.has_value() && *selectedObject == *objPtr;
 
 		// Attempt to cast Object to Mesh using dynamic_cast
-		if (const auto mesh = dynamic_cast<const Mesh*>(&obj)) {
+		if (const auto mesh = dynamic_cast<const Mesh*>(objPtr.get())) {
 			MeshRenderer::render(*mesh, camPos, isSelected, mode.mode == Mode::EDIT);
 		}
 	}

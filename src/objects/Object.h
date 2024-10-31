@@ -15,7 +15,7 @@ public:
 	// Constructor & Destructor
 	Object(std::string name, const Vector3& position, const Vector3& scale, const Vector3& rotation)
 		: name(std::move(name)), position(position), scale(scale), rotation(rotation), id(nextID++) {}
-	virtual ~Object() = default;
+	virtual ~Object() = default;	// Virtual destructor to enable dynamic_cast
 
 	bool operator==(const Object& other) const { return id == other.id; }	// Object == Object
 

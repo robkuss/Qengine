@@ -9,15 +9,15 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(GLEW_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs/glew-2.2.0/include)
-set(FREETYPE_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/libs/freetype-2.13.3/include)
-set(FREETYPE_LIBRARY ${CMAKE_SOURCE_DIR}/libs/freetype-2.13.3/lib/Release/freetype.lib)
-
 # Detect architecture for GLEW
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(GLEW_LIB_DIR ${CMAKE_SOURCE_DIR}/libs/glew-2.2.0/lib/Release/x64)
 else()  # Assume 32-bit
 	set(GLEW_LIB_DIR ${CMAKE_SOURCE_DIR}/libs/glew-2.2.0/lib/Release/Win32)
 endif()
+
+set(FREETYPE_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/libs/freetype-2.13.3/include)
+set(FREETYPE_LIBRARY ${CMAKE_SOURCE_DIR}/libs/freetype-2.13.3/lib/Release/freetype.lib)
 
 find_package(OpenGL REQUIRED)
 find_package(Freetype REQUIRED)
@@ -26,8 +26,8 @@ add_subdirectory(libs/glfw-3.4 ${CMAKE_BINARY_DIR}/glfw-build)
 
 # Add the executable target
 add_executable(Qengine
-		src/Qengine.cpp
-		src/scene/graphics/Viewport.cpp
+	src/Qengine.cpp
+	src/scene/graphics/Viewport.cpp
 )
 
 # Define static linking

@@ -128,7 +128,7 @@ void Viewport::centerWindow() const {
 
 void Viewport::drawOnScreenText() const {
 	#ifdef TEXT
-		const auto cube = sceneManager.sceneObjects[0];
+		const auto cube = *sceneManager.sceneObjects[0];
 		const auto mouseWorld = screenToWorld(mouseX[0], mouseY[0], 0);
 		for (int i = 0; i <= 11; i++) {
 			std::ostringstream text;
@@ -410,9 +410,9 @@ void Viewport::handleSelection(const double selectX, const double selectY) {
 
 	std::vector<Mesh> intersectingObjects;
 	intersectingObjects.reserve(sceneManager.sceneObjects.size());
-	for (Object& obj : sceneManager.sceneObjects) {
+	for (auto& objPtr : sceneManager.sceneObjects) {
 		// Attempt to cast Object to Mesh using dynamic_cast
-		if (std::optional meshOpt = dynamic_cast<const Mesh*>(&obj); meshOpt && ray.intersects(**meshOpt)) {
+		if (std::optional meshOpt = dynamic_cast<const Mesh*>(objPtr.get()); meshOpt && ray.intersects(**meshOpt)) {
 			intersectingObjects.push_back(**meshOpt);
 		}
 	}
