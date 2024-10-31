@@ -24,12 +24,9 @@ public:
 
 inline bool Ray::intersects(Mesh mesh) const {
 	const auto triangles = mesh.getTriangles();
-	for (int i = 0; i < sizeof(triangles); i++) {
-		if (intersects(triangles[i])) {
-			return true;
-		}
-	}
-	return false;
+	return std::ranges::any_of(triangles, [this](const Triangle& triangle) {
+		return intersects(triangle);
+	});
 }
 
 inline bool Ray::intersects(const Triangle &triangle) const {

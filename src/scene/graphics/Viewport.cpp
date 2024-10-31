@@ -410,10 +410,13 @@ void Viewport::handleSelection(const double selectX, const double selectY) {
 
 	std::vector<Mesh> intersectingObjects;
 	intersectingObjects.reserve(sceneManager.sceneObjects.size());
+
 	for (auto& objPtr : sceneManager.sceneObjects) {
 		// Attempt to cast Object to Mesh using dynamic_cast
-		if (std::optional meshOpt = dynamic_cast<const Mesh*>(objPtr.get()); meshOpt && ray.intersects(**meshOpt)) {
-			intersectingObjects.push_back(**meshOpt);
+		if (const auto meshOpt = dynamic_cast<const Mesh*>(objPtr.get())) {
+			if (ray.intersects(*meshOpt)) {
+				intersectingObjects.push_back(*meshOpt); // Use *meshOpt since it's a pointer
+			}
 		}
 	}
 
