@@ -38,7 +38,7 @@ private:
 };
 
 /** Apply transformations to the object */
-void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transformation) {
+inline void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transformation) {
 	switch (mode) {
 		case Mode::GRAB : {
 			position = position + transformation;
@@ -101,7 +101,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transfor
 	}
 }
 
-std::vector<Triangle> Mesh::getTriangles() {
+inline std::vector<Triangle> Mesh::getTriangles() {
 	std::vector<Triangle> triangles;
 
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
@@ -116,7 +116,7 @@ std::vector<Triangle> Mesh::getTriangles() {
 }
 
 /** Build the edge-to-face adjacency map for the mesh */
-void Mesh::buildEdgeToFaceMap() {
+inline void Mesh::buildEdgeToFaceMap() {
 	edgeToFaceMap.clear();
 
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
@@ -135,7 +135,7 @@ void Mesh::buildEdgeToFaceMap() {
 }
 
 /** Helper function to add an edge to the map */
-void Mesh::addEdgeToMap(int v0, int v1, const int faceIndex) {
+inline void Mesh::addEdgeToMap(int v0, int v1, const int faceIndex) {
 	// Ensure that the order of the vertices is consistent
 	if (const std::pair<int, int> edge = (v0 < v1)
 			? std::make_pair(v0, v1)
@@ -150,7 +150,7 @@ void Mesh::addEdgeToMap(int v0, int v1, const int faceIndex) {
 }
 
 /** Calculate the normal for a face in the Mesh */
-Vector3 Mesh::faceNormal(const int faceIndex) const {
+inline Vector3 Mesh::faceNormal(const int faceIndex) const {
 	const Vector3 v0 = vertices[faceIndices[faceIndex * 3]];
 	const Vector3 v1 = vertices[faceIndices[faceIndex * 3 + 1]];
 	const Vector3 v2 = vertices[faceIndices[faceIndex * 3 + 2]];

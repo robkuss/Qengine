@@ -32,7 +32,7 @@ private:
 	MeshRenderer meshRenderer;
 };
 
-void SceneManager::render(const Mode mode, const Vector3 camPos) {
+inline void SceneManager::render(const Mode mode, const Vector3 camPos) {
 	// Loop through the sceneObjects and render Mesh instances
 	for (Object& obj : sceneObjects) {
 		// Check if selectedObject is not null and if it matches the current obj

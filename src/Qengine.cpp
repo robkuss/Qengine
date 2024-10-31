@@ -4,7 +4,7 @@
 #include <chrono>
 #include <iostream>
 
-#include "scene/graphics/Viewport.cpp"
+#include "scene/graphics/Viewport.h"
 
 int main() {
     try {

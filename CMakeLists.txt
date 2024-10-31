@@ -3,7 +3,6 @@ project(Qengine)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXE_LINKER_FLAGS "-v")
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -26,7 +25,10 @@ find_package(Freetype REQUIRED)
 add_subdirectory(libs/glfw-3.4 ${CMAKE_BINARY_DIR}/glfw-build)
 
 # Add the executable target
-add_executable(Qengine src/Qengine.cpp)
+add_executable(Qengine
+		src/Qengine.cpp
+		src/scene/graphics/Viewport.cpp
+)
 
 # Define static linking
 target_compile_definitions(Qengine PRIVATE GLEW_STATIC FREETYPE_STATIC)

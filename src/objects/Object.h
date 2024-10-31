@@ -25,6 +25,6 @@ private:
 };
 
 // Initialize Object ID
-int Object::nextID = 0;
+inline int Object::nextID = 0;
 
 #endif // OBJECT_H

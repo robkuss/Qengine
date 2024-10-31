@@ -14,7 +14,7 @@ private:
 	static bool isSilhouetteEdge(const Mesh&, const std::vector<int>&, Vector3);
 };
 
-void MeshRenderer::render(Mesh mesh, Vector3 camPos, const bool isSelected, const bool isEditMode) {
+inline void MeshRenderer::render(Mesh mesh, Vector3 camPos, const bool isSelected, const bool isEditMode) {
 	// Draw the faces in one color
 	color3f(MESH_FACE_COLOR);
 	glBegin(GL_TRIANGLES);
@@ -75,7 +75,7 @@ void MeshRenderer::render(Mesh mesh, Vector3 camPos, const bool isSelected, cons
 	}
 }
 
-bool MeshRenderer::isSilhouetteEdge(const Mesh& mesh, const std::vector<int>& faces, const Vector3 camPos) {
+inline bool MeshRenderer::isSilhouetteEdge(const Mesh& mesh, const std::vector<int>& faces, const Vector3 camPos) {
 	if (faces.size() == 1) return true;	  // If only one face shares this edge, it's on the silhouette
 
 	// Get the normals of the two faces

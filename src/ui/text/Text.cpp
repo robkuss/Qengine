@@ -12,7 +12,7 @@
 
 #include "../../scene/graphics/color/Color.h"
 
-auto fontPath = "C:/Users/rober/OneDrive/Qengine/Qengine/resources/fonts/cour.ttf";
+inline auto fontPath = "C:/Users/rober/OneDrive/Qengine/Qengine/resources/fonts/cour.ttf";
 constexpr int fontSize = 48;
 
 constexpr float firstLineX = 10.0f;
@@ -27,13 +27,13 @@ struct Character {
 	FT_Pos advance;			    // Offset to advance to next glyph
 };
 
-FT_Library library;
-FT_Face font;
-GLuint fontTexture;
-std::map<char, Character> characters;
+inline FT_Library library;
+inline FT_Face font;
+inline GLuint fontTexture;
+inline std::map<char, Character> characters;
 
 // Function to initialize FreeType and load the font
-void initFreeType() {
+inline void initFreeType() {
     // Initialize the FreeType library
     if (FT_Init_FreeType(&library)) {
         std::cerr << "ERROR: Could not initialize FreeType library" << std::endl;
@@ -94,7 +94,7 @@ void initFreeType() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void fontCleanup() {
+inline void fontCleanup() {
     if (font) {
         FT_Done_Face(font);
         font = nullptr;     // Optional: set to nullptr to avoid dangling pointer
@@ -111,7 +111,7 @@ void fontCleanup() {
 }
 
 /** Line number to screen coordinates */
-float line(const int lineNumber, const float fontScale) {
+inline float line(const int lineNumber, const float fontScale) {
     return firstLineY * fontScale + static_cast<float>(lineNumber) * fontSize * fontScale * lineSpacing;
 }
 
@@ -125,7 +125,7 @@ float line(const int lineNumber, const float fontScale) {
  * @param windowH the height of the window
  * @param color the color that the text will be drawn in
  */
-void renderText(const char* text, const float x, const int lineNum, const float scale, const int windowW, const int windowH, const Color color) {
+inline void renderText(const char* text, const float x, const int lineNum, const float scale, const int windowW, const int windowH, const Color color) {
     // Save the current matrix state (3D perspective matrix)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();

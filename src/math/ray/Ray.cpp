@@ -22,7 +22,7 @@ public:
 };
 
 
-bool Ray::intersects(Mesh mesh) const {
+inline bool Ray::intersects(Mesh mesh) const {
 	const auto triangles = mesh.getTriangles();
 	for (int i = 0; i < sizeof(triangles); i++) {
 		if (intersects(triangles[i])) {
@@ -32,7 +32,7 @@ bool Ray::intersects(Mesh mesh) const {
 	return false;
 }
 
-bool Ray::intersects(const Triangle &triangle) const {
+inline bool Ray::intersects(const Triangle &triangle) const {
 	const auto vertex0 = triangle.v0;
 	const auto vertex1 = triangle.v1;
 	const auto vertex2 = triangle.v2;
@@ -72,7 +72,7 @@ bool Ray::intersects(const Triangle &triangle) const {
 	return t > EPSILON;
 }
 
-std::optional<Vector3> Ray::intersectWithPlane(const Vector3 planePoint, const Vector3 planeNormal) const {
+inline std::optional<Vector3> Ray::intersectWithPlane(const Vector3 planePoint, const Vector3 planeNormal) const {
 	// Calculate the denominator of the intersection formula (dot product between ray direction and plane normal)
 	const auto denominator = planeNormal.dot(direction);
 
