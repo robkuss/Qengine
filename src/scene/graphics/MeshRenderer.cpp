@@ -5,7 +5,6 @@
 
 #include <GL/gl.h>
 
-
 class MeshRenderer {
 public:
 	static void render(Mesh, Vector3, bool, bool);

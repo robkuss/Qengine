@@ -1,3 +1,4 @@
+#include <functional>
 #ifndef VIEWPORT_C
 #define VIEWPORT_C
 
@@ -279,11 +280,13 @@ void Viewport::transform(const double mouseX, const double mouseY) {
 				case SubMode::Z: wpDirectional = Vector3(0, 0, worldPos.z); break;
 			}
 
-			const float grabZ = (sceneManager.selectedObject.value().position - cameraPosition).length();	// Distance of the object from the camera
-			lastTransform  = lastTransform == Vector3::ZERO ? wpDirectional : lastTransform;				// Ensure last transformation is non-zero
-			transformation = (wpDirectional - lastTransform) * grabZ;										// Calculate transformation vector
-			dynamic_cast<Mesh*>(&sceneManager.selectedObject.value())->applyTransformation(transformMode.mode, transformation);
-			lastTransform  = wpDirectional;
+			if (const auto mesh = dynamic_cast<Mesh*>(sceneManager.selectedObject.get())) {
+				const float grabZ = (mesh->position - cameraPosition).length();									// Distance of the object from the camera
+				lastTransform  = lastTransform == Vector3::ZERO ? wpDirectional : lastTransform;				// Ensure last transformation is non-zero
+				transformation = (wpDirectional - lastTransform) * grabZ;										// Calculate transformation vector
+				mesh->applyTransformation(transformMode.mode, transformation);
+				lastTransform  = wpDirectional;
+			} else throw std::runtime_error("Error: selected Object is not a Mesh.");
 			break;
 		}
 		case Mode::SCALE: {
@@ -408,25 +411,28 @@ Ray Viewport::getMouseRay(const double mouseX, const double mouseY) {
 void Viewport::handleSelection(const double selectX, const double selectY) {
 	const Ray ray = getMouseRay(selectX, selectY);
 
-	std::vector<Mesh> intersectingObjects;
+	std::vector<std::shared_ptr<Object>> intersectingObjects;
 	intersectingObjects.reserve(sceneManager.sceneObjects.size());
 
-	for (auto& objPtr : sceneManager.sceneObjects) {
+	for (const auto& objPtr : sceneManager.sceneObjects) {
 		// Attempt to cast Object to Mesh using dynamic_cast
-		if (const auto meshOpt = dynamic_cast<const Mesh*>(objPtr.get())) {
-			if (ray.intersects(*meshOpt)) {
-				intersectingObjects.push_back(*meshOpt); // Use *meshOpt since it's a pointer
+		if (const auto meshPtr = dynamic_cast<Mesh*>(objPtr.get())) {
+			if (ray.intersects(*meshPtr)) {
+				intersectingObjects.push_back(objPtr);
 			}
-		}
+		} else throw std::runtime_error("Selected Object is not a Mesh!");
 	}
 
-	std::optional<Mesh> selectedObject;
 	if (!intersectingObjects.empty()) {
-		selectedObject = *std::ranges::min_element(intersectingObjects, [&ray](const Mesh& a, const Mesh& b) {
-			return a.position.distance(ray.origin) < b.position.distance(ray.origin);
-		});
-	}
-	sceneManager.selectObject(selectedObject);
+		sceneManager.selectObject(
+			*std::ranges::min_element(
+				intersectingObjects,
+				[&ray](const std::shared_ptr<Object>& a, const std::shared_ptr<Object>& b) {
+					return a->position.distance(ray.origin) < b->position.distance(ray.origin);
+				}
+			)
+		);
+	} else sceneManager.selectObject(nullptr);
 }
 
 

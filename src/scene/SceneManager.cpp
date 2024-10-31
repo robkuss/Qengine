@@ -11,7 +11,7 @@
 class SceneManager {
 public:
 	std::vector<std::shared_ptr<Object>> sceneObjects;		// Scene Objects as shared pointers to prevent object slicing
-	std::optional<Object> selectedObject = std::nullopt;
+	std::shared_ptr<Object> selectedObject = nullptr;
 
 	// Constructor & Destructor
 	explicit SceneManager(const MeshRenderer meshRenderer) : meshRenderer(meshRenderer) {
@@ -26,7 +26,7 @@ public:
 
 	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
-	void selectObject(const std::optional<Object>& obj)   { selectedObject = obj; }
+	void selectObject(const std::shared_ptr<Object>& obj) { selectedObject = obj; }
 
 private:
 	MeshRenderer meshRenderer;
@@ -36,7 +36,7 @@ inline void SceneManager::render(const Mode mode, const Vector3 camPos) const {
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& objPtr : sceneObjects) {
 		// Check if the current Object is selected
-		const bool isSelected = selectedObject.has_value() && *selectedObject == *objPtr;
+		const bool isSelected = selectedObject && selectedObject == objPtr;
 
 		// Attempt to cast Object to Mesh using dynamic_cast
 		if (const auto mesh = dynamic_cast<const Mesh*>(objPtr.get())) {

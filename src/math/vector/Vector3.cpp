@@ -79,6 +79,10 @@ public:
 	[[nodiscard]] Vector3 cross(const Vector3& other) const {
 		return {y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x};
 	}
+
+	[[nodiscard]] std::string toString() const {
+		return std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z);
+	}
 };
 
 inline const Vector3 Vector3::ZERO = Vector3(0, 0, 0);
