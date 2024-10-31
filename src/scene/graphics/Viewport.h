@@ -12,9 +12,12 @@
 #include "../SceneManager.cpp"
 #include "../../math/ray/Ray.cpp"
 
+// Options
 #ifdef TEXT
 	#include "../../ui/text/Text.cpp"
 #endif
+
+//#define DRAW_MOUSE_RAY
 
 // Constants
 const auto CAMERA_POSITION_INIT			= Vector3(10, 0, 0);			// Default camera position

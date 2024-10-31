@@ -1,4 +1,3 @@
-#include <functional>
 #ifndef VIEWPORT_C
 #define VIEWPORT_C
 
@@ -95,8 +94,9 @@ void Viewport::render() {
 	// Render scene objects
 	sceneManager.render(viewportMode, cameraPosition);
 
-	// Draw the mouse ray
-	drawMouseRay();
+	#ifdef DRAW_MOUSE_RAY
+		drawMouseRay();
+	#endif
 
 	drawOnScreenText();
 
@@ -411,9 +411,17 @@ Ray Viewport::getMouseRay(const double mouseX, const double mouseY) {
 void Viewport::handleSelection(const double selectX, const double selectY) {
 	const Ray ray = getMouseRay(selectX, selectY);
 
+	#ifdef DRAW_MOUSE_RAY
+		// Update the visual Mouse Ray
+		const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
+		rayStart = ray.origin;
+		rayEnd   = ray.origin + directionScaled;
+	#endif
+
 	std::vector<std::shared_ptr<Object>> intersectingObjects;
 	intersectingObjects.reserve(sceneManager.sceneObjects.size());
 
+	// Find Objects that intersect with the Mouse Ray
 	for (const auto& objPtr : sceneManager.sceneObjects) {
 		// Attempt to cast Object to Mesh using dynamic_cast
 		if (const auto meshPtr = dynamic_cast<Mesh*>(objPtr.get())) {
@@ -424,6 +432,7 @@ void Viewport::handleSelection(const double selectX, const double selectY) {
 	}
 
 	if (!intersectingObjects.empty()) {
+		// Select the Object that's closest to the ray origin (the camera)
 		sceneManager.selectObject(
 			*std::ranges::min_element(
 				intersectingObjects,
@@ -432,7 +441,7 @@ void Viewport::handleSelection(const double selectX, const double selectY) {
 				}
 			)
 		);
-	} else sceneManager.selectObject(nullptr);
+	} else sceneManager.selectObject(nullptr);	// No Object selected
 }
 
 
