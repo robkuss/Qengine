@@ -129,7 +129,7 @@ void Viewport::centerWindow() const {
 void Viewport::drawOnScreenText() const {
 	#ifdef TEXT
 		const auto cube = *sceneManager.sceneObjects[0];
-		const auto mouseWorld = screenToWorld(mouseX[0], mouseY[0], 0);
+		const auto mouseWorld = screenToWorld(mouseX[0], mouseY[0], 0.0f);
 		for (int i = 0; i <= 11; i++) {
 			std::ostringstream text;
 			switch (i) {
@@ -160,7 +160,7 @@ void Viewport::drawOnScreenText() const {
 void Viewport::gluPerspective() const {
 	glMatrixMode(GL_PROJECTION);	// Subsequent matrix operations will affect the projection matrix
 
-	const double fh = tan(FOV_Y * M_PI / 360) * Z_NEAR;	// Height of the Near Clipping Plane
+	const double fh = tan(FOV_Y * M_PI / 360.0) * Z_NEAR;	// Height of the Near Clipping Plane
 	const double fw = fh * aspect;							//  Width of the Near Clipping Plane
 
 	// Update the perspective projection matrix based on the calculated dimensions
@@ -186,10 +186,10 @@ void Viewport::gluLookAt(const Vector3 eye, const Vector3 center, const Vector3 
 
 	// Construct the view matrix, which is used to transform coordinates from world space to camera space
 	const GLfloat viewMatrix[] = {
-		 side.x,		 zUp.x,		  -forward.x,		 0,
-		 side.y,		 zUp.y,		  -forward.y,		 0,
-		 side.z,		 zUp.z,		  -forward.z,		 0,
-		-side.dot(eye), -zUp.dot(eye), forward.dot(eye), 1
+		 side.x,		 zUp.x,		  -forward.x,		 0.0f,
+		 side.y,		 zUp.y,		  -forward.y,		 0.0f,
+		 side.z,		 zUp.z,		  -forward.z,		 0.0f,
+		-side.dot(eye), -zUp.dot(eye), forward.dot(eye), 1.0f
 	};
 
 	// Update the view matrix, which sets up the camera's orientation and position
@@ -199,8 +199,8 @@ void Viewport::gluLookAt(const Vector3 eye, const Vector3 center, const Vector3 
 
 /** Update camera position based on spherical coordinates. */
 void Viewport::updateCameraPosition() {
-	const double radH = rotH * M_PI / 180;
-	const double radV = rotV * M_PI / 180;
+	const double radH = rotH * M_PI / 180.0;
+	const double radV = rotV * M_PI / 180.0;
 
 	const auto sinH = static_cast<float>(sin(radH));
 	const auto cosH = static_cast<float>(cos(radH));
@@ -368,12 +368,12 @@ Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const 
 	glGetFloatv(GL_MODELVIEW_MATRIX, viewMatrix);
 
 	// Convert mouse coordinates to normalized device coordinates (NDC)
-	const auto x = static_cast<float>(2 * mouseX / viewport[2] - 1);
-	const auto y = static_cast<float>(1 - 2 * mouseY / viewport[3]);
+	const auto x = static_cast<float>(2.0f * mouseX / viewport[2] - 1.0f);
+	const auto y = static_cast<float>(1.0f - 2.0f * mouseY / viewport[3]);
 
-	const auto viewSpace = Vector4(x, y, depth, 1);										// Create a vector in clip space
+	const auto viewSpace = Vector4(x, y, depth, 1.0f);									// Create a vector in clip space
 	const auto clipSpace = Matrix4x4(projectionMatrix).invert() * viewSpace;			// Transform from clip space to view space by applying the inverse of the projection matrix
-	const auto unprojectedClipSpace = Vector4(clipSpace.x, clipSpace.y, -1, 0);			// Set the Z to -1 for proper unprojection and W to 0 for direction vector in the case of a ray
+	const auto unprojectedClipSpace = Vector4(clipSpace.x, clipSpace.y, -1.0f, 0.0f);	// Set the Z to -1 for proper unprojection and W to 0 for direction vector in the case of a ray
 	const auto worldSpace = Matrix4x4(viewMatrix).invert() * unprojectedClipSpace;	// Transform from clip space to world space by applying the inverse of the view matrix
 
 	return {worldSpace.x, worldSpace.y, worldSpace.z};
@@ -392,7 +392,7 @@ Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const 
  * @return A [Ray] object representing the origin and direction of the ray in world space.
  */
 Ray Viewport::getMouseRay(const double mouseX, const double mouseY) {
-	return {cameraPosition, screenToWorld(mouseX, mouseY, 1).normalize()};
+	return {cameraPosition, screenToWorld(mouseX, mouseY, 1.0f).normalize()};
 }
 
 /**
@@ -560,28 +560,28 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
 	if (action != GLFW_PRESS) return;
 	switch (key) {
-		case GLFW_KEY_TAB : toggleViewportMode(); break;					// TAB -> Toggle Object/Edit Mode
+		case GLFW_KEY_TAB : toggleViewportMode(); break;						// TAB -> Toggle Object/Edit Mode
 
 		// Number keys for perspective toggling
-		case GLFW_KEY_1	  : togglePerspective(  0,  0);	break;			// 1 -> Front View  (towards negative X)
-		case GLFW_KEY_2   : togglePerspective(-90,  0);	break;			// 2 -> Right View  (towards negative Y)
-		case GLFW_KEY_3   : togglePerspective(  0, 90);	break;			// 3 -> Top View    (towards negative Z)
-		case GLFW_KEY_4   : togglePerspective(180,  0);	break;			// 4 -> Back View   (towards positive X)
-		case GLFW_KEY_5   : togglePerspective( 90,  0);	break;			// 5 -> Left View   (towards positive Y)
-		case GLFW_KEY_6   : togglePerspective(  0,-90);	break;			// 6 -> Bottom View (towards positive Z)
+		case GLFW_KEY_1	  : togglePerspective(  0.0f,  0.0f); break;		// 1 -> Front View  (towards negative X)
+		case GLFW_KEY_2   : togglePerspective(-90.0f,  0.0f); break;		// 2 -> Right View  (towards negative Y)
+		case GLFW_KEY_3   : togglePerspective(  0.0f, 90.0f); break;		// 3 -> Top View    (towards negative Z)
+		case GLFW_KEY_4   : togglePerspective(180.0f,  0.0f); break;		// 4 -> Back View   (towards positive X)
+		case GLFW_KEY_5   : togglePerspective( 90.0f,  0.0f); break;		// 5 -> Left View   (towards positive Y)
+		case GLFW_KEY_6   : togglePerspective(  0.0f,-90.0f); break;		// 6 -> Bottom View (towards positive Z)
 
 		// Change Transform Mode
-		case GLFW_KEY_G	  : changeTransformMode(Mode::GRAB); break;			// G -> Grab
-		case GLFW_KEY_S	  : changeTransformMode(Mode::SCALE); break;		// S -> Scale
-		case GLFW_KEY_R   : changeTransformMode(Mode::ROTATE); break; 		// R -> Rotate
-		case GLFW_KEY_E	  : changeTransformMode(Mode::EXTRUDE);	break;		// E -> Extrude
-		case GLFW_KEY_F	  : changeTransformMode(Mode::FILL); break;			// F -> Fill
-		case GLFW_KEY_M   : changeTransformMode(Mode::MERGE); break;		// M -> Merge
+		case GLFW_KEY_G	  : changeTransformMode(Mode::GRAB); break;				// G -> Grab
+		case GLFW_KEY_S	  : changeTransformMode(Mode::SCALE); break;			// S -> Scale
+		case GLFW_KEY_R   : changeTransformMode(Mode::ROTATE); break; 			// R -> Rotate
+		case GLFW_KEY_E	  : changeTransformMode(Mode::EXTRUDE);	break;			// E -> Extrude
+		case GLFW_KEY_F	  : changeTransformMode(Mode::FILL); break;				// F -> Fill
+		case GLFW_KEY_M   : changeTransformMode(Mode::MERGE); break;			// M -> Merge
 
 		// Change Transform SubMode
-		case GLFW_KEY_X   : changeTransformSubMode(SubMode::X);	break; 		// X -> Snap transformation to X direction
-		case GLFW_KEY_Y   : changeTransformSubMode(SubMode::Y);	break;		// Y -> Snap transformation to Y direction
-		case GLFW_KEY_Z   : changeTransformSubMode(SubMode::Z);	break;		// Z -> Snap transformation to Z direction
+		case GLFW_KEY_X   : changeTransformSubMode(SubMode::X);	break; 			// X -> Snap transformation to X direction
+		case GLFW_KEY_Y   : changeTransformSubMode(SubMode::Y);	break;			// Y -> Snap transformation to Y direction
+		case GLFW_KEY_Z   : changeTransformSubMode(SubMode::Z);	break;			// Z -> Snap transformation to Z direction
 
 		default: throw std::invalid_argument("Invalid key");
 	}

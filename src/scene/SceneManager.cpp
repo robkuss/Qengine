@@ -6,12 +6,11 @@
 
 #include <optional>
 #include <algorithm>
-#include <iostream>
 
 
 class SceneManager {
 public:
-	std::vector<std::shared_ptr<Object>> sceneObjects;
+	std::vector<std::shared_ptr<Object>> sceneObjects;		// Scene Objects as shared pointers to prevent object slicing
 	std::optional<Object> selectedObject = std::nullopt;
 
 	// Constructor & Destructor
@@ -25,9 +24,9 @@ public:
 
 	void render(Mode mode, Vector3 camPos) const;
 
-	void addObject(const std::shared_ptr<Object>& obj) { sceneObjects.push_back(obj); }
+	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
-	void selectObject(const std::optional<Object>& obj) { selectedObject = obj; }
+	void selectObject(const std::optional<Object>& obj)   { selectedObject = obj; }
 
 private:
 	MeshRenderer meshRenderer;
