@@ -5,8 +5,6 @@
 #include <iostream>
 
 #include "scene/graphics/Viewport.cpp"
-#include "scene/graphics/MeshRenderer.cpp"
-#include "scene/SceneManager.cpp"
 
 int main() {
     try {

@@ -2,8 +2,6 @@
 #define MESHRENDERER_C
 
 #include "color/Colors.h"
-#include "../../objects/mesh/Mesh.cpp"
-#include "../../math/vector/Vector3.cpp"
 
 #include <GL/gl.h>
 

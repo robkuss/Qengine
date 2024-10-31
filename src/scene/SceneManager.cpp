@@ -1,9 +1,6 @@
 #ifndef SCENEMANAGER_C
 #define SCENEMANAGER_C
 
-#include "../math/vector/Vector3.cpp"
-#include "../objects/Object.h"
-#include "../objects/mesh/Mesh.cpp"
 #include "../objects/mesh/cube/Cube.cpp"
 #include "../scene/graphics/MeshRenderer.cpp"
 

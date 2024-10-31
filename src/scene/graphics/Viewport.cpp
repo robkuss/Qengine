@@ -1,137 +1,16 @@
 #ifndef VIEWPORT_C
 #define VIEWPORT_C
 
-#define GLFW_INCLUDE_GLEXT
-
-#define TEXT	// For on-screen debug text (experimental)
-
 #include <cmath>
 #include <sstream>
 #include <iomanip>
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GLFW/glfw3.h>
+#include "Viewport.h"
 
-#include "../../Qengine.cpp"
-#include "../SceneManager.cpp"
-#include "../../Mode.h"
-#include "../../math/ray/Ray.cpp"
-#include "../../math/vector/Vector4.cpp"
 #include "../../math/matrix/Matrix4x4.cpp"
 
-#ifdef TEXT
-	#include "../../ui/text/Text.cpp"
-#endif
+constexpr double M_PI = 3.14159265358979323846;	// Because for some reason there is no Pi in cmath
 
-// Constants
-const auto CAMERA_POSITION_INIT			= Vector3(10, 0, 0);			// Default camera position
-const float CAMERA_DISTANCE_INIT		= CAMERA_POSITION_INIT.length();	// Camera distance from the origin
-const auto LOOK_AT_POINT_INIT			= Vector3(0, 0, 0);			// Default: Looking at origin
-const auto UP_VECTOR_INIT				= Vector3(0, 0, 1);			// Default: Up direction is positive Z
-
-constexpr double M_PI					= 3.14159265358979323846;
-
-constexpr float CAMERA_DISTANCE_MIN		= 0.02f;
-constexpr float CAMERA_DISTANCE_MAX		= 10000.0f;
-constexpr float Z_NEAR					= CAMERA_DISTANCE_MIN / 2;			// Near Clipping Plane: The distance from the camera to the near clipping plane. Objects closer than this distance are not rendered.
-constexpr float Z_FAR					= CAMERA_DISTANCE_MAX * 2;			//  Far Clipping Plane: The distance from the camera to the far clipping plane. Objects further than this distance are not rendered.
-constexpr float FOV_Y					= 45.0f;							// Field of View in Y dimension
-constexpr float ZOOM_SENSITIVITY		= 2.0f;
-constexpr float AXES_LENGTH				= 100.0f;
-constexpr float MOUSE_RAY_LENGTH		= 1000.0f;
-
-constexpr int ANTIALIASING_SAMPLES		= 10;
-
-
-class Viewport {
-public:
-	explicit Viewport(const std::string &title, int width, int height, const SceneManager& sceneManager);
-	~Viewport();
-
-	void setCallbacks(GLFWwindow* window);
-
-	void start();
-	void render();
-
-	void centerWindow() const;
-	void windowResize(int newW, int newH);
-
-	void select();
-	void initRotation(bool isRotating);
-	void transform(double mouseX, double mouseY);
-	void zoom(double yoffset);
-	void togglePerspective(float h, float v);
-
-	void toggleViewportMode();
-	void changeTransformMode(Mode::ModeEnum mode);
-	void changeTransformSubMode(SubMode subMode);
-
-	void onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
-
-private:
-	GLFWwindow* window;
-	std::string title;
-	int width, height;
-	float aspect;
-	SceneManager sceneManager;
-
-	// Mode
-	Mode viewportMode		= OBJECT;
-	Mode transformMode		= NONE;
-
-	// Initial values
-	Vector3 cameraPosition	= CAMERA_POSITION_INIT;
-	Vector3 lookAt			= LOOK_AT_POINT_INIT;
-	Vector3 up				= UP_VECTOR_INIT;
-	float cameraDistance	= CAMERA_DISTANCE_INIT;
-	float zoomSpeed			= 1.0f;
-	float fontScale			= 0.5f;
-
-	// Variables for camera rotation
-	bool rotating			= false;
-	double rotSensitivity	= 0.5;
-	double rotH				= 0.0;
-	double rotV				= 0.0;
-	double lastH			= 0.0;
-	double lastV			= 0.0;
-
-	// Variables for object transformation
-	Vector3 transformation	= Vector3::ZERO;
-	Vector3 lastTransform	= transformation;
-
-	// Mouse Ray
-	Vector3 rayStart        = Vector3(-1, -1, -1);
-	Vector3 rayEnd          = Vector3( 1,  1,  1);
-
-	// FPS tracking
-	double previousTime = 0.0;
-	int frameCount = 0;
-	int fps = 0;
-
-	// "Pointers" - Shared resources for viewport state used mainly by the OpenGL library
-	int* viewport			= new int[4];
-	float* projectionMatrix = new float[16];
-	float* viewMatrix		= new float[16];
-	double* mouseX			= new double[1];
-	double* mouseY			= new double[1];
-
-	// Functions
-	void gluPerspective() const;
-	static void gluLookAt(Vector3 eye, Vector3 center, Vector3 up);
-	void updateCameraPosition();
-
-	[[nodiscard]] Vector3 screenToWorld(double mouseX, double mouseY, float depth) const;
-	Ray getMouseRay(double mouseX, double mouseY);
-	void handleSelection(double selectX, double selectY);
-
-	static void drawAxes();
-	static void drawGrid();
-	void drawMouseRay() const;
-	void drawOnScreenText() const;
-
-	void getFPS();
-};
 
 Viewport::Viewport(const std::string &title, const int width, const int height, const SceneManager& sceneManager)
 		: title(title), width(width), height(height), sceneManager(sceneManager) {
@@ -163,10 +42,10 @@ Viewport::Viewport(const std::string &title, const int width, const int height, 
 	setCallbacks(window);
 
 	// OpenGL setup
-	glEnable(GL_DEPTH_TEST);	// Enable depth testing
-	glEnable(GL_MULTISAMPLE);	// Enable multi-sampling (antialiasing)
+	glEnable(GL_DEPTH_TEST); // Enable depth testing
+	glEnable(GL_MULTISAMPLE); // Enable multi-sampling (antialiasing)
 
-	glfwSwapInterval(0);			// Enable v-sync
+	glfwSwapInterval(0); // Enable v-sync
 
 	aspect = static_cast<float>(width) / static_cast<float>(height);
 }
@@ -182,7 +61,7 @@ Viewport::~Viewport() {
 }
 
 void Viewport::start() {
-	// Initialize matrices
+	// Init matrices
 	gluPerspective();				// Initialize projection matrix
 	gluLookAt(						// Initialize modelview matrix
 		cameraPosition,
@@ -681,28 +560,28 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
 	if (action != GLFW_PRESS) return;
 	switch (key) {
-		case GLFW_KEY_TAB : toggleViewportMode();					// TAB -> Toggle Object/Edit Mode
+		case GLFW_KEY_TAB : toggleViewportMode(); break;					// TAB -> Toggle Object/Edit Mode
 
 		// Number keys for perspective toggling
-		case GLFW_KEY_1	  : togglePerspective(  0,  0);			// 1 -> Front View  (towards negative X)
-		case GLFW_KEY_2   : togglePerspective(-90,  0);			// 2 -> Right View  (towards negative Y)
-		case GLFW_KEY_3   : togglePerspective(  0, 90);			// 3 -> Top View    (towards negative Z)
-		case GLFW_KEY_4   : togglePerspective(180,  0);			// 4 -> Back View   (towards positive X)
-		case GLFW_KEY_5   : togglePerspective( 90,  0);			// 5 -> Left View   (towards positive Y)
-		case GLFW_KEY_6   : togglePerspective(  0,-90);			// 6 -> Bottom View (towards positive Z)
+		case GLFW_KEY_1	  : togglePerspective(  0,  0);	break;			// 1 -> Front View  (towards negative X)
+		case GLFW_KEY_2   : togglePerspective(-90,  0);	break;			// 2 -> Right View  (towards negative Y)
+		case GLFW_KEY_3   : togglePerspective(  0, 90);	break;			// 3 -> Top View    (towards negative Z)
+		case GLFW_KEY_4   : togglePerspective(180,  0);	break;			// 4 -> Back View   (towards positive X)
+		case GLFW_KEY_5   : togglePerspective( 90,  0);	break;			// 5 -> Left View   (towards positive Y)
+		case GLFW_KEY_6   : togglePerspective(  0,-90);	break;			// 6 -> Bottom View (towards positive Z)
 
 		// Change Transform Mode
-		case GLFW_KEY_G	  : changeTransformMode(Mode::GRAB);		// G -> Grab
-		case GLFW_KEY_S	  : changeTransformMode(Mode::SCALE);		// S -> Scale
-		case GLFW_KEY_R   : changeTransformMode(Mode::ROTATE);  	// R -> Rotate
-		case GLFW_KEY_E	  : changeTransformMode(Mode::EXTRUDE);		// E -> Extrude
-		case GLFW_KEY_F	  : changeTransformMode(Mode::FILL);		// F -> Fill
-		case GLFW_KEY_M   : changeTransformMode(Mode::MERGE);		// M -> Merge
+		case GLFW_KEY_G	  : changeTransformMode(Mode::GRAB); break;			// G -> Grab
+		case GLFW_KEY_S	  : changeTransformMode(Mode::SCALE); break;		// S -> Scale
+		case GLFW_KEY_R   : changeTransformMode(Mode::ROTATE); break; 		// R -> Rotate
+		case GLFW_KEY_E	  : changeTransformMode(Mode::EXTRUDE);	break;		// E -> Extrude
+		case GLFW_KEY_F	  : changeTransformMode(Mode::FILL); break;			// F -> Fill
+		case GLFW_KEY_M   : changeTransformMode(Mode::MERGE); break;		// M -> Merge
 
 		// Change Transform SubMode
-		case GLFW_KEY_X   : changeTransformSubMode(SubMode::X);		// X -> Snap transformation to X direction
-		case GLFW_KEY_Y   : changeTransformSubMode(SubMode::Y);		// Y -> Snap transformation to Y direction
-		case GLFW_KEY_Z   : changeTransformSubMode(SubMode::Z);		// Z -> Snap transformation to Z direction
+		case GLFW_KEY_X   : changeTransformSubMode(SubMode::X);	break; 		// X -> Snap transformation to X direction
+		case GLFW_KEY_Y   : changeTransformSubMode(SubMode::Y);	break;		// Y -> Snap transformation to Y direction
+		case GLFW_KEY_Z   : changeTransformSubMode(SubMode::Z);	break;		// Z -> Snap transformation to Z direction
 
 		default: throw std::invalid_argument("Invalid key");
 	}
