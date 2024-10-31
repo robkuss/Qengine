@@ -3,8 +3,6 @@
 
 #define GLFW_INCLUDE_GLEXT
 
-#define TEXT	// For on-screen debug text (experimental)
-
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -13,11 +11,12 @@
 #include "../../math/ray/Ray.cpp"
 
 // Options
+#define TEXT	// For on-screen debug text
 #ifdef TEXT
 	#include "../../ui/text/Text.cpp"
 #endif
-
 //#define DRAW_MOUSE_RAY
+
 
 // Constants
 const auto CAMERA_POSITION_INIT			= Vector3(10, 0, 0);			// Default camera position
@@ -98,9 +97,9 @@ private:
 	Vector3 rayEnd          = Vector3( 1,  1,  1);
 
 	// FPS tracking
-	double previousTime = 0.0;
-	int frameCount = 0;
-	int fps = 0;
+	double previousTime		= 0.0;
+	int frameCount			= 0;
+	int fps					= 0;
 
 	// "Pointers" - Shared resources for viewport state used mainly by the OpenGL library
 	int* viewport			= new int[4];
