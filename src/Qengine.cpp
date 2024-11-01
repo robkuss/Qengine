@@ -8,12 +8,8 @@
 
 int main() {
     try {
-        // Initialize Mesh Renderer, Scene Manager and Viewport
-        const auto sceneManager     = SceneManager();
-        auto viewport               = Viewport("Qengine", 1920, 1080, sceneManager);
-
-        viewport.start();
-
+        // Initialize and start Viewport
+        Viewport("Qengine", 1920, 1080, SceneManager()).start();
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
