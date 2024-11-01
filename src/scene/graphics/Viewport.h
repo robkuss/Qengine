@@ -68,6 +68,8 @@ private:
 	float aspect;
 	SceneManager sceneManager;
 
+	Text* text{};				// For on-screen debug text
+
 	// Mode
 	Mode viewportMode		= OBJECT;
 	Mode transformMode		= NONE;
@@ -78,11 +80,10 @@ private:
 	Vector3 up				= UP_VECTOR_INIT;
 	float cameraDistance	= CAMERA_DISTANCE_INIT;
 	float zoomSpeed			= 1.0f;
-	float fontScale			= 0.5f;
 
 	// Variables for camera rotation
 	bool rotating			= false;
-	double rotSensitivity	= 0.5;
+	double rotSens			= 0.5;
 	double rotH				= 0.0;
 	double rotV				= 0.0;
 	double lastH			= 0.0;
@@ -91,10 +92,11 @@ private:
 	// Variables for object transformation
 	Vector3 transformation	= Vector3::ZERO;
 	Vector3 lastTransform	= transformation;
+	float scalingSens		= 1.0f;
 
 	// Mouse Ray
-	Vector3 rayStart        = Vector3(-1, -1, -1);
-	Vector3 rayEnd          = Vector3( 1,  1,  1);
+	Vector3 rayStart        = Vector3::MINUS_ONE;
+	Vector3 rayEnd          = Vector3::ONE;
 
 	// FPS tracking
 	double previousTime		= 0.0;

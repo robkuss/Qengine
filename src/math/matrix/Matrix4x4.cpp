@@ -1,7 +1,6 @@
 #ifndef MATRIX4X4_C
 #define MATRIX4X4_C
 
-#include <cmath>
 #include <array>
 #include <stdexcept>
 
@@ -93,7 +92,7 @@ Matrix4x4 Matrix4x4::invert() const {
 	// Calculate the determinant
 	float det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
 
-	if (det == 0) throw std::runtime_error("Matrix is singular and cannot be inverted.");
+	if (det > -EPSILON && det < EPSILON) throw std::runtime_error("Matrix is singular and cannot be inverted.");
 
 	det = 1.0f / det;
 

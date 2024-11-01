@@ -14,6 +14,7 @@ public:
 	// Static constants
 	static const Vector3 ZERO;
 	static const Vector3 ONE;
+	static const Vector3 MINUS_ONE;
 
 	// Check equality
 	bool operator==(const Vector3& other) const {
@@ -85,7 +86,8 @@ public:
 	}
 };
 
-inline const Vector3 Vector3::ZERO = Vector3(0, 0, 0);
-inline const Vector3 Vector3::ONE  = Vector3(1, 1, 1);
+inline const Vector3 Vector3::ZERO		= Vector3(0.0f, 0.0f, 0.0f);
+inline const Vector3 Vector3::ONE		= Vector3(1.0f, 1.0f, 1.0f);
+inline const Vector3 Vector3::MINUS_ONE	= Vector3(-1.0f, -1.0f, -1.0f);
 
 #endif // VECTOR3_C

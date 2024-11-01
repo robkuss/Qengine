@@ -4,7 +4,6 @@
 #include <iostream>
 #include <map>
 #include <fstream>
-#include <string>
 
 #include <GL/glew.h>
 #include <ft2build.h>
@@ -12,12 +11,6 @@
 
 #include "../../scene/graphics/color/Color.h"
 
-inline auto fontPath = "C:/Users/rober/OneDrive/Qengine/Qengine/resources/fonts/cour.ttf";
-constexpr int fontSize = 48;
-
-constexpr float firstLineX = 10.0f;
-constexpr float firstLineY = 45.0f;
-constexpr float lineSpacing = 1.2f;
 
 // Define a struct to represent each character glyph (similar to Kotlin's Character class)
 struct Character {
@@ -27,13 +20,42 @@ struct Character {
 	FT_Pos advance;			    // Offset to advance to next glyph
 };
 
-inline FT_Library library;
-inline FT_Face font;
-inline GLuint fontTexture;
-inline std::map<char, Character> characters;
+class Text {
+public:
+    static constexpr float firstLineX = 10.0f;
+    static constexpr float firstLineY = 45.0f;
+    static constexpr float bottomLineY = 10.0f;
+    static constexpr float lineSpacing = 1.2f;
+    static constexpr float fontScale = 0.5f;
+    std::string nonFatalErrorText;
+
+    double errorTime = 0.0;
+
+    Text();
+    ~Text();
+
+    void initFreeType();
+    void renderText(const char *text, float x, float y, int windowW, int windowH, Color color);
+    void setErrorText(const std::string& text);
+    void drawErrorText(int windowW, int windowH);
+
+    static float line(int lineNumber);
+
+private:
+    static constexpr auto fontPath = "C:/Users/rober/OneDrive/Qengine/Qengine/resources/fonts/cour.ttf";
+    static constexpr int fontSize = 48;
+
+    FT_Library library{};
+    FT_Face font{};
+    GLuint fontTexture{};
+    std::map<char, Character> characters;
+
+    std::atomic<bool> errorTimerRunning = false;
+};
+
 
 // Function to initialize FreeType and load the font
-inline void initFreeType() {
+inline Text::Text() {
     // Initialize the FreeType library
     if (FT_Init_FreeType(&library)) {
         std::cerr << "ERROR: Could not initialize FreeType library" << std::endl;
@@ -94,7 +116,7 @@ inline void initFreeType() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-inline void fontCleanup() {
+inline Text::~Text() {
     if (font) {
         FT_Done_Face(font);
         font = nullptr;     // Optional: set to nullptr to avoid dangling pointer
@@ -110,8 +132,9 @@ inline void fontCleanup() {
     }
 }
 
+
 /** Line number to screen coordinates */
-inline float line(const int lineNumber, const float fontScale) {
+inline float Text::line(const int lineNumber) {
     return firstLineY * fontScale + static_cast<float>(lineNumber) * fontSize * fontScale * lineSpacing;
 }
 
@@ -119,13 +142,12 @@ inline float line(const int lineNumber, const float fontScale) {
  * Draw UI Text somewhere on the screen
  * @param text the String that will be rendered to the screen
  * @param x the x position in screen coordinates where the text will be drawn
- * @param lineNum the y position, represented as an Integer line number
- * @param scale scaling factor for the text. It will be drawn with font size [fontSize] * [scale]
+ * @param y the y position in screen coordinates where the text will be drawn
  * @param windowW the width of the window
  * @param windowH the height of the window
  * @param color the color that the text will be drawn in
  */
-inline void renderText(const char* text, const float x, const int lineNum, const float scale, const int windowW, const int windowH, const Color color) {
+inline void Text::renderText(const char* text, const float x, const float y, const int windowW, const int windowH, const Color color) {
     // Save the current matrix state (3D perspective matrix)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -146,8 +168,8 @@ inline void renderText(const char* text, const float x, const int lineNum, const
     color3f(color);
 
     // Move to the position where the text should be drawn
-    glTranslatef(x, line(lineNum, scale), 0.0f);
-    glScalef(scale, scale, 1.0f);
+    glTranslatef(x, y, 0.0f);
+    glScalef(fontScale, fontScale, 1.0f);
 
     // Render the text character by character
     for (int i = 0; text[i] != '\0'; ++i) {
@@ -158,9 +180,7 @@ inline void renderText(const char* text, const float x, const int lineNum, const
 
         // Correct kerning by considering the glyph's bearing.x
         const auto xpos = static_cast<float>(bearingX);
-        const auto ypos = c == '-'
-            ? static_cast<float>(-bearingY)
-            : 0.0f;
+        const auto ypos = static_cast<float>(sizeY - bearingY);
 
         // Bind the character's texture
         glBindTexture(GL_TEXTURE_2D, textureID);
@@ -200,5 +220,31 @@ inline void renderText(const char* text, const float x, const int lineNum, const
     // Switch back to the model view matrix
     glMatrixMode(GL_MODELVIEW);
 }
+
+/**
+ * Set a non-fatal error text to be displayed at the bottom of the screen.
+ * The text will disappear after 3 seconds.
+ */
+inline void Text::setErrorText(const std::string& text) {
+    nonFatalErrorText = text;
+
+    if (!errorTimerRunning) {
+        errorTimerRunning = true;
+
+        // Launch a thread to reset the errorText after 3 seconds
+        std::thread([this]() {
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            nonFatalErrorText = "";
+            errorTimerRunning = false;
+        }).detach(); // Detach the thread so it runs independently
+    }
+}
+
+/** Draw a non-fatal error text at the bottom of the screen */
+inline void Text::drawErrorText(const int windowW, const int windowH) {
+    if (!nonFatalErrorText.empty())
+        renderText(nonFatalErrorText.c_str(), firstLineX, static_cast<float>(windowH) - bottomLineY, windowW, windowH, RED);
+}
+
 
 #endif // TEXT_C

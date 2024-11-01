@@ -53,12 +53,13 @@ inline void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 t
 		}
 		case Mode::SCALE : {
 			const Vector3 oldScale = scale;
-			scale = scale * transformation;
+			scale = transformation;
 
 			// Apply scaling to each vertex based on the new scale
 			for (Vector3& vertex : vertices) {
 				vertex = (vertex - position) * (scale / oldScale) + position;
 			}
+			break;
 		}
 		case Mode::ROTATE : {
 			rotation = rotation + transformation;
@@ -98,6 +99,7 @@ inline void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 t
 				// Translate back to the original position
 				vertex = tmp + position;
 			}
+			break;
 		}
 		default : { /* TODO("Not yet implemented") */ }
 	}

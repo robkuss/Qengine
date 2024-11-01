@@ -8,6 +8,7 @@
 #include "Viewport.h"
 
 #include "../../math/matrix/Matrix4x4.cpp"
+#include "../../math/vector/Vector2.cpp"
 
 constexpr double M_PI = 3.14159265358979323846;	// Because for some reason there is no Pi in cmath
 
@@ -56,7 +57,7 @@ Viewport::~Viewport() {
 	glfwTerminate();
 
 	#ifdef TEXT
-		fontCleanup();
+		text->~Text();
 	#endif
 }
 
@@ -70,12 +71,17 @@ void Viewport::start() {
 	);
 
 	#ifdef TEXT
-		initFreeType();				// Initialize FreeType for on-screen debug text
+		text = new Text();			// Initialize FreeType for on-screen debug text
 	#endif
 
 	// Start rendering the Viewport
 	while (!glfwWindowShouldClose(window)) {
 		render();
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+
+		getFPS();
 	}
 }
 
@@ -98,12 +104,10 @@ void Viewport::render() {
 		drawMouseRay();
 	#endif
 
-	drawOnScreenText();
-
-	glfwSwapBuffers(window);
-	glfwPollEvents();
-
-	getFPS();
+	#ifdef TEXT
+		drawOnScreenText();
+		text->drawErrorText(width, height);
+	#endif
 }
 
 void Viewport::getFPS() {
@@ -128,30 +132,28 @@ void Viewport::centerWindow() const {
 }
 
 void Viewport::drawOnScreenText() const {
-	#ifdef TEXT
-		const auto cube = *sceneManager.sceneObjects[0];
-		const auto mouseWorld = screenToWorld(mouseX[0], mouseY[0], 0.0f);
-		for (int i = 0; i <= 11; i++) {
-			std::ostringstream text;
-			switch (i) {
-				case 0:  text << "FPS: " << fps; break;
-				case 1:  text << "Camera Pos: " << std::fixed << std::setprecision(3) << cameraPosition.x << " " << cameraPosition.y << " " << cameraPosition.z; break;
-				case 2:  text << "Camera Rot: " << std::fixed << std::setprecision(1) << rotH << " / " << rotV; break;
-				case 3:  text << "Zoom: " << std::fixed << std::setprecision(3) << cameraDistance; break;
-				case 4:  text << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
-				case 5:  text << "Mouse World: "  << std::fixed << std::setprecision(3) << mouseWorld.x << " " << mouseWorld.y << " " << mouseWorld.z; break;
-				case 6:	 text << "Mode: " << modeToString(viewportMode.mode);
-							  if (transformMode.mode    != Mode::NONE)	  text << " "  << modeToString(transformMode.mode);
-							  if (transformMode.subMode != SubMode::NONE) text << " "  << subModeToString(transformMode.subMode); break;
-				case 7:  text << "Transform: " << std::fixed << std::setprecision(3) << transformation.x << " " << transformation.y << " " << transformation.z; break;
-				case 8:  text << "Cube:"; break;
-				case 9:  text << "    Pos: "   << std::fixed << std::setprecision(3) << cube.position.x  << " " << cube.position.y  << " " << cube.position.z;  break;
-				case 10: text << "    Scale: " << std::fixed << std::setprecision(3) << cube.scale.x     << " " << cube.scale.y     << " " << cube.scale.z;     break;
-				default: text << "    Rot: "   << std::fixed << std::setprecision(3) << cube.rotation.x  << " " << cube.rotation.y  << " " << cube.rotation.z;  break;
-			}
-			renderText(text.str().c_str(), firstLineX, i, fontScale, width, height, TEXT_COLOR);
+	const auto cube = *sceneManager.sceneObjects[0];
+	const auto mouseWorld = screenToWorld(mouseX[0], mouseY[0], 0.0f);
+	for (int i = 0; i <= 11; i++) {
+		std::ostringstream out;
+		switch (i) {
+			case 0:  out << "FPS: " << fps; break;
+			case 1:  out << "Camera Pos: " << std::fixed << std::setprecision(3) << cameraPosition.x << " " << cameraPosition.y << " " << cameraPosition.z; break;
+			case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << rotH << " / " << rotV; break;
+			case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << cameraDistance; break;
+			case 4:  out << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
+			case 5:  out << "Mouse World: "  << std::fixed << std::setprecision(3) << mouseWorld.x << " " << mouseWorld.y << " " << mouseWorld.z; break;
+			case 6:	 out << "Mode: " << modeToString(viewportMode.mode);
+				if (transformMode.mode    != Mode::NONE)	out << " " << modeToString(transformMode.mode);
+				if (transformMode.subMode != SubMode::NONE) out << " " << subModeToString(transformMode.subMode); break;
+			case 7:  out << "Transform: " << std::fixed << std::setprecision(3) << transformation.x << " " << transformation.y << " " << transformation.z; break;
+			case 8:  out << "Cube:"; break;
+			case 9:  out << "    Pos: "   << std::fixed << std::setprecision(3) << cube.position.x  << " " << cube.position.y  << " " << cube.position.z;  break;
+			case 10: out << "    Scale: " << std::fixed << std::setprecision(3) << cube.scale.x     << " " << cube.scale.y     << " " << cube.scale.z;     break;
+			default: out << "    Rot: "   << std::fixed << std::setprecision(3) << cube.rotation.x  << " " << cube.rotation.y  << " " << cube.rotation.z;  break;
 		}
-	#endif
+		text->renderText(out.str().c_str(), Text::firstLineX, Text::line(i), width, height, TEXT_COLOR);
+	}
 }
 
 /**
@@ -251,22 +253,35 @@ void Viewport::initRotation(const bool isRotating) {
 void Viewport::transform(const double mouseX, const double mouseY) {
 	glfwGetCursorPos(window, this->mouseX, this->mouseY);
 
-	switch (transformMode.mode) {
-		case Mode::NONE: {
-			if (rotating) {
-				const double dx = mouseX - lastH;
-				const double dy = mouseY - lastV;
-				rotH = fmod(rotH + dx * rotSensitivity, 360.0);  // Adjust horizontal rotation
-				rotV = fmod(rotV + dy * rotSensitivity, 360.0);  // Adjust vertical rotation
-				lastH = mouseX;
-				lastV = mouseY;
+	if (transformMode.mode == Mode::NONE) {
+		if (rotating) {
+			const double dx = mouseX - lastH;
+			const double dy = mouseY - lastV;
+			rotH = fmod(rotH + dx * rotSens, 360.0);  // Adjust horizontal rotation
+			rotV = fmod(rotV + dy * rotSens, 360.0);  // Adjust vertical rotation
+			lastH = mouseX;
+			lastV = mouseY;
 
-				// Apply camera rotation
-				updateCameraPosition();
-				gluLookAt(cameraPosition, lookAt, up);
-			}
-			break;
+			// Apply camera rotation
+			updateCameraPosition();
+			gluLookAt(cameraPosition, lookAt, up);
 		}
+		return;
+	}
+
+	// Get the selected Object
+	const auto obj = sceneManager.selectedObject.get();
+	if (!obj) {
+		text->setErrorText("No object selected.");
+		return;
+	}
+	const auto mesh = dynamic_cast<Mesh*>(obj);
+	if (!mesh) {
+		text->setErrorText("Selected Object is not a Mesh.");
+		return;
+	}
+
+	switch (transformMode.mode) {
 		case Mode::GRAB: {
 			const Vector3 worldPos = screenToWorld(mouseX, mouseY, 0);	// Ray from the mouse position
 
@@ -280,31 +295,33 @@ void Viewport::transform(const double mouseX, const double mouseY) {
 				case SubMode::Z: wpDirectional = Vector3(0, 0, worldPos.z); break;
 			}
 
-			if (const auto mesh = dynamic_cast<Mesh*>(sceneManager.selectedObject.get())) {
-				const float grabZ = (mesh->position - cameraPosition).length();									// Distance of the object from the camera
-				lastTransform  = lastTransform == Vector3::ZERO ? wpDirectional : lastTransform;				// Ensure last transformation is non-zero
-				transformation = (wpDirectional - lastTransform) * grabZ;										// Calculate transformation vector
-				mesh->applyTransformation(transformMode.mode, transformation);
-				lastTransform  = wpDirectional;
-			} else throw std::runtime_error("Error: selected Object is not a Mesh.");
+			const float grabZ = (mesh->position - cameraPosition).length();						// Get distance of the object from the camera
+			lastTransform  = lastTransform == Vector3::ZERO ? wpDirectional : lastTransform;	// Ensure last transformation is non-zero
+			transformation = (wpDirectional - lastTransform) * grabZ;							// Calculate transformation vector
+			mesh->applyTransformation(transformMode.mode, transformation);						// Apply transformation
+			lastTransform  = wpDirectional;
 			break;
 		}
 		case Mode::SCALE: {
-			throw std::runtime_error("Scaling is not yet implemented.");
+			const auto screenCenter = Vector2(static_cast<float>(width) / 2, static_cast<float>(height) / 2);
+			const auto mousePos = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+			const float scale = screenCenter.distance(mousePos) / 100.0f;
+			mesh->applyTransformation(transformMode.mode, Vector3(scale, scale, scale));
+			break;
 		}
 		case Mode::ROTATE: {
-			throw std::runtime_error("Rotating is not yet implemented.");
+			return;
 		}
 		case Mode::EXTRUDE: {
-			throw std::runtime_error("Extruding is not yet implemented.");
+			return;
 		}
 		case Mode::FILL: {
-			throw std::runtime_error("Filling is not yet implemented.");
+			return;
 		}
 		case Mode::MERGE: {
-			throw std::runtime_error("Merge is not yet implemented.");
+			return;
 		}
-		default: throw std::runtime_error("Wrong transform mode.");
+		default: text->setErrorText("Error: Invalid transform mode.");
 	}
 }
 
@@ -591,17 +608,29 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 		// Change Transform Mode
 		case GLFW_KEY_G	  : changeTransformMode(Mode::GRAB); break;				// G -> Grab
 		case GLFW_KEY_S	  : changeTransformMode(Mode::SCALE); break;			// S -> Scale
-		case GLFW_KEY_R   : changeTransformMode(Mode::ROTATE); break; 			// R -> Rotate
-		case GLFW_KEY_E	  : changeTransformMode(Mode::EXTRUDE);	break;			// E -> Extrude
-		case GLFW_KEY_F	  : changeTransformMode(Mode::FILL); break;				// F -> Fill
-		case GLFW_KEY_M   : changeTransformMode(Mode::MERGE); break;			// M -> Merge
+		case GLFW_KEY_R   : {													// R -> Rotate
+			changeTransformMode(Mode::ROTATE);
+			text->setErrorText("Rotating is not yet implemented."); break;
+		}
+		case GLFW_KEY_E	  : {													// E -> Extrude
+			changeTransformMode(Mode::EXTRUDE);
+			text->setErrorText("Extruding is not yet implemented."); break;
+		}
+		case GLFW_KEY_F	  : {													// F -> Fill
+			changeTransformMode(Mode::FILL);
+			text->setErrorText("Filling is not yet implemented."); break;
+		}
+		case GLFW_KEY_M   : {													// M -> Merge
+			changeTransformMode(Mode::MERGE);
+			text->setErrorText("Merging is not yet implemented."); break;
+		}
 
 		// Change Transform SubMode
 		case GLFW_KEY_X   : changeTransformSubMode(SubMode::X);	break; 			// X -> Snap transformation to X direction
 		case GLFW_KEY_Y   : changeTransformSubMode(SubMode::Y);	break;			// Y -> Snap transformation to Y direction
 		case GLFW_KEY_Z   : changeTransformSubMode(SubMode::Z);	break;			// Z -> Snap transformation to Z direction
 
-		default: throw std::invalid_argument("Invalid key");
+		default: text->setErrorText("Invalid key.");
 	}
 }
 
