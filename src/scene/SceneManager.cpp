@@ -4,7 +4,6 @@
 #include "../objects/mesh/cube/Cube.cpp"
 #include "../scene/graphics/MeshRenderer.cpp"
 
-#include <optional>
 #include <algorithm>
 
 
@@ -14,7 +13,7 @@ public:
 	std::shared_ptr<Object> selectedObject = nullptr;
 
 	// Constructor & Destructor
-	explicit SceneManager(const MeshRenderer meshRenderer) : meshRenderer(meshRenderer) {
+	explicit SceneManager() {
 		// Add Default Cube to scene
 		addObject(
 			std::make_shared<Cube>("Cube", Vector3(.5f, .5f, .5f), 1.0f)
@@ -27,9 +26,6 @@ public:
 	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
 	void selectObject(const std::shared_ptr<Object>& obj) { selectedObject = obj; }
-
-private:
-	MeshRenderer meshRenderer;
 };
 
 inline void SceneManager::render(const Mode mode, const Vector3 camPos) const {

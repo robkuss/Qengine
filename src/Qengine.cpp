@@ -9,8 +9,7 @@
 int main() {
     try {
         // Initialize Mesh Renderer, Scene Manager and Viewport
-        constexpr auto meshRenderer = MeshRenderer();
-        const auto sceneManager     = SceneManager(meshRenderer);
+        const auto sceneManager     = SceneManager();
         auto viewport               = Viewport("Qengine", 1920, 1080, sceneManager);
 
         viewport.start();
