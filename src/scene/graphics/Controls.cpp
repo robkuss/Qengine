@@ -43,9 +43,13 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	});
 
 	// Cursor position callback
-	glfwSetCursorPosCallback(window, [](GLFWwindow* cbWindow, const double xPos, const double yPos) {
-		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow)))
-			vp->transform(xPos, yPos);
+	glfwSetCursorPosCallback(window, [](GLFWwindow* cbWindow, const double mouseX, const double mouseY) {
+		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
+			vp->updateMousePosition();
+			if (vp->transformMode.mode == Mode::NONE) {
+				if (vp->rotating) vp->rotate(mouseX, mouseY);
+			} else vp->transform(mouseX, mouseY);
+		}
 	});
 
 	// Mouse scroll callback

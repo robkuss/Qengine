@@ -49,15 +49,19 @@ public:
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
 
+	void updateMousePosition() const;
+
 	void select();
 	void initRotation(bool isRotating);
-	void transform(double mouseX, double mouseY);
+	void rotate(double mouseX, double mouseY);
 	void zoom(double yoffset);
 	void togglePerspective(float h, float v);
 
 	void toggleViewportMode();
 	void changeTransformMode(Mode::ModeEnum mode);
 	void changeTransformSubMode(SubMode subMode);
+
+	void transform(double mouseX, double mouseY);
 
 	void onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
 

@@ -243,17 +243,17 @@ void Viewport::windowResize(const int newW, const int newH) {
 void Viewport::select() {
 	const Ray ray = getMouseRay(mouseX[0], mouseY[0]);
 
-#ifdef DRAW_MOUSE_RAY
-	// Update the visual Mouse Ray
-	const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
-	rayStart = ray.origin;
-	rayEnd   = ray.origin + directionScaled;
-#endif
+	#ifdef DRAW_MOUSE_RAY
+		// Update the visual Mouse Ray
+		const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
+		rayStart = ray.origin;
+		rayEnd   = ray.origin + directionScaled;
+	#endif
 
+	// Find Objects that intersect with the Mouse Ray
 	std::vector<std::shared_ptr<Object>> intersectingObjects;
 	intersectingObjects.reserve(sceneManager.sceneObjects.size());
 
-	// Find Objects that intersect with the Mouse Ray
 	for (const auto& objPtr : sceneManager.sceneObjects) {
 		// Attempt to cast Object to Mesh using dynamic_cast
 		if (const auto meshPtr = dynamic_cast<Mesh*>(objPtr.get())) {
@@ -263,8 +263,8 @@ void Viewport::select() {
 		} else throw std::runtime_error("Selected Object is not a Mesh!");
 	}
 
+	// Select the Object that's closest to the ray origin (the camera)
 	if (!intersectingObjects.empty()) {
-		// Select the Object that's closest to the ray origin (the camera)
 		sceneManager.selectObject(
 			*std::ranges::min_element(
 				intersectingObjects,
@@ -275,6 +275,7 @@ void Viewport::select() {
 		);
 	} else sceneManager.selectObject(nullptr);	// No Object selected
 
+	// When transforming an Object, clicking applies the transformation
 	if (transformMode.mode != Mode::NONE) {
 		transformation		  = Vector3::ZERO;	// Reset transformation vector
 		lastTransform		  = Vector3::ZERO;
@@ -291,25 +292,24 @@ void Viewport::initRotation(const bool isRotating) {
 	}
 }
 
-void Viewport::transform(const double mouseX, const double mouseY) {
+void Viewport::updateMousePosition() const {
 	glfwGetCursorPos(window, this->mouseX, this->mouseY);
+}
 
-	if (transformMode.mode == Mode::NONE) {
-		if (rotating) {
-			const double dx = mouseX - lastH;
-			const double dy = mouseY - lastV;
-			rotH = fmod(rotH + dx * rotSens, 360.0);  // Adjust horizontal rotation
-			rotV = fmod(rotV + dy * rotSens, 360.0);  // Adjust vertical rotation
-			lastH = mouseX;
-			lastV = mouseY;
+void Viewport::rotate(const double mouseX, const double mouseY) {
+	const double dx = mouseX - lastH;
+	const double dy = mouseY - lastV;
+	rotH = fmod(rotH + dx * rotSens, 360.0);  // Adjust horizontal rotation
+	rotV = fmod(rotV + dy * rotSens, 360.0);  // Adjust vertical rotation
+	lastH = mouseX;
+	lastV = mouseY;
 
-			// Apply camera rotation
-			updateCameraPosition();
-			gluLookAt(cameraPosition, lookAt, up);
-		}
-		return;
-	}
+	// Apply camera rotation
+	updateCameraPosition();
+	gluLookAt(cameraPosition, lookAt, up);
+}
 
+void Viewport::transform(const double mouseX, const double mouseY) {
 	// Get the selected Object
 	const auto obj = sceneManager.selectedObject.get();
 	if (!obj) {
