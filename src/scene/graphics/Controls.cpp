@@ -50,7 +50,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 			if (vp->sceneManager.transformMode.mode == Mode::NONE) {
 				if (vp->rotating) vp->rotate(mouseX, mouseY);
 			} else {
-				vp->sceneManager.transform(mouseX, mouseY, vp->width, vp->height, vp->screenToWorld(mouseX, mouseY, 0), vp->cameraPosition);
+				vp->sceneManager.transform(mouseX, mouseY, vp->width, vp->height, vp->screenToWorld(mouseX, mouseY, 0), vp->camPos);
 			}
 		}
 	});
@@ -75,7 +75,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
 	if (action != GLFW_PRESS) return;
 	switch (key) {
-		case GLFW_KEY_TAB : toggleViewportMode(); break;						// TAB -> Toggle Object/Edit Mode
+		case GLFW_KEY_TAB : sceneManager.toggleViewportMode(); break;			// TAB -> Toggle Object/Edit Mode
 
 		// Number keys for perspective toggling
 		case GLFW_KEY_1	  : togglePerspective(  0.0f,  0.0f); break;		// 1 -> Front View  (towards negative X)

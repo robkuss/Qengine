@@ -6,7 +6,7 @@
 #include <memory>   // For std::shared_ptr
 
 
-void SceneManager::render(const Mode mode, const Vector3 camPos) const {
+void SceneManager::render(const Vector3 camPos) const {
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& obj : sceneObjects) {
 		// Check if the current Object is selected
@@ -14,7 +14,7 @@ void SceneManager::render(const Mode mode, const Vector3 camPos) const {
 
 		// Attempt to cast Object to Mesh using dynamic_cast
 		if (const auto mesh = dynamic_cast<const Mesh*>(obj.get())) {
-			MeshRenderer::render(*mesh, camPos, isSelected, mode.mode == Mode::EDIT);
+			MeshRenderer::render(*mesh, camPos, isSelected, viewportMode.mode == Mode::EDIT);
 		}
 	}
 }
@@ -123,6 +123,14 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 			return;
 		}
 		default: /*text->setErrorText("Error: Invalid transform mode.")*/;
+	}
+}
+
+void SceneManager::toggleViewportMode() {
+	switch (viewportMode.mode) {
+		case Mode::OBJECT: viewportMode.mode = Mode::EDIT; break;
+		case Mode::EDIT: viewportMode.mode = Mode::OBJECT; break;
+		default: {}
 	}
 }
 

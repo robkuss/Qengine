@@ -62,12 +62,8 @@ Viewport::~Viewport() {
 
 void Viewport::start() {
 	// Init matrices
-	gluPerspective();				// Initialize projection matrix
-	gluLookAt(						// Initialize modelview matrix
-		cameraPosition,
-		lookAt,
-		up
-	);
+	gluPerspective();						  // Initialize projection matrix
+	gluLookAt(camPos, lookAt, up);   // Initialize view matrix
 
 	#ifdef TEXT
 		text = new Text();			// Initialize FreeType for on-screen debug text
@@ -97,7 +93,7 @@ void Viewport::render() {
 	drawGrid();
 
 	// Render scene objects
-	sceneManager.render(viewportMode, cameraPosition);
+	sceneManager.render(camPos);
 
 	#ifdef DRAW_MOUSE_RAY
 		drawMouseRay();
@@ -118,6 +114,17 @@ void Viewport::getFPS() {
 	frameCount++;
 }
 
+void Viewport::windowResize(const int newW, const int newH) {
+	width = newW;
+	height = newH;
+	aspect = static_cast<float>(width) / static_cast<float>(height);
+
+	// Update viewport
+	glViewport(0, 0, width, height);
+	gluPerspective();
+	render();
+}
+
 /** Centers the application's window to the middle of the screen. */
 void Viewport::centerWindow() const {
 	const auto monitor = glfwGetPrimaryMonitor();
@@ -136,12 +143,12 @@ void Viewport::drawOnScreenText() const {
 		std::ostringstream out;
 		switch (i) {
 			case 0:  out << "FPS: " << fps; break;
-			case 1:  out << "Camera Pos: " << std::fixed << std::setprecision(3) << cameraPosition.x << " " << cameraPosition.y << " " << cameraPosition.z; break;
+			case 1:  out << "Camera Pos: " << std::fixed << std::setprecision(3) << camPos.x << " " << camPos.y << " " << camPos.z; break;
 			case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << rotH << " / " << rotV; break;
-			case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << cameraDistance; break;
+			case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camDist; break;
 			case 4:  out << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
 			case 5:  out << "Mouse World: "  << std::fixed << std::setprecision(3) << mouseWorld.x << " " << mouseWorld.y << " " << mouseWorld.z; break;
-			case 6:	 out << "Mode: " << modeToString(viewportMode.mode);
+			case 6:	 out << "Mode: " << modeToString(sceneManager.viewportMode.mode);
 				if (sceneManager.transformMode.mode    != Mode::NONE)	out << " " << modeToString(sceneManager.transformMode.mode);
 				if (sceneManager.transformMode.subMode != SubMode::NONE) out << " " << subModeToString(sceneManager.transformMode.subMode); break;
 			case 7:  out << "Transform: " << std::fixed << std::setprecision(3) << sceneManager.transformation.x << " " << sceneManager.transformation.y << " " << sceneManager.transformation.z; break;
@@ -208,28 +215,12 @@ void Viewport::updateCameraPosition() {
 	const auto sinV = static_cast<float>(sin(radV));
 	const auto cosV = static_cast<float>(cos(radV));
 
-	cameraPosition = Vector3(
-		cameraDistance * cosV * cosH,
-		cameraDistance * cosV * -sinH,
-		cameraDistance * sinV
+	camPos = Vector3(
+		camDist * cosV * cosH,
+		camDist * cosV * -sinH,
+		camDist * sinV
 	);
 }
-
-
-// User input processing / Callback response
-
-void Viewport::windowResize(const int newW, const int newH) {
-	width = newW;
-	height = newH;
-	aspect = static_cast<float>(width) / static_cast<float>(height);
-
-	// Update viewport
-	glViewport(0, 0, width, height);
-	gluPerspective();
-	render();
-}
-
-
 
 void Viewport::initRotation(const bool isRotating) {
 	rotating = isRotating;
@@ -249,56 +240,48 @@ void Viewport::rotate(const double mouseX, const double mouseY) {
 
 	// Apply camera rotation
 	updateCameraPosition();
-	gluLookAt(cameraPosition, lookAt, up);
+	gluLookAt(camPos, lookAt, up);
 }
 
 /** Handle the mouse scroll event to zoom in and out. */
 void Viewport::zoom(const double yoffset) {
 	// Calculate the zoom speed scalar based on the current camera distance
-	zoomSpeed = cameraDistance / CAMERA_DISTANCE_INIT * ZOOM_SENSITIVITY;
+	zoomSpeed = camDist / CAMERA_DISTANCE_INIT * ZOOM_SENSITIVITY;
 
 	// Update the camera distance with the scroll input
-	cameraDistance -= static_cast<float>(yoffset) * zoomSpeed;
-	cameraDistance = std::clamp(cameraDistance, CAMERA_DISTANCE_MIN, CAMERA_DISTANCE_MAX);
+	camDist -= static_cast<float>(yoffset) * zoomSpeed;
+	camDist = std::clamp(camDist, CAMERA_DISTANCE_MIN, CAMERA_DISTANCE_MAX);
 
 	// Apply zoom
 	updateCameraPosition();
-	gluLookAt(cameraPosition, lookAt, up);
+	gluLookAt(camPos, lookAt, up);
 }
 
 void Viewport::togglePerspective(const float h, const float v) {
 	rotH = h;
 	rotV = v;
 	updateCameraPosition();	 // Apply camera rotation
-	gluLookAt(cameraPosition, lookAt, up);
-}
-
-void Viewport::toggleViewportMode() {
-	switch (viewportMode.mode) {
-		case Mode::OBJECT: viewportMode.mode = Mode::EDIT; break;
-		case Mode::EDIT: viewportMode.mode = Mode::OBJECT; break;
-		default: {}
-	}
+	gluLookAt(camPos, lookAt, up);
 }
 
 
 // Quick Maths
 
 /**
- * This function maps screen space (2D mouse coordinates) to world space (3D).
+ * This function maps screen space (2D mouse coordinates) to 3D world space.
  *
  * @param mouseX The x-coordinate of the mouse position in screen space.
  * @param mouseY The y-coordinate of the mouse position in screen space.
  * @param depth A Z-value in normalized device coordinates.
- *              Use 1f for a ray (far plane),
- *              and 0f for the near plane or exact position grabbing.
+ *              Use 1.0f for a ray (far plane),
+ *              and 0.0f for the near plane or exact position grabbing.
  *
  * @return the world space coordinates for the given mouse position as a Vector3
  */
 Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const float depth) const {
 	// Get viewport, projection, and modelview matrices
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix);
+	glGetFloatv(GL_PROJECTION_MATRIX, projMatrix);
 	glGetFloatv(GL_MODELVIEW_MATRIX, viewMatrix);
 
 	// Convert mouse coordinates to normalized device coordinates (NDC)
@@ -306,29 +289,16 @@ Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const 
 	const auto y = static_cast<float>(1.0f - 2.0f * mouseY / viewport[3]);
 
 	const auto viewSpace = Vector4(x, y, depth, 1.0f);									// Create a vector in clip space
-	const auto clipSpace = Matrix4x4(projectionMatrix).invert() * viewSpace;			// Transform from clip space to view space by applying the inverse of the projection matrix
+	const auto clipSpace = Matrix4x4(projMatrix).invert() * viewSpace;			// Transform from clip space to view space by applying the inverse of the projection matrix
 	const auto unprojectedClipSpace = Vector4(clipSpace.x, clipSpace.y, -1.0f, 0.0f);	// Set the Z to -1 for proper unprojection and W to 0 for direction vector in the case of a ray
 	const auto worldSpace = Matrix4x4(viewMatrix).invert() * unprojectedClipSpace;	// Transform from clip space to world space by applying the inverse of the view matrix
 
 	return {worldSpace.x, worldSpace.y, worldSpace.z};
 }
 
-/**
- * Computes a [Ray] from the camera through the specified mouse coordinates in the window.
- *
- * This function converts the mouse screen coordinates to normalized device coordinates (NDC),
- * then transforms these coordinates into world space to generate a Ray. The Ray is defined by
- * its origin (the camera position) and its direction (the computed direction in world space).
- *
- * @param mouseX The x-coordinate of the mouse position in screen space.
- * @param mouseY The y-coordinate of the mouse position in screen space.
- *
- * @return A [Ray] object representing the origin and direction of the ray in world space.
- */
 Ray Viewport::getMouseRay(const double mouseX, const double mouseY) {
-	return {cameraPosition, screenToWorld(mouseX, mouseY, 1.0f).normalize()};
+	return {camPos, screenToWorld(mouseX, mouseY, 1.0f).normalize()};
 }
-
 
 // Drawing functions
 
@@ -376,9 +346,6 @@ void Viewport::drawGrid() {
 	glEnd();
 }
 
-/**
-	 * Draw the [Ray] that's created when the user clicks anywhere in the Viewport
-	 */
 void Viewport::drawMouseRay() const {
 	glPointSize(5);
 	glBegin(GL_POINTS);

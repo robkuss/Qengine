@@ -50,12 +50,11 @@ public:
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
 
+	void toggleViewportMode();
 	void initRotation(bool isRotating);
 	void rotate(double mouseX, double mouseY);
 	void zoom(double yoffset);
 	void togglePerspective(float h, float v);
-
-	void toggleViewportMode();
 
 	void onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
 
@@ -66,16 +65,13 @@ private:
 	float aspect;
 	SceneManager sceneManager;
 
-	Text* text{};				// For on-screen debug text
-
-	// Mode
-	Mode viewportMode		= OBJECT;
+	Text* text{};			// For on-screen debug text
 
 	// Initial values
-	Vector3 cameraPosition	= CAMERA_POSITION_INIT;
+	Vector3 camPos			= CAMERA_POSITION_INIT;
 	Vector3 lookAt			= LOOK_AT_POINT_INIT;
 	Vector3 up				= UP_VECTOR_INIT;
-	float cameraDistance	= CAMERA_DISTANCE_INIT;
+	float camDist			= CAMERA_DISTANCE_INIT;
 	float zoomSpeed			= 1.0f;
 
 	// Variables for camera rotation
@@ -97,7 +93,7 @@ private:
 
 	// "Pointers" - Shared resources for viewport state used mainly by the OpenGL library
 	int* viewport			= new int[4];
-	float* projectionMatrix = new float[16];
+	float* projMatrix		= new float[16];
 	float* viewMatrix		= new float[16];
 	double* mouseX			= new double[1];
 	double* mouseY			= new double[1];

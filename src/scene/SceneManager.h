@@ -10,6 +10,7 @@ public:
 	std::shared_ptr<Object> selectedObject = nullptr;
 
 	// Mode
+	Mode viewportMode  = OBJECT;
 	Mode transformMode = NONE;
 
 	// Constructor & Destructor
@@ -21,17 +22,18 @@ public:
 	}
 	~SceneManager() = default;
 
-	void render(Mode mode, Vector3 camPos) const;
+	void render(Vector3 camPos) const;
 
 	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
 	void selectObject(const std::shared_ptr<Object>& obj) { selectedObject = obj; }
 	void select(const Ray &ray);
 
+	void transform(double mouseX, double mouseY, int width, int height, Vector3 worldPos, Vector3 camPos);
+
+	void toggleViewportMode();
 	void changeTransformMode(Mode::ModeEnum mode);
 	void changeTransformSubMode(SubMode subMode);
-
-	void transform(double mouseX, double mouseY, int width, int height, Vector3 worldPos, Vector3 camPos);
 
 	// Variables for object transformation TODO could be made private if debugging was better
 	Vector3 transformation	= Vector3::ZERO;
