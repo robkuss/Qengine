@@ -117,7 +117,6 @@ private:
 
 	[[nodiscard]] Vector3 screenToWorld(double mouseX, double mouseY, float depth) const;
 	Ray getMouseRay(double mouseX, double mouseY);
-	void handleSelection(double selectX, double selectY);
 
 	static void drawAxes();
 	static void drawGrid();

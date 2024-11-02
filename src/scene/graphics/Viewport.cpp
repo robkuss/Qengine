@@ -1,3 +1,6 @@
+#ifndef VIEWPORT_C
+#define VIEWPORT_C
+
 #include <cmath>
 #include <sstream>
 #include <iomanip>
@@ -116,7 +119,6 @@ void Viewport::getFPS() {
 	frameCount++;
 }
 
-
 /** Centers the application's window to the middle of the screen. */
 void Viewport::centerWindow() const {
 	const auto monitor = glfwGetPrimaryMonitor();
@@ -228,8 +230,50 @@ void Viewport::windowResize(const int newW, const int newH) {
 	render();
 }
 
+/**
+ * Handles the selection of [Object]s in the scene based on the current mouse position.
+ *
+ * This function retrieves the mouse Ray using the current mouse coordinates and checks for
+ * intersections with any [Mesh] in the scene. If a Mesh is intersected, it is selected
+ * by the [SceneManager]. Additionally, the Ray's origin and calculated endpoint are logged
+ * for debugging purposes.
+ *
+ * @see getMouseRay for the ray computation logic.
+ */
 void Viewport::select() {
-	handleSelection(mouseX[0], mouseY[0]);
+	const Ray ray = getMouseRay(mouseX[0], mouseY[0]);
+
+#ifdef DRAW_MOUSE_RAY
+	// Update the visual Mouse Ray
+	const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
+	rayStart = ray.origin;
+	rayEnd   = ray.origin + directionScaled;
+#endif
+
+	std::vector<std::shared_ptr<Object>> intersectingObjects;
+	intersectingObjects.reserve(sceneManager.sceneObjects.size());
+
+	// Find Objects that intersect with the Mouse Ray
+	for (const auto& objPtr : sceneManager.sceneObjects) {
+		// Attempt to cast Object to Mesh using dynamic_cast
+		if (const auto meshPtr = dynamic_cast<Mesh*>(objPtr.get())) {
+			if (ray.intersects(*meshPtr)) {
+				intersectingObjects.push_back(objPtr);
+			}
+		} else throw std::runtime_error("Selected Object is not a Mesh!");
+	}
+
+	if (!intersectingObjects.empty()) {
+		// Select the Object that's closest to the ray origin (the camera)
+		sceneManager.selectObject(
+			*std::ranges::min_element(
+				intersectingObjects,
+				[&ray](const std::shared_ptr<Object>& a, const std::shared_ptr<Object>& b) {
+					return a->position.distance(ray.origin) < b->position.distance(ray.origin);
+				}
+			)
+		);
+	} else sceneManager.selectObject(nullptr);	// No Object selected
 
 	if (transformMode.mode != Mode::NONE) {
 		transformation		  = Vector3::ZERO;	// Reset transformation vector
@@ -412,52 +456,6 @@ Ray Viewport::getMouseRay(const double mouseX, const double mouseY) {
 	return {cameraPosition, screenToWorld(mouseX, mouseY, 1.0f).normalize()};
 }
 
-/**
- * Handles the selection of [Object]s in the scene based on the current mouse position.
- *
- * This function retrieves the mouse Ray using the current mouse coordinates and checks for
- * intersections with any [Mesh] in the scene. If a Mesh is intersected, it is selected
- * by the [SceneManager]. Additionally, the Ray's origin and calculated endpoint are logged
- * for debugging purposes.
- *
- * @see getMouseRay for the ray computation logic.
- */
-void Viewport::handleSelection(const double selectX, const double selectY) {
-	const Ray ray = getMouseRay(selectX, selectY);
-
-	#ifdef DRAW_MOUSE_RAY
-		// Update the visual Mouse Ray
-		const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
-		rayStart = ray.origin;
-		rayEnd   = ray.origin + directionScaled;
-	#endif
-
-	std::vector<std::shared_ptr<Object>> intersectingObjects;
-	intersectingObjects.reserve(sceneManager.sceneObjects.size());
-
-	// Find Objects that intersect with the Mouse Ray
-	for (const auto& objPtr : sceneManager.sceneObjects) {
-		// Attempt to cast Object to Mesh using dynamic_cast
-		if (const auto meshPtr = dynamic_cast<Mesh*>(objPtr.get())) {
-			if (ray.intersects(*meshPtr)) {
-				intersectingObjects.push_back(objPtr);
-			}
-		} else throw std::runtime_error("Selected Object is not a Mesh!");
-	}
-
-	if (!intersectingObjects.empty()) {
-		// Select the Object that's closest to the ray origin (the camera)
-		sceneManager.selectObject(
-			*std::ranges::min_element(
-				intersectingObjects,
-				[&ray](const std::shared_ptr<Object>& a, const std::shared_ptr<Object>& b) {
-					return a->position.distance(ray.origin) < b->position.distance(ray.origin);
-				}
-			)
-		);
-	} else sceneManager.selectObject(nullptr);	// No Object selected
-}
-
 
 // Drawing functions
 
@@ -522,3 +520,5 @@ void Viewport::drawMouseRay() const {
 	glVertex3f(rayEnd.x, rayEnd.y, rayEnd.z);
 	glEnd();
 }
+
+#endif // VIEWPORT_C

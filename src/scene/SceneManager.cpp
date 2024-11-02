@@ -2,7 +2,7 @@
 #include "../scene/graphics/MeshRenderer.cpp"
 
 #include <algorithm>
-
+#include <memory>   // For std::shared_ptr
 
 class SceneManager {
 public:
