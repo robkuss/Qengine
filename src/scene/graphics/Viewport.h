@@ -8,9 +8,8 @@
 #include <GLFW/glfw3.h>
 
 #include "../Mode.h"
-#include "../SceneManager.cpp"
-#include "../../math/ray/Ray.cpp"
-#include "../../math/matrix/Matrix4x4.cpp"
+#include "../SceneManager.h"
+#include "../../math/matrix/Matrix4x4.h"
 
 // Options
 #define TEXT	// For on-screen debug text
@@ -51,17 +50,12 @@ public:
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
 
-	void select();
 	void initRotation(bool isRotating);
 	void rotate(double mouseX, double mouseY);
 	void zoom(double yoffset);
 	void togglePerspective(float h, float v);
 
 	void toggleViewportMode();
-	void changeTransformMode(Mode::ModeEnum mode);
-	void changeTransformSubMode(SubMode subMode);
-
-	void transform(double mouseX, double mouseY);
 
 	void onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
 
@@ -76,7 +70,6 @@ private:
 
 	// Mode
 	Mode viewportMode		= OBJECT;
-	Mode transformMode		= NONE;
 
 	// Initial values
 	Vector3 cameraPosition	= CAMERA_POSITION_INIT;
@@ -92,11 +85,6 @@ private:
 	double rotV				= 0.0;
 	double lastH			= 0.0;
 	double lastV			= 0.0;
-
-	// Variables for object transformation
-	Vector3 transformation	= Vector3::ZERO;
-	Vector3 lastTransform	= transformation;
-	float scalingSens		= 1.0f;
 
 	// Mouse Ray
 	Vector3 rayStart        = Vector3::MINUS_ONE;

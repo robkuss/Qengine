@@ -6,7 +6,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "../../scene/graphics/color/Color.h"
+#include "../../scene/graphics/color/Colors.h"
 
 
 // Define a struct to represent each character glyph (similar to Kotlin's Character class)

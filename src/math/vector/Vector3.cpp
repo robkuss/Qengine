@@ -1,6 +1,7 @@
 #ifndef VECTOR3_C
 #define VECTOR3_C
 
+#include <string>
 #include <stdexcept>
 #include <cmath>
 

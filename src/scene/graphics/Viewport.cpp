@@ -9,6 +9,7 @@
 
 #include "../../math/Util.h"
 #include "../../math/vector/Vector2.cpp"
+#include "color/Colors.h"
 
 
 Viewport::Viewport(const std::string &title, const int width, const int height, const SceneManager& sceneManager)
@@ -141,9 +142,9 @@ void Viewport::drawOnScreenText() const {
 			case 4:  out << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
 			case 5:  out << "Mouse World: "  << std::fixed << std::setprecision(3) << mouseWorld.x << " " << mouseWorld.y << " " << mouseWorld.z; break;
 			case 6:	 out << "Mode: " << modeToString(viewportMode.mode);
-				if (transformMode.mode    != Mode::NONE)	out << " " << modeToString(transformMode.mode);
-				if (transformMode.subMode != SubMode::NONE) out << " " << subModeToString(transformMode.subMode); break;
-			case 7:  out << "Transform: " << std::fixed << std::setprecision(3) << transformation.x << " " << transformation.y << " " << transformation.z; break;
+				if (sceneManager.transformMode.mode    != Mode::NONE)	out << " " << modeToString(sceneManager.transformMode.mode);
+				if (sceneManager.transformMode.subMode != SubMode::NONE) out << " " << subModeToString(sceneManager.transformMode.subMode); break;
+			case 7:  out << "Transform: " << std::fixed << std::setprecision(3) << sceneManager.transformation.x << " " << sceneManager.transformation.y << " " << sceneManager.transformation.z; break;
 			case 8:  out << "Cube:"; break;
 			case 9:  out << "    Pos: "   << std::fixed << std::setprecision(3) << cube.position.x  << " " << cube.position.y  << " " << cube.position.z;  break;
 			case 10: out << "    Scale: " << std::fixed << std::setprecision(3) << cube.scale.x     << " " << cube.scale.y     << " " << cube.scale.z;     break;
@@ -228,59 +229,7 @@ void Viewport::windowResize(const int newW, const int newH) {
 	render();
 }
 
-/**
- * Handles the selection of [Object]s in the scene based on the current mouse position.
- *
- * This function retrieves the mouse Ray using the current mouse coordinates and checks for
- * intersections with any [Mesh] in the scene. If a Mesh is intersected, it is selected
- * by the [SceneManager]. Additionally, the Ray's origin and calculated endpoint are logged
- * for debugging purposes.
- *
- * @see getMouseRay for the ray computation logic.
- */
-void Viewport::select() {
-	const Ray ray = getMouseRay(mouseX[0], mouseY[0]);
 
-	#ifdef DRAW_MOUSE_RAY
-		// Update the visual Mouse Ray
-		const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
-		rayStart = ray.origin;
-		rayEnd   = ray.origin + directionScaled;
-	#endif
-
-	// Find Objects that intersect with the Mouse Ray
-	std::vector<std::shared_ptr<Object>> intersectingObjects;
-	intersectingObjects.reserve(sceneManager.sceneObjects.size());
-
-	for (const auto& objPtr : sceneManager.sceneObjects) {
-		// Attempt to cast Object to Mesh using dynamic_cast
-		if (const auto meshPtr = dynamic_cast<Mesh*>(objPtr.get())) {
-			if (ray.intersects(*meshPtr)) {
-				intersectingObjects.push_back(objPtr);
-			}
-		} else throw std::runtime_error("Selected Object is not a Mesh!");
-	}
-
-	// Select the Object that's closest to the ray origin (the camera)
-	if (!intersectingObjects.empty()) {
-		sceneManager.selectObject(
-			*std::ranges::min_element(
-				intersectingObjects,
-				[&ray](const std::shared_ptr<Object>& a, const std::shared_ptr<Object>& b) {
-					return a->position.distance(ray.origin) < b->position.distance(ray.origin);
-				}
-			)
-		);
-	} else sceneManager.selectObject(nullptr);	// No Object selected
-
-	// When transforming an Object, clicking applies the transformation
-	if (transformMode.mode != Mode::NONE) {
-		transformation		  = Vector3::ZERO;	// Reset transformation vector
-		lastTransform		  = Vector3::ZERO;
-		transformMode.mode	  = Mode::NONE;		// Go back to View Mode
-		transformMode.subMode = SubMode::NONE;
-	}
-}
 
 void Viewport::initRotation(const bool isRotating) {
 	rotating = isRotating;
@@ -301,63 +250,6 @@ void Viewport::rotate(const double mouseX, const double mouseY) {
 	// Apply camera rotation
 	updateCameraPosition();
 	gluLookAt(cameraPosition, lookAt, up);
-}
-
-void Viewport::transform(const double mouseX, const double mouseY) {
-	// Get the selected Object
-	const auto obj = sceneManager.selectedObject.get();
-	if (!obj) {
-		text->setErrorText("No object selected.");
-		return;
-	}
-	const auto mesh = dynamic_cast<Mesh*>(obj);
-	if (!mesh) {
-		text->setErrorText("Selected Object is not a Mesh.");
-		return;
-	}
-
-	switch (transformMode.mode) {
-		case Mode::GRAB: {
-			const Vector3 worldPos = screenToWorld(mouseX, mouseY, 0);	// Ray from the mouse position
-
-			// Truncate world position vector based on the selected direction (Transformation Sub Mode)
-			Vector3 wpDirectional = Vector3::ZERO;
-			switch (transformMode.subMode) {
-				case SubMode::NONE: wpDirectional = worldPos; break;
-				// TODO: Make the unidirectional translation also follow the cursor
-				case SubMode::X: wpDirectional = Vector3(worldPos.x, 0, 0); break;
-				case SubMode::Y: wpDirectional = Vector3(0, worldPos.y, 0); break;
-				case SubMode::Z: wpDirectional = Vector3(0, 0, worldPos.z); break;
-			}
-
-			const float grabZ = (mesh->position - cameraPosition).length();						// Get distance of the object from the camera
-			lastTransform  = lastTransform == Vector3::ZERO ? wpDirectional : lastTransform;	// Ensure last transformation is non-zero
-			transformation = (wpDirectional - lastTransform) * grabZ;							// Calculate transformation vector
-			mesh->applyTransformation(transformMode.mode, transformation);						// Apply transformation
-			lastTransform  = wpDirectional;
-			break;
-		}
-		case Mode::SCALE: {
-			const auto screenCenter = Vector2(static_cast<float>(width) / 2, static_cast<float>(height) / 2);
-			const auto mousePos = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
-			const float scale = screenCenter.distance(mousePos) / 100.0f;
-			mesh->applyTransformation(transformMode.mode, Vector3(scale, scale, scale));
-			break;
-		}
-		case Mode::ROTATE: {
-			return;
-		}
-		case Mode::EXTRUDE: {
-			return;
-		}
-		case Mode::FILL: {
-			return;
-		}
-		case Mode::MERGE: {
-			return;
-		}
-		default: text->setErrorText("Error: Invalid transform mode.");
-	}
 }
 
 /** Handle the mouse scroll event to zoom in and out. */
@@ -386,19 +278,6 @@ void Viewport::toggleViewportMode() {
 		case Mode::OBJECT: viewportMode.mode = Mode::EDIT; break;
 		case Mode::EDIT: viewportMode.mode = Mode::OBJECT; break;
 		default: {}
-	}
-}
-
-void Viewport::changeTransformMode(const Mode::ModeEnum mode) {
-	if (!sceneManager.selectedObject) return;	// Don't change mode if no Object is selected
-	transformMode.mode = mode;
-	transformMode.subMode = SubMode::NONE;		// Reset direction
-}
-
-void Viewport::changeTransformSubMode(const SubMode subMode) {
-	if (!sceneManager.selectedObject) return;	// Don't change mode if no Object is selected
-	if (transformMode.type != ModeType::TRANSFORM) {
-		transformMode.subMode = subMode;
 	}
 }
 

@@ -1,3 +1,4 @@
+#include <algorithm>
 #ifndef RAY_C
 #define RAY_C
 
@@ -16,14 +17,14 @@ public:
 	// Constructor
 	Ray(const Vector3 origin, const Vector3 direction) : origin(origin), direction(direction) {}
 
-	[[nodiscard]] bool intersects(Mesh) const;
+	[[nodiscard]] bool intersects(std::vector<Triangle>) const;
 	[[nodiscard]] bool intersects(const Triangle&) const;
 	[[nodiscard]] std::optional<Vector3> intersectWithPlane(Vector3, Vector3) const;
 };
 
 
-inline bool Ray::intersects(Mesh mesh) const {
-	return std::ranges::any_of(mesh.getTriangles(), [this](const Triangle& triangle) {
+inline bool Ray::intersects(std::vector<Triangle> triangles) const {
+	return std::ranges::any_of(triangles, [this](const Triangle& triangle) {
 		return intersects(triangle);
 	});
 }
