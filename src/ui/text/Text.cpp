@@ -232,7 +232,7 @@ inline void Text::setErrorText(const std::string& text) {
         errorTimerRunning = true;
 
         // Launch a thread to reset the errorText after 3 seconds
-        std::thread([this]() {
+        std::thread([this] {
             std::this_thread::sleep_for(std::chrono::seconds(3));
             nonFatalErrorText = "";
             errorTimerRunning = false;
