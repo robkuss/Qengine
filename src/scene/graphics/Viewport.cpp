@@ -7,9 +7,6 @@
 
 #include "Viewport.h"
 
-#include "../../math/matrix/Matrix4x4.cpp"
-#include "../../math/vector/Vector2.cpp"
-
 constexpr double M_PI = 3.14159265358979323846;	// Because for some reason there is no Pi in cmath
 
 
@@ -290,10 +287,6 @@ void Viewport::initRotation(const bool isRotating) {
 		lastH = mouseX[0];
 		lastV = mouseY[0];
 	}
-}
-
-void Viewport::updateMousePosition() const {
-	glfwGetCursorPos(window, this->mouseX, this->mouseY);
 }
 
 void Viewport::rotate(const double mouseX, const double mouseY) {

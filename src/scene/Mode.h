@@ -1,6 +1,8 @@
 #ifndef MODE_H
 #define MODE_H
 
+#include <iostream>
+
 enum class ModeType {
     NONE,
     VIEW,       // Select (Object & Edit Mode)

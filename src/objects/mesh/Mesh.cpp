@@ -9,7 +9,7 @@
 #include <valarray>
 
 #include "../Object.h"
-#include "../../Mode.h"
+#include "../../scene/Mode.h"
 #include "../../math/Triangle.h"
 
 

@@ -7,8 +7,11 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
+#include "../Mode.h"
 #include "../SceneManager.cpp"
 #include "../../math/ray/Ray.cpp"
+#include "../../math/matrix/Matrix4x4.cpp"
+#include "../../math/vector/Vector2.cpp"
 
 // Options
 #define TEXT	// For on-screen debug text
@@ -48,8 +51,6 @@ public:
 
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
-
-	void updateMousePosition() const;
 
 	void select();
 	void initRotation(bool isRotating);

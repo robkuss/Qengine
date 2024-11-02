@@ -25,17 +25,16 @@ private:
 	const float *m;
 };
 
+inline Matrix4x4::Matrix4x4(const float *m) : m(m) {}
 
-Matrix4x4::Matrix4x4(const float *m) : m(m) {}
-
-float Matrix4x4::operator[](const int index) const {
+inline float Matrix4x4::operator[](const int index) const {
 	if (index < 0 || index >= 16) {
 		throw std::out_of_range("Index out of bounds for Matrix4x4");
 	}
 	return m[index];
 }
 
-Vector4 Matrix4x4::operator*(const Vector4& vec) const {
+inline Vector4 Matrix4x4::operator*(const Vector4& vec) const {
 	return {
 		m[0] * vec.x + m[4] * vec.y + m[8] * vec.z + m[12] * vec.w,
 		m[1] * vec.x + m[5] * vec.y + m[9] * vec.z + m[13] * vec.w,
@@ -44,7 +43,7 @@ Vector4 Matrix4x4::operator*(const Vector4& vec) const {
 	};
 }
 
-Matrix4x4 Matrix4x4::operator*(const Matrix4x4& other) const {
+inline Matrix4x4 Matrix4x4::operator*(const Matrix4x4& other) const {
 	float result[16];
 	for (float& i : result) i = 0.0f;
 
@@ -64,7 +63,7 @@ Matrix4x4 Matrix4x4::operator*(const Matrix4x4& other) const {
 	return Matrix4x4(result);
 }
 
-Matrix4x4 Matrix4x4::invert() const {
+inline Matrix4x4 Matrix4x4::invert() const {
 	// The inverted matrix we'll return
 	std::array<float, 16> inv{};
 
