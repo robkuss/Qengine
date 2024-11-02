@@ -8,7 +8,7 @@
 #include "Viewport.h"
 
 #include "../../math/Util.h"
-#include "../../math/vector/Vector2.cpp"
+#include "../../math/vector/Vector2.h"
 #include "color/Colors.h"
 
 

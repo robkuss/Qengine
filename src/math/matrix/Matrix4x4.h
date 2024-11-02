@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 #include "../Util.h"
-#include "../vector/Vector4.cpp"
+#include "../vector/Vector4.h"
 
 
 class Matrix4x4 {

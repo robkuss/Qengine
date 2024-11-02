@@ -2,7 +2,7 @@
 #define SCENE_MANAGER_H
 
 #include "../objects/mesh/cube/Cube.cpp"
-#include "../math/ray/Ray.cpp"
+#include "../math/ray/Ray.h"
 
 class SceneManager {
 public:

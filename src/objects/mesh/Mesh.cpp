@@ -1,44 +1,9 @@
-#ifndef MESH_C
-#define MESH_C
+#include "Mesh.h"
 
-#include <map>
-#include <cmath>
-#include <string>
-#include <vector>
-#include <utility>  // For std::pair
-#include <valarray>
-
-#include "../Object.h"
-#include "../../scene/Mode.h"
-#include "../../math/Triangle.h"
-
-
-class Mesh : public Object {
-public:
-	std::vector<Vector3> vertices;
-	std::vector<int> faceIndices;
-	std::vector<int> edgeIndices;
-
-	// Edge-to-face adjacency information
-	std::map<std::pair<int, int>, std::vector<int>> edgeToFaceMap;
-
-	// Constructor & Destructor
-	Mesh(const std::string& name, const Vector3& position, const Vector3& scale, const Vector3& rotation)
-		: Object{name, position, scale, rotation} {}
-	~Mesh() override = default;
-
-	// Mesh functions
-	void buildEdgeToFaceMap();
-	std::vector<Triangle> getTriangles();
-	void applyTransformation(Mode::ModeEnum, Vector3);
-	[[nodiscard]] Vector3 faceNormal(int) const;
-
-private:
-	void addEdgeToMap(int, int, int);
-};
+#include "../../math/Util.h"
 
 /** Apply transformations to the object */
-inline void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transformation) {
+void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transformation) {
 	switch (mode) {
 		case Mode::GRAB : {
 			position = position + transformation;
@@ -63,8 +28,7 @@ inline void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 t
 			rotation = rotation + transformation;
 
 			// Get the rotation angles in degrees from the transformation vector
-			constexpr double M_PI = 3.14159265358979323846;
-			const Vector3 rotationRadians = transformation * M_PI / 180.f;
+			const Vector3 rotationRadians = transformation * PI / 180.f;
 
 			// Calculate the sine and cosine for the rotation angles
 			const float sinX = std::sin(rotationRadians.x);
@@ -103,7 +67,7 @@ inline void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 t
 	}
 }
 
-inline std::vector<Triangle> Mesh::getTriangles() {
+std::vector<Triangle> Mesh::getTriangles() {
 	std::vector<Triangle> triangles;
 
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
@@ -118,7 +82,7 @@ inline std::vector<Triangle> Mesh::getTriangles() {
 }
 
 /** Build the edge-to-face adjacency map for the mesh */
-inline void Mesh::buildEdgeToFaceMap() {
+void Mesh::buildEdgeToFaceMap() {
 	edgeToFaceMap.clear();
 
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
@@ -137,7 +101,7 @@ inline void Mesh::buildEdgeToFaceMap() {
 }
 
 /** Helper function to add an edge to the map */
-inline void Mesh::addEdgeToMap(int v0, int v1, const int faceIndex) {
+void Mesh::addEdgeToMap(int v0, int v1, const int faceIndex) {
 	// Ensure that the order of the vertices is consistent
 	if (const std::pair<int, int> edge = (v0 < v1)
 			? std::make_pair(v0, v1)
@@ -152,7 +116,7 @@ inline void Mesh::addEdgeToMap(int v0, int v1, const int faceIndex) {
 }
 
 /** Calculate the normal for a face in the Mesh */
-inline Vector3 Mesh::faceNormal(const int faceIndex) const {
+Vector3 Mesh::faceNormal(const int faceIndex) const {
 	const Vector3 v0 = vertices[faceIndices[faceIndex * 3]];
 	const Vector3 v1 = vertices[faceIndices[faceIndex * 3 + 1]];
 	const Vector3 v2 = vertices[faceIndices[faceIndex * 3 + 2]];
@@ -164,5 +128,3 @@ inline Vector3 Mesh::faceNormal(const int faceIndex) const {
 	// Compute the normal using the cross product
 	return e1.cross(e2).normalize();
 }
-
-#endif // MESH_C

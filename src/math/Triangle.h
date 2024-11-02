@@ -1,7 +1,7 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
-#include "vector/Vector3.cpp"
+#include "vector/Vector3.h"
 
 struct Triangle {
 	Vector3 v0, v1, v2;

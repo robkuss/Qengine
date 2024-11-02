@@ -4,7 +4,7 @@
 #include <utility>
 #include <string>
 
-#include "../math/vector/Vector3.cpp"
+#include "../math/vector/Vector3.h"
 
 
 class Object {

@@ -6,8 +6,8 @@
 
 #include "../Util.h"
 #include "../Triangle.h"
-#include "../vector/Vector3.cpp"
-#include "../../objects/mesh/Mesh.cpp"
+#include "../vector/Vector3.h"
+#include "../../objects/mesh/Mesh.h"
 
 
 class Ray {

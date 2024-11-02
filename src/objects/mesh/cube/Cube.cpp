@@ -1,8 +1,8 @@
 #ifndef CUBE_C
 #define CUBE_C
 
-#include "../Mesh.cpp"
-#include "../../../math/vector/Vector3.cpp"
+#include "../Mesh.h"
+#include "../../../math/vector/Vector3.h"
 
 class Cube final : public Mesh {
 public:

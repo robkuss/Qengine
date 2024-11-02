@@ -1,7 +1,7 @@
 #include "SceneManager.h"
 
 #include "../scene/graphics/MeshRenderer.h"
-#include "../math/vector/Vector2.cpp"
+#include "../math/vector/Vector2.h"
 
 #include <memory>   // For std::shared_ptr
 
