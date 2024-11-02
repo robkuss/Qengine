@@ -7,9 +7,9 @@
 
 #include "Viewport.h"
 
-#include "../../math/Util.h"
-#include "../../math/vector/Vector2.h"
-#include "color/Colors.h"
+#include "../math/Util.h"
+#include "../math/vector/Vector2.h"
+#include "graphics/color/Colors.h"
 
 
 Viewport::Viewport(const std::string &title, const int width, const int height, const SceneManager& sceneManager)
@@ -263,9 +263,6 @@ void Viewport::togglePerspective(const float h, const float v) {
 	updateCameraPosition();	 // Apply camera rotation
 	gluLookAt(camPos, lookAt, up);
 }
-
-
-// Quick Maths
 
 /**
  * This function maps screen space (2D mouse coordinates) to 3D world space.

@@ -7,14 +7,14 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-#include "../Mode.h"
-#include "../SceneManager.h"
-#include "../../math/matrix/Matrix4x4.h"
+#include "Mode.h"
+#include "SceneManager.h"
+#include "../math/matrix/Matrix4x4.h"
 
 // Options
 #define TEXT	// For on-screen debug text
 #ifdef TEXT
-	#include "../../ui/text/Text.cpp"
+	#include "../ui/text/Text.cpp"
 #endif
 //#define DRAW_MOUSE_RAY
 
@@ -91,7 +91,7 @@ private:
 	int frameCount			= 0;
 	int fps					= 0;
 
-	// "Pointers" - Shared resources for viewport state used mainly by the OpenGL library
+	// Pointers - Shared resources for viewport state used mainly by the OpenGL library
 	int* viewport			= new int[4];
 	float* projMatrix		= new float[16];
 	float* viewMatrix		= new float[16];
