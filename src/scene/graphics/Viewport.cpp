@@ -1,15 +1,12 @@
-#ifndef VIEWPORT_C
-#define VIEWPORT_C
+#include "Viewport.h"
+
+#include "../../math/Util.h"
+#include "../../math/vector/Vector2.h"
+#include "../graphics/color/Colors.h"
 
 #include <cmath>
 #include <sstream>
 #include <iomanip>
-
-#include "Viewport.h"
-
-#include "../math/Util.h"
-#include "../math/vector/Vector2.h"
-#include "graphics/color/Colors.h"
 
 
 Viewport::Viewport(const std::string &title, const int width, const int height, const SceneManager& sceneManager)
@@ -357,5 +354,3 @@ void Viewport::drawMouseRay() const {
 	glVertex3f(rayEnd.x, rayEnd.y, rayEnd.z);
 	glEnd();
 }
-
-#endif // VIEWPORT_C

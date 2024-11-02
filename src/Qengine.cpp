@@ -1,7 +1,7 @@
 #include <chrono>
 #include <iostream>
 
-#include "scene/Viewport.h"
+#include "scene/graphics/Viewport.h"
 
 constexpr auto TITLE         = "Qengine";
 constexpr int DEFAULT_WIDTH  = 1920;

@@ -1,4 +1,4 @@
-#include "Viewport.h"
+#include "graphics/Viewport.h"
 
 // Controls
 
@@ -75,32 +75,32 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
 	if (action != GLFW_PRESS) return;
 	switch (key) {
-		case GLFW_KEY_TAB : sceneManager.toggleViewportMode(); break;			// TAB -> Toggle Object/Edit Mode
+		case GLFW_KEY_TAB : sceneManager.toggleViewportMode(); break;				// TAB -> Toggle Object/Edit Mode
 
 		// Number keys for perspective toggling
-		case GLFW_KEY_1	  : togglePerspective(  0.0f,  0.0f); break;		// 1 -> Front View  (towards negative X)
-		case GLFW_KEY_2   : togglePerspective(-90.0f,  0.0f); break;		// 2 -> Right View  (towards negative Y)
-		case GLFW_KEY_3   : togglePerspective(  0.0f, 90.0f); break;		// 3 -> Top View    (towards negative Z)
-		case GLFW_KEY_4   : togglePerspective(180.0f,  0.0f); break;		// 4 -> Back View   (towards positive X)
-		case GLFW_KEY_5   : togglePerspective( 90.0f,  0.0f); break;		// 5 -> Left View   (towards positive Y)
-		case GLFW_KEY_6   : togglePerspective(  0.0f,-90.0f); break;		// 6 -> Bottom View (towards positive Z)
+		case GLFW_KEY_1	  : togglePerspective(  0.0f,  0.0f); break;			// 1 -> Front View  (towards negative X)
+		case GLFW_KEY_2   : togglePerspective(-90.0f,  0.0f); break;			// 2 -> Right View  (towards negative Y)
+		case GLFW_KEY_3   : togglePerspective(  0.0f, 90.0f); break;			// 3 -> Top View    (towards negative Z)
+		case GLFW_KEY_4   : togglePerspective(180.0f,  0.0f); break;			// 4 -> Back View   (towards positive X)
+		case GLFW_KEY_5   : togglePerspective( 90.0f,  0.0f); break;			// 5 -> Left View   (towards positive Y)
+		case GLFW_KEY_6   : togglePerspective(  0.0f,-90.0f); break;			// 6 -> Bottom View (towards positive Z)
 
 		// Change Transform Mode
-		case GLFW_KEY_G	  : sceneManager.changeTransformMode(Mode::GRAB); break;				// G -> Grab
-		case GLFW_KEY_S	  : sceneManager.changeTransformMode(Mode::SCALE); break;			// S -> Scale
-		case GLFW_KEY_R   : {													// R -> Rotate
+		case GLFW_KEY_G	  : sceneManager.changeTransformMode(Mode::GRAB); break;	// G -> Grab
+		case GLFW_KEY_S	  : sceneManager.changeTransformMode(Mode::SCALE); break;	// S -> Scale
+		case GLFW_KEY_R   : {														// R -> Rotate
 			sceneManager.changeTransformMode(Mode::ROTATE);
 			text->setErrorText("Rotating is not yet implemented."); break;
 		}
-		case GLFW_KEY_E	  : {													// E -> Extrude
+		case GLFW_KEY_E	  : {														// E -> Extrude
 			sceneManager.changeTransformMode(Mode::EXTRUDE);
 			text->setErrorText("Extruding is not yet implemented."); break;
 		}
-		case GLFW_KEY_F	  : {													// F -> Fill
+		case GLFW_KEY_F	  : {														// F -> Fill
 			sceneManager.changeTransformMode(Mode::FILL);
 			text->setErrorText("Filling is not yet implemented."); break;
 		}
-		case GLFW_KEY_M   : {													// M -> Merge
+		case GLFW_KEY_M   : {														// M -> Merge
 			sceneManager.changeTransformMode(Mode::MERGE);
 			text->setErrorText("Merging is not yet implemented."); break;
 		}

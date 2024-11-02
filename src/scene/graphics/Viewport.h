@@ -7,14 +7,14 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-#include "Mode.h"
-#include "SceneManager.h"
-#include "../math/matrix/Matrix4x4.h"
+#include "../Mode.h"
+#include "../SceneManager.h"
+#include "../../math/matrix/Matrix4x4.h"
 
 // Options
 #define TEXT	// For on-screen debug text
 #ifdef TEXT
-	#include "../ui/text/Text.cpp"
+	#include "../../ui/text/Text.cpp"
 #endif
 //#define DRAW_MOUSE_RAY
 
