@@ -7,7 +7,8 @@
 
 #include "Viewport.h"
 
-constexpr double M_PI = 3.14159265358979323846;	// Because for some reason there is no Pi in cmath
+#include "../../math/Util.h"
+#include "../../math/vector/Vector2.cpp"
 
 
 Viewport::Viewport(const std::string &title, const int width, const int height, const SceneManager& sceneManager)
@@ -159,7 +160,7 @@ void Viewport::drawOnScreenText() const {
 void Viewport::gluPerspective() const {
 	glMatrixMode(GL_PROJECTION);	// Subsequent matrix operations will affect the projection matrix
 
-	const double fh = tan(FOV_Y * M_PI / 360.0) * Z_NEAR;	// Height of the Near Clipping Plane
+	const double fh = tan(FOV_Y * PI / 360.0) * Z_NEAR;	// Height of the Near Clipping Plane
 	const double fw = fh * aspect;							//  Width of the Near Clipping Plane
 
 	// Update the perspective projection matrix based on the calculated dimensions
@@ -198,8 +199,8 @@ void Viewport::gluLookAt(const Vector3 eye, const Vector3 center, const Vector3 
 
 /** Update camera position based on spherical coordinates. */
 void Viewport::updateCameraPosition() {
-	const double radH = rotH * M_PI / 180.0;
-	const double radV = rotV * M_PI / 180.0;
+	const double radH = rotH * PI / 180.0;
+	const double radV = rotV * PI / 180.0;
 
 	const auto sinH = static_cast<float>(sin(radH));
 	const auto cosH = static_cast<float>(cos(radH));

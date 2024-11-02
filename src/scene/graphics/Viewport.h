@@ -11,7 +11,6 @@
 #include "../SceneManager.cpp"
 #include "../../math/ray/Ray.cpp"
 #include "../../math/matrix/Matrix4x4.cpp"
-#include "../../math/vector/Vector2.cpp"
 
 // Options
 #define TEXT	// For on-screen debug text
