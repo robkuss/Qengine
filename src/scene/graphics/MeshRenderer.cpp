@@ -1,6 +1,3 @@
-#ifndef MESHRENDERER_C
-#define MESHRENDERER_C
-
 #include "color/Colors.h"
 
 #include <GL/gl.h>
@@ -88,6 +85,3 @@ private:
 		return (dot1 > 0.0f && dot2 < 0.0f) || (dot1 < 0.0f && dot2 > 0.0f);
 	}
 };
-
-
-#endif // MESHRENDERER_C

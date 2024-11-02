@@ -1,6 +1,3 @@
-#ifndef TEXT_C
-#define TEXT_C
-
 #include <iostream>
 #include <map>
 #include <fstream>
@@ -245,6 +242,3 @@ inline void Text::drawErrorText(const int windowW, const int windowH) {
     if (!nonFatalErrorText.empty())
         renderText(nonFatalErrorText.c_str(), firstLineX, static_cast<float>(windowH) - bottomLineY, windowW, windowH, RED);
 }
-
-
-#endif // TEXT_C

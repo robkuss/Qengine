@@ -8,8 +8,6 @@
 #include <utility>  // For std::pair
 #include <valarray>
 
-#include <iostream>
-
 #include "../Object.h"
 #include "../../Mode.h"
 #include "../../math/Triangle.h"

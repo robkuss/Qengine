@@ -1,6 +1,3 @@
-#ifndef SCENEMANAGER_C
-#define SCENEMANAGER_C
-
 #include "../objects/mesh/cube/Cube.cpp"
 #include "../scene/graphics/MeshRenderer.cpp"
 
@@ -40,5 +37,3 @@ inline void SceneManager::render(const Mode mode, const Vector3 camPos) const {
 		}
 	}
 }
-
-#endif // SCENEMANAGER_C

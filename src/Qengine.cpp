@@ -1,6 +1,3 @@
-#ifndef QENGINE_C
-#define QENGINE_C
-
 #include <chrono>
 #include <iostream>
 
@@ -21,5 +18,3 @@ int main() {
 
     return EXIT_SUCCESS;
 }
-
-#endif // QENGINE_C
