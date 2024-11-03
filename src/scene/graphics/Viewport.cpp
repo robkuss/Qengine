@@ -2,7 +2,7 @@
 
 #include "../../math/Util.h"
 #include "../../math/vector/Vector2.h"
-#include "../graphics/color/Colors.h"
+#include "color/Colors.h"
 
 #include <cmath>
 #include <sstream>

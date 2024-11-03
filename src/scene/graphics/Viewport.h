@@ -14,7 +14,7 @@
 // Options
 #define TEXT	// For on-screen debug text
 #ifdef TEXT
-	#include "../../ui/text/Text.cpp"
+	#include "ui/text/Text.cpp"
 #endif
 //#define DRAW_MOUSE_RAY
 
