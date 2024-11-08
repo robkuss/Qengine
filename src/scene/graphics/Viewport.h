@@ -9,7 +9,7 @@
 
 #include "../Mode.h"
 #include "../SceneManager.h"
-#include "../../math/matrix/Matrix4x4.h"
+#include "../../math/matrix/Matrix4.h"
 
 // Options
 #define TEXT	// For on-screen debug text

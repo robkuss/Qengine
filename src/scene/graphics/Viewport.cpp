@@ -283,9 +283,9 @@ Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const 
 	const auto y = static_cast<float>(1.0f - 2.0f * mouseY / viewport[3]);
 
 	const auto viewSpace = Vector4(x, y, depth, 1.0f);									// Create a vector in clip space
-	const auto clipSpace = Matrix4x4(projMatrix).invert() * viewSpace;				// Transform from clip space to view space by applying the inverse of the projection matrix
+	const auto clipSpace = Matrix4(projMatrix).invert() * viewSpace;				// Transform from clip space to view space by applying the inverse of the projection matrix
 	const auto unprojectedClipSpace = Vector4(clipSpace.x, clipSpace.y, -1.0f, 0.0f);	// Set the Z to -1 for proper unprojection and W to 0 for direction vector in the case of a ray
-	const auto worldSpace = Matrix4x4(viewMatrix).invert() * unprojectedClipSpace;	// Transform from clip space to world space by applying the inverse of the view matrix
+	const auto worldSpace = Matrix4(viewMatrix).invert() * unprojectedClipSpace;	// Transform from clip space to world space by applying the inverse of the view matrix
 
 	return {worldSpace.x, worldSpace.y, worldSpace.z};
 }
