@@ -38,10 +38,9 @@ public:
 	// Variables for object transformation TODO could be made private if debugging was better
 	Vector3 transformation	= Vector3::ZERO;
 	Vector3 lastTransform	= transformation;
-	float scalingSens		= 1.0f;
 
 private:
-
+	float scaleSens			= 1000.0f;
 };
 
 #endif // SCENE_MANAGER_H

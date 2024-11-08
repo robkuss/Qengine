@@ -96,7 +96,7 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 				case SubMode::Z: wpDirectional = Vector3(0, 0, worldPos.z); break;
 			}
 
-			const float grabZ = (mesh->position - camPos).length();						// Get distance of the object from the camera
+			const float grabZ = (mesh->position - camPos).length();								// Get distance of the object from the camera
 			lastTransform  = lastTransform == Vector3::ZERO ? wpDirectional : lastTransform;	// Ensure last transformation is non-zero
 			transformation = (wpDirectional - lastTransform) * grabZ;							// Calculate transformation vector
 			mesh->applyTransformation(transformMode.mode, transformation);						// Apply transformation
@@ -106,7 +106,8 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 		case Mode::SCALE: {
 			const auto screenCenter = Vector2(static_cast<float>(width) / 2, static_cast<float>(height) / 2);
 			const auto mousePos = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
-			const float scale = screenCenter.distance(mousePos) / 100.0f;
+			const float objDist = mesh->position.distance(camPos);
+			const float scale = screenCenter.distance(mousePos) * (objDist / scaleSens);
 			mesh->applyTransformation(transformMode.mode, Vector3(scale, scale, scale));
 			break;
 		}
