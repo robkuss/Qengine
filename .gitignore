@@ -1,6 +1,8 @@
 .idea
+.clang-format
 cmake-build-debug/
 libs/
+codegen.sh
 
 # Prerequisites
 *.d
