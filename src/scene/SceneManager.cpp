@@ -126,65 +126,18 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
             mesh->applyTransformation(transformMode.mode, rotationMatrix);
             break;
         }
-        default: break;
+    	case Mode::EXTRUDE: {
+        	break;
+    	}
+    	case Mode::FILL: {
+        	break;
+    	}
+    	case Mode::MERGE: {
+        	break;
+    	}
+    	default: break;
     }
 }
-
-/*void SceneManager::transform(const double mouseX, const double mouseY, const int width, const int height, const Vector3 worldPos, const Vector3 camPos) {
-	// Get the selected Object
-	const auto obj = selectedObject.get();
-	if (!obj) {
-		//text->setErrorText("No object selected.");
-		return;
-	}
-	const auto mesh = dynamic_cast<Mesh*>(obj);
-	if (!mesh) {
-		//text->setErrorText("Selected Object is not a Mesh.");
-		return;
-	}
-
-	switch (transformMode.mode) {
-		case Mode::GRAB: {
-			// Truncate world position vector based on the selected direction (Transformation Sub Mode)
-			Vector3 wpDirectional = Vector3::ZERO;
-			switch (transformMode.subMode) {
-				case SubMode::NONE: wpDirectional = worldPos; break;
-				// TODO: Make the unidirectional translation also follow the cursor
-				case SubMode::X: wpDirectional = Vector3(worldPos.x, 0, 0); break;
-				case SubMode::Y: wpDirectional = Vector3(0, worldPos.y, 0); break;
-				case SubMode::Z: wpDirectional = Vector3(0, 0, worldPos.z); break;
-			}
-
-			const float grabZ = (mesh->position - camPos).length();								// Get distance of the object from the camera
-			lastTransform  = lastTransform == Vector3::ZERO ? wpDirectional : lastTransform;	// Ensure last transformation is non-zero
-			transformation = (wpDirectional - lastTransform) * grabZ;							// Calculate transformation vector
-			mesh->applyTransformation(transformMode.mode, transformation);						// Apply transformation
-			lastTransform  = wpDirectional;
-			break;
-		}
-		case Mode::SCALE: {
-			const auto screenCenter = Vector2(static_cast<float>(width) / 2, static_cast<float>(height) / 2);
-			const auto mousePos = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
-			const float objDist = mesh->position.distance(camPos);
-			const float scale = screenCenter.distance(mousePos) * (objDist / scaleSens);
-			mesh->applyTransformation(transformMode.mode, Vector3(scale, scale, scale));
-			break;
-		}
-		case Mode::ROTATE: {
-			return;
-		}
-		case Mode::EXTRUDE: {
-			return;
-		}
-		case Mode::FILL: {
-			return;
-		}
-		case Mode::MERGE: {
-			return;
-		}
-		default: /*text->setErrorText("Error: Invalid transform mode.")#1#;
-	}
-}*/
 
 void SceneManager::toggleViewportMode() {
 	switch (viewportMode.mode) {

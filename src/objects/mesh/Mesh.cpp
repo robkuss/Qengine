@@ -61,74 +61,18 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
             }
             break;
         }
+    	case Mode::EXTRUDE: {
+        	break;
+    	}
+    	case Mode::FILL: {
+        	break;
+    	}
+    	case Mode::MERGE: {
+        	break;
+    	}
     	default: break;
     }
 }
-
-/*/** Apply transformations to the object #1#
-void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transformation) {
-	switch (mode) {
-		case Mode::GRAB : {
-			position = position + transformation;
-
-			// Translate each vertex by the same transformation
-			for (Vector3& vertex : vertices) {
-				vertex = vertex + transformation;
-			}
-			break;
-		}
-		case Mode::SCALE : {
-			const Vector3 oldScale = scale;
-			scale = transformation;
-
-			// Apply scaling to each vertex based on the new scale
-			for (Vector3& vertex : vertices) {
-				vertex = (vertex - position) * (scale / oldScale) + position;
-			}
-			break;
-		}
-		case Mode::ROTATE : {
-			rotation = rotation + transformation;
-
-			// Get the rotation angles in degrees from the transformation vector
-			const Vector3 rotationRadians = transformation * PI / 180.0f;
-
-			// Calculate the sine and cosine for the rotation angles
-			const float sinX = std::sin(rotationRadians.x);
-			const float cosX = std::cos(rotationRadians.x);
-			const float sinY = std::sin(rotationRadians.y);
-			const float cosY = std::cos(rotationRadians.y);
-			const float sinZ = std::sin(rotationRadians.z);
-			const float cosZ = std::cos(rotationRadians.z);
-
-			// Apply the rotation to each vertex
-			for (Vector3& vertex : vertices) {
-				// Translate vertex to origin
-				Vector3 tmp = vertex - position;
-
-				// Rotate around x-axis
-				const float newY1 = tmp.y * cosX - tmp.z * sinX;
-				const float newZ1 = tmp.y * sinX + tmp.z * cosX;
-				tmp = Vector3(tmp.x, newY1, newZ1);
-
-				// Rotate around y-axis
-				const float newX2 = tmp.x * cosY + tmp.z * sinY;
-				const float newZ2 = -tmp.x * sinY + tmp.z * cosY;
-				tmp = Vector3(newX2, tmp.y, newZ2);
-
-				// Rotate around z-axis
-				const float newX3 = tmp.x * cosZ - tmp.y * sinZ;
-				const float newY3 = tmp.x * sinZ + tmp.y * cosZ;
-				tmp = Vector3(newX3, newY3, tmp.z);
-
-				// Translate back to the original position
-				vertex = tmp + position;
-			}
-			break;
-		}
-		default : { /* TODO("Not yet implemented") #1# }
-	}
-}*/
 
 std::vector<Triangle> Mesh::getTriangles() {
 	std::vector<Triangle> triangles;
