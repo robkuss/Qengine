@@ -2,6 +2,7 @@
 
 #include "../scene/graphics/MeshRenderer.h"
 #include "../math/vector/Vector2.h"
+#include "../math/matrix/Matrix4.h"
 
 #include <memory>   // For std::shared_ptr
 
@@ -64,14 +65,72 @@ void SceneManager::select(const Ray& ray) {
 
 	// When transforming an Object, clicking applies the transformation
 	if (transformMode.mode != Mode::NONE) {
-		transformation		  = Vector3::ZERO;	// Reset transformation vector
-		lastTransform		  = Vector3::ZERO;
+		lastTransform		  = Vector3::ZERO;	// Reset transformation data
 		transformMode.mode	  = Mode::NONE;		// Go back to View Mode
 		transformMode.subMode = SubMode::NONE;
 	}
 }
 
 void SceneManager::transform(const double mouseX, const double mouseY, const int width, const int height, const Vector3 worldPos, const Vector3 camPos) {
+    // Get the selected Object
+    const auto obj = selectedObject.get();
+    if (!obj) {
+        //text->setErrorText("No object selected.");
+        return;
+    }
+    const auto mesh = dynamic_cast<Mesh*>(obj);
+    if (!mesh) {
+        //text->setErrorText("Selected Object is not a Mesh.");
+        return;
+    }
+
+    switch (transformMode.mode) {
+        case Mode::GRAB: {
+            // Define direction based on subMode
+            Vector3 direction = Vector3::ZERO;
+            switch (transformMode.subMode) {
+                case SubMode::NONE: direction = worldPos; break;
+                case SubMode::X:	direction = Vector3(worldPos.x, 0, 0); break;
+                case SubMode::Y:	direction = Vector3(0, worldPos.y, 0); break;
+                case SubMode::Z:	direction = Vector3(0, 0, worldPos.z); break;
+            }
+
+        	const float grabZ = (mesh->position - camPos).length();										// Get distance of the object from the camera
+        	lastTransform = lastTransform == Vector3::ZERO ? direction : lastTransform;					// Ensure last transformation is non-zero
+        	const auto translationMatrix = Matrix4::translate((direction - lastTransform) * grabZ);	// Calculate translation matrix
+        	lastTransform = direction;																	// Store new transformation for next frame
+
+        	mesh->applyTransformation(transformMode.mode, translationMatrix);
+            break;
+        }
+        case Mode::SCALE: {
+            // Compute scaling factor based on mouse position and object distance
+            const auto screenCenter = Vector2(static_cast<float>(width) / 2, static_cast<float>(height) / 2);
+            const auto mousePos		= Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+            const float objDist		= mesh->position.distance(camPos);
+            const float scale		= screenCenter.distance(mousePos) * (objDist / scaleSens);
+
+            // Construct scale matrix
+        	const Matrix4 scaleMatrix = Matrix4::scale(Vector3(scale, scale, scale));
+
+            mesh->applyTransformation(transformMode.mode, scaleMatrix);
+            break;
+        }
+        case Mode::ROTATE: {
+            // Example for rotation: Calculate a basic rotation matrix for illustration
+            // Assume rotation about Z-axis as an example (replace with desired axis/mouse inputs)
+            constexpr float angle = 0.01f; // TODO (Replace with calculated rotation angle based on mouse input)
+
+        	const Matrix4 rotationMatrix = Matrix4::rotateZ(angle);
+
+            mesh->applyTransformation(transformMode.mode, rotationMatrix);
+            break;
+        }
+        default: break;
+    }
+}
+
+/*void SceneManager::transform(const double mouseX, const double mouseY, const int width, const int height, const Vector3 worldPos, const Vector3 camPos) {
 	// Get the selected Object
 	const auto obj = selectedObject.get();
 	if (!obj) {
@@ -123,9 +182,9 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 		case Mode::MERGE: {
 			return;
 		}
-		default: /*text->setErrorText("Error: Invalid transform mode.")*/;
+		default: /*text->setErrorText("Error: Invalid transform mode.")#1#;
 	}
-}
+}*/
 
 void SceneManager::toggleViewportMode() {
 	switch (viewportMode.mode) {
@@ -135,13 +194,13 @@ void SceneManager::toggleViewportMode() {
 	}
 }
 
-void SceneManager::changeTransformMode(const Mode::ModeEnum mode) {
+void SceneManager::setTransformMode(const Mode::ModeEnum mode) {
 	if (!selectedObject) return;	// Don't change mode if no Object is selected
 	transformMode.mode = mode;
 	transformMode.subMode = SubMode::NONE;		// Reset direction
 }
 
-void SceneManager::changeTransformSubMode(const SubMode subMode) {
+void SceneManager::setTransformSubMode(const SubMode subMode) {
 	if (!selectedObject) return;	// Don't change mode if no Object is selected
 	if (transformMode.type != ModeType::TRANSFORM) {
 		transformMode.subMode = subMode;

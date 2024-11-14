@@ -1,9 +1,11 @@
-#ifndef VECTOR3_C
-#define VECTOR3_C
+#ifndef VECTOR3_H
+#define VECTOR3_H
 
 #include <string>
 #include <stdexcept>
 #include <cmath>
+
+#include "Vector4.h"
 
 class Vector3 {
 public:
@@ -13,9 +15,9 @@ public:
 	Vector3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
 
 	// Static constants
-	static const Vector3 ZERO;
-	static const Vector3 ONE;
-	static const Vector3 MINUS_ONE;
+	static const Vector3& ZERO;
+	static const Vector3& ONE;
+	static const Vector3& MINUS_ONE;
 
 	// Check equality
 	bool operator==(const Vector3& other) const {
@@ -82,13 +84,17 @@ public:
 		return {y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x};
 	}
 
+	[[nodiscard]] Vector4 toVector4() const {
+		return {x, y, z, 1.0f};
+	}
+
 	[[nodiscard]] std::string toString() const {
 		return std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z);
 	}
 };
 
-inline const Vector3 Vector3::ZERO		= Vector3(0.0f, 0.0f, 0.0f);
-inline const Vector3 Vector3::ONE		= Vector3(1.0f, 1.0f, 1.0f);
-inline const Vector3 Vector3::MINUS_ONE	= Vector3(-1.0f, -1.0f, -1.0f);
+inline const Vector3& Vector3::ZERO		 = Vector3(0.0f, 0.0f, 0.0f);
+inline const Vector3& Vector3::ONE		 = Vector3(1.0f, 1.0f, 1.0f);
+inline const Vector3& Vector3::MINUS_ONE = Vector3(-1.0f, -1.0f, -1.0f);
 
-#endif // VECTOR3_C
+#endif // VECTOR3_H

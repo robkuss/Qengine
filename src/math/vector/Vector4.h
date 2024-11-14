@@ -1,5 +1,5 @@
-#ifndef VECTOR4_C
-#define VECTOR4_C
+#ifndef VECTOR4_H
+#define VECTOR4_H
 
 #include <stdexcept>
 #include <cmath>
@@ -69,4 +69,4 @@ public:
 	}
 };
 
-#endif // VECTOR4_C
+#endif // VECTOR4_H

@@ -2,7 +2,70 @@
 
 #include "../../math/Util.h"
 
-/** Apply transformations to the object */
+void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
+    switch (mode) {
+        case Mode::GRAB: {
+        	// Extract translation from the transformation matrix (last column of the matrix)
+	        const Vector3 translation(
+        		transformation[3],
+        		transformation[7],
+        		transformation[11]
+        	);
+        	position = position + translation;
+
+        	// Apply the translation to each vertex
+        	for (Vector3& vertex : vertices) {
+		        const Vector4 transformedVertex = transformation * vertex.toVector4();
+        		vertex = Vector3(transformedVertex.x, transformedVertex.y, transformedVertex.z) + translation;
+        	}
+            break;
+        }
+        case Mode::SCALE: {
+            // Extract scale values from the matrix
+            const Vector3 scaleFactors(
+                transformation[0],
+                transformation[5],
+                transformation[10]
+            );
+            const Vector3 oldScale = scale;
+            scale = scaleFactors;
+
+            // Apply scaling relative to the mesh position
+            for (Vector3& vertex : vertices) {
+                Vector3 relativePosition = vertex - position;
+                relativePosition = Vector3(
+                    relativePosition.x * (scale.x / oldScale.x),
+                    relativePosition.y * (scale.y / oldScale.y),
+                    relativePosition.z * (scale.z / oldScale.z)
+                );
+                vertex = relativePosition + position;
+            }
+            break;
+        }
+        case Mode::ROTATE: {
+            rotation = rotation + Vector3(
+                transformation[0],  // This assumes rotationMatrix is set up for x, y, z rotations
+                transformation[5],
+                transformation[10]
+            );
+
+            // Apply the rotation to each vertex
+            for (Vector3& vertex : vertices) {
+                Vector3 relativePosition = vertex - position;
+                const Vector4 rotatedPosition = transformation * relativePosition.toVector4();
+            	vertex = Vector3(
+					rotatedPosition.x + position.x,
+					rotatedPosition.y + position.y,
+					rotatedPosition.z + position.z
+				);
+            }
+            break;
+        }
+    	default: break;
+    }
+}
+
+/*/** Apply transformations to the object #1#
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transformation) {
 	switch (mode) {
 		case Mode::GRAB : {
@@ -28,7 +91,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transfor
 			rotation = rotation + transformation;
 
 			// Get the rotation angles in degrees from the transformation vector
-			const Vector3 rotationRadians = transformation * PI / 180.f;
+			const Vector3 rotationRadians = transformation * PI / 180.0f;
 
 			// Calculate the sine and cosine for the rotation angles
 			const float sinX = std::sin(rotationRadians.x);
@@ -63,9 +126,9 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Vector3 transfor
 			}
 			break;
 		}
-		default : { /* TODO("Not yet implemented") */ }
+		default : { /* TODO("Not yet implemented") #1# }
 	}
-}
+}*/
 
 std::vector<Triangle> Mesh::getTriangles() {
 	std::vector<Triangle> triangles;

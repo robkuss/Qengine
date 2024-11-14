@@ -32,15 +32,12 @@ public:
 	void transform(double mouseX, double mouseY, int width, int height, Vector3 worldPos, Vector3 camPos);
 
 	void toggleViewportMode();
-	void changeTransformMode(Mode::ModeEnum mode);
-	void changeTransformSubMode(SubMode subMode);
-
-	// Variables for object transformation TODO could be made private if debugging was better
-	Vector3 transformation	= Vector3::ZERO;
-	Vector3 lastTransform	= transformation;
+	void setTransformMode(Mode::ModeEnum mode);
+	void setTransformSubMode(SubMode subMode);
 
 private:
 	float scaleSens			= 1000.0f;
+	Vector3 lastTransform   = Vector3::ZERO;
 };
 
 #endif // SCENE_MANAGER_H

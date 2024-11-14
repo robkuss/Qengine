@@ -3,6 +3,7 @@
 
 #include <array>
 #include <stdexcept>
+#include <cmath> // For sin, cos, etc.
 
 #include "../Util.h"
 #include "../vector/Vector4.h"
@@ -10,145 +11,132 @@
 
 class Matrix4 {
 public:
-	// Constructor that initializes the matrix
-	explicit Matrix4(const float *m);
-	~Matrix4() = default;
+    explicit Matrix4(const std::array<float, 16>& m);
+    ~Matrix4() = default;
 
-	// [[nodiscard]] const std::array<float, 16>& get() const;	// Get the underlying matrix
-	float operator[](int) const;					// Access matrix elements
-	Vector4 operator*(const Vector4&) const;		// Matrix * vector
-	Matrix4 operator*(const Matrix4&) const;	// Matrix * matrix
-	static Matrix4 translate(const Vector3 &translation);
+    float operator[](int) const;                    // Access matrix elements
+    Vector4 operator*(const Vector4&) const;        // Matrix * vector
+    Matrix4 operator*(const Matrix4&) const;        // Matrix * matrix
 
-	static Matrix4 scale(const Vector3 &scaling);
+    static Matrix4 translate(const Vector3& t);
+    static Matrix4 scale(const Vector3& s);
+    static Matrix4 rotateX(float angle);
+    static Matrix4 rotateY(float angle);
+    static Matrix4 rotateZ(float angle);
+    static Matrix4 createTransformationMatrix(const Vector3& t, const Vector3& r, const Vector3& s);
 
-	static Matrix4 rotateX(float angle);
-
-	static Matrix4 rotateY(float angle);
-
-	static Matrix4 rotateZ(float angle);
-
-	static Matrix4 createTransformationMatrix(const Vector3 &position, const Vector3 &rotation, const Vector3 &scaling);
-
-	[[nodiscard]] Matrix4 invert() const;			// Invert a 4x4 Matrix
+    [[nodiscard]] Matrix4 invert() const;           // Invert a 4x4 Matrix
 
 private:
-	const float *m;
+    std::array<float, 16> m{};  // Matrix stored in a std::array for safety and ease of use
 };
 
-inline Matrix4::Matrix4(const float *m) : m(m) {}
+
+inline Matrix4::Matrix4(const std::array<float, 16>& m) : m(m) {}
+
 
 inline float Matrix4::operator[](const int index) const {
-	if (index < 0 || index >= 16) {
-		throw std::out_of_range("Index out of bounds for Matrix4x4");
-	}
-	return m[index];
+    if (index < 0 || index >= 16) {
+        throw std::out_of_range("Index out of bounds for Matrix4x4");
+    }
+    return m[index];
 }
 
 inline Vector4 Matrix4::operator*(const Vector4& vec) const {
-	return {
-		m[0] * vec.x + m[4] * vec.y + m[8] * vec.z + m[12] * vec.w,
-		m[1] * vec.x + m[5] * vec.y + m[9] * vec.z + m[13] * vec.w,
-		m[2] * vec.x + m[6] * vec.y + m[10] * vec.z + m[14] * vec.w,
-		m[3] * vec.x + m[7] * vec.y + m[11] * vec.z + m[15] * vec.w
-	};
+    return {
+        m[0] * vec.x + m[4] * vec.y + m[8] * vec.z + m[12] * vec.w,
+        m[1] * vec.x + m[5] * vec.y + m[9] * vec.z + m[13] * vec.w,
+        m[2] * vec.x + m[6] * vec.y + m[10] * vec.z + m[14] * vec.w,
+        m[3] * vec.x + m[7] * vec.y + m[11] * vec.z + m[15] * vec.w
+    };
 }
 
 inline Matrix4 Matrix4::operator*(const Matrix4& other) const {
-	float result[16];
-	for (float& i : result) i = 0.0f;
+    std::array<float, 16> result{};
 
-	// Loop through rows of the first matrix (this)
-	for (int i = 0; i < 4; ++i) {
-		// Loop through columns of the second matrix (other)
-		for (int j = 0; j < 4; ++j) {
-			// Calculate the dot product for element (i, j)
-			float sum = 0.0f;
-			for (int k = 0; k < 4; ++k) {
-				sum += this->m[i * 4 + k] * other[k * 4 + j];
-			}
-			result[i * 4 + j] = sum;
-		}
-	}
+    // Matrix multiplication (dot products)
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            float sum = 0.0f;
+            for (int k = 0; k < 4; ++k) {
+                sum += m[i * 4 + k] * other[k * 4 + j];
+            }
+            result[i * 4 + j] = sum;
+        }
+    }
 
-	return Matrix4(result);
+    return Matrix4(result);
 }
 
-inline Matrix4 Matrix4::translate(const Vector3& translation) {
-	float t[16] = {
-		1, 0, 0, translation.x,
-		0, 1, 0, translation.y,
-		0, 0, 1, translation.z,
-		0, 0, 0, 1
-	};
-	return Matrix4(t);
+inline Matrix4 Matrix4::translate(const Vector3& t) {
+    return Matrix4({
+        1, 0, 0, t.x,
+        0, 1, 0, t.y,
+        0, 0, 1, t.z,
+        0, 0, 0, 1
+    });
 }
 
-inline Matrix4 Matrix4::scale(const Vector3& scaling) {
-	float s[16] = {
-		scaling.x, 0, 0, 0,
-		0, scaling.y, 0, 0,
-		0, 0, scaling.z, 0,
-		0, 0, 0, 1
-	};
-	return Matrix4(s);
+inline Matrix4 Matrix4::scale(const Vector3& s) {
+    return Matrix4({
+        s.x, 0, 0, 0,
+        0, s.y, 0, 0,
+        0, 0, s.z, 0,
+        0, 0, 0, 1
+    });
 }
 
 inline Matrix4 Matrix4::rotateX(const float angle) {
-	const float c = cos(angle);
-	const float s = sin(angle);
-	float r[16] = {
-		1, 0, 0, 0,
-		0, c, -s, 0,
-		0, s, c, 0,
-		0, 0, 0, 1
-	};
-	return Matrix4(r);
+    const float c = cos(angle);
+    const float s = sin(angle);
+    return Matrix4({
+        1, 0, 0, 0,
+        0, c, -s, 0,
+        0, s, c, 0,
+        0, 0, 0, 1
+    });
 }
 
 inline Matrix4 Matrix4::rotateY(const float angle) {
-	const float c = cos(angle);
-	const float s = sin(angle);
-	float r[16] = {
-		c, 0, s, 0,
-		0, 1, 0, 0,
-		-s, 0, c, 0,
-		0, 0, 0, 1
-	};
-	return Matrix4(r);
+    const float c = cos(angle);
+    const float s = sin(angle);
+    return Matrix4({
+        c, 0, s, 0,
+        0, 1, 0, 0,
+        -s, 0, c, 0,
+        0, 0, 0, 1
+    });
 }
 
 inline Matrix4 Matrix4::rotateZ(const float angle) {
-	const float c = cos(angle);
-	const float s = sin(angle);
-	float r[16] = {
-		c, -s, 0, 0,
-		s, c, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	};
-	return Matrix4(r);
+    const float c = cos(angle);
+    const float s = sin(angle);
+    return Matrix4({
+        c, -s, 0, 0,
+        s, c, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    });
 }
 
-inline Matrix4 Matrix4::createTransformationMatrix(const Vector3& position, const Vector3& rotation, const Vector3& scaling) {
-	// Apply transformations in reverse order: scale -> rotate -> translate
-	const Matrix4 scaleMatrix		= scale(scaling);
-	const Matrix4 rotateXMatrix		= rotateX(rotation.x);
-	const Matrix4 rotateYMatrix		= rotateY(rotation.y);
-	const Matrix4 rotateZMatrix		= rotateZ(rotation.z);
-	const Matrix4 translationMatrix = translate(position);
+inline Matrix4 Matrix4::createTransformationMatrix(const Vector3& t, const Vector3& r, const Vector3& s) {
+    // Apply transformations in reverse order: scale -> rotate -> translate
+    const Matrix4 scaleMatrix = scale(s);
+    const Matrix4 rotateXMatrix = rotateX(r.x);
+    const Matrix4 rotateYMatrix = rotateY(r.y);
+    const Matrix4 rotateZMatrix = rotateZ(r.z);
+    const Matrix4 translationMatrix = translate(t);
 
-	// Combine them into a single transformation matrix
-	const Matrix4 modelMatrix = translationMatrix * (rotateZMatrix * (rotateYMatrix * (rotateXMatrix * scaleMatrix)));
-	return modelMatrix;
+    // Combine them into a single transformation matrix
+    const Matrix4 modelMatrix = translationMatrix * (rotateZMatrix * (rotateYMatrix * (rotateXMatrix * scaleMatrix)));
+    return modelMatrix;
 }
 
 inline Matrix4 Matrix4::invert() const {
-	// The inverted matrix we'll return
-	std::array<float, 16> inv{};
+    std::array<float, 16> inv{};
 
-	// The following calculations find the inverse using cofactor expansion and determinant division
-	inv[0]  =  m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] + m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
+    // Calculate the cofactor matrix
+    inv[0]  =  m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] + m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
 	inv[4]  = -m[4] * m[10] * m[15] + m[4] * m[11] * m[14] + m[8] * m[6] * m[15] - m[8] * m[7] * m[14] - m[12] * m[6] * m[11] + m[12] * m[7] * m[10];
 	inv[8]  =  m[4] * m[9]  * m[15] - m[4] * m[11] * m[13] - m[8] * m[5] * m[15] + m[8] * m[7] * m[13] + m[12] * m[5] * m[11] - m[12] * m[7] * m[9];
 	inv[12] = -m[4] * m[9]  * m[14] + m[4] * m[10] * m[13] + m[8] * m[5] * m[14] - m[8] * m[6] * m[13] - m[12] * m[5] * m[10] + m[12] * m[6] * m[9];
@@ -180,8 +168,7 @@ inline Matrix4 Matrix4::invert() const {
 		inv[i] *= det;
 	}
 
-	// Return the inverted matrix
-	return Matrix4(inv.data());
+    return Matrix4(inv);
 }
 
 #endif // MATRIX4_H

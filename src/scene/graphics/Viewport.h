@@ -65,38 +65,38 @@ private:
 	float aspect;
 	SceneManager sceneManager;
 
-	Text* text{};			// For on-screen debug text
+	Text* text{};		// For on-screen debug text
 
 	// Initial values
-	Vector3 camPos			= CAMERA_POSITION_INIT;
-	Vector3 lookAt			= LOOK_AT_POINT_INIT;
-	Vector3 up				= UP_VECTOR_INIT;
-	float camDist			= CAMERA_DISTANCE_INIT;
-	float zoomSpeed			= 1.0f;
+	Vector3 camPos		= CAMERA_POSITION_INIT;
+	Vector3 lookAt		= LOOK_AT_POINT_INIT;
+	Vector3 up			= UP_VECTOR_INIT;
+	float camDist		= CAMERA_DISTANCE_INIT;
+	float zoomSpeed		= 1.0f;
 
 	// Variables for camera rotation
-	bool rotating			= false;
-	double rotSens			= 0.5;
-	double rotH				= 0.0;
-	double rotV				= 0.0;
-	double lastH			= 0.0;
-	double lastV			= 0.0;
+	bool rotating		= false;
+	double rotSens		= 0.5;
+	double rotH			= 0.0;
+	double rotV			= 0.0;
+	double lastH		= 0.0;
+	double lastV		= 0.0;
 
 	// Mouse Ray
-	Vector3 rayStart        = Vector3::MINUS_ONE;
-	Vector3 rayEnd          = Vector3::ONE;
+	Vector3 rayStart    = Vector3::MINUS_ONE;
+	Vector3 rayEnd      = Vector3::ONE;
 
 	// FPS tracking
-	double previousTime		= 0.0;
-	int frameCount			= 0;
-	int fps					= 0;
+	double previousTime = 0.0;
+	int frameCount		= 0;
+	int fps				= 0;
 
-	// Pointers - Shared resources for viewport state used mainly by the OpenGL library
-	int* viewport			= new int[4];
-	float* projMatrix		= new float[16];
-	float* viewMatrix		= new float[16];
-	double* mouseX			= new double[1];
-	double* mouseY			= new double[1];
+	// OpenGL Pointers
+	GLint* viewport		= new int[4];
+	GLfloat* projMatrix = new float[16];
+	GLfloat* viewMatrix = new float[16];
+	GLdouble* mouseX	= new double[1];
+	GLdouble* mouseY	= new double[1];
 
 	// Functions
 	void gluPerspective() const;

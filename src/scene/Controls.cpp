@@ -46,9 +46,12 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	// Cursor position callback
 	glfwSetCursorPosCallback(window, [](GLFWwindow* cbWindow, const double mouseX, const double mouseY) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
-			glfwGetCursorPos(cbWindow, vp->mouseX, vp->mouseY);	// Update the mouse position in the Viewport
+			glfwGetCursorPos(cbWindow, vp->mouseX, vp->mouseY); // Update the mouse position in the Viewport
+
 			if (vp->sceneManager.transformMode.mode == Mode::NONE) {
-				if (vp->rotating) vp->rotate(mouseX, mouseY);
+				if (vp->rotating) {
+					vp->rotate(mouseX, mouseY); // Regular rotation handling if no transformation mode is active
+				}
 			} else {
 				vp->sceneManager.transform(mouseX, mouseY, vp->width, vp->height, vp->screenToWorld(mouseX, mouseY, 0), vp->camPos);
 			}
@@ -86,29 +89,26 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 		case GLFW_KEY_6   : togglePerspective(  0.0f,-90.0f); break;			// 6 -> Bottom View (towards positive Z)
 
 		// Change Transform Mode
-		case GLFW_KEY_G	  : sceneManager.changeTransformMode(Mode::GRAB); break;	// G -> Grab
-		case GLFW_KEY_S	  : sceneManager.changeTransformMode(Mode::SCALE); break;	// S -> Scale
-		case GLFW_KEY_R   : {														// R -> Rotate
-			sceneManager.changeTransformMode(Mode::ROTATE);
-			text->setErrorText("Rotating is not yet implemented."); break;
-		}
+		case GLFW_KEY_G	  : sceneManager.setTransformMode(Mode::GRAB); break;		// G -> Grab
+		case GLFW_KEY_S	  : sceneManager.setTransformMode(Mode::SCALE); break;		// S -> Scale
+		case GLFW_KEY_R   : sceneManager.setTransformMode(Mode::ROTATE); break; 	// R -> Rotate
 		case GLFW_KEY_E	  : {														// E -> Extrude
-			sceneManager.changeTransformMode(Mode::EXTRUDE);
+			sceneManager.setTransformMode(Mode::EXTRUDE);
 			text->setErrorText("Extruding is not yet implemented."); break;
 		}
 		case GLFW_KEY_F	  : {														// F -> Fill
-			sceneManager.changeTransformMode(Mode::FILL);
+			sceneManager.setTransformMode(Mode::FILL);
 			text->setErrorText("Filling is not yet implemented."); break;
 		}
 		case GLFW_KEY_M   : {														// M -> Merge
-			sceneManager.changeTransformMode(Mode::MERGE);
+			sceneManager.setTransformMode(Mode::MERGE);
 			text->setErrorText("Merging is not yet implemented."); break;
 		}
 
 		// Change Transform SubMode
-		case GLFW_KEY_X   : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.changeTransformSubMode(SubMode::X); break; // X -> Snap transformation to X direction
-		case GLFW_KEY_Y   : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.changeTransformSubMode(SubMode::Y); break; // Y -> Snap transformation to Y direction
-		case GLFW_KEY_Z   : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.changeTransformSubMode(SubMode::Z); break; // Z -> Snap transformation to Z direction
+		case GLFW_KEY_X   : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.setTransformSubMode(SubMode::X); break; // X -> Snap transformation to X direction
+		case GLFW_KEY_Y   : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.setTransformSubMode(SubMode::Y); break; // Y -> Snap transformation to Y direction
+		case GLFW_KEY_Z   : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.setTransformSubMode(SubMode::Z); break; // Z -> Snap transformation to Z direction
 
 		default: text->setErrorText("Invalid key.");
 	}

@@ -9,7 +9,7 @@
 #include "../Object.h"
 #include "../../scene/Mode.h"
 #include "../../math/Triangle.h"
-
+#include "../../math/matrix/Matrix4.h"
 
 class Mesh : public Object {
 public:
@@ -25,7 +25,7 @@ public:
 		: Object{name, position, scale, rotation} {}
 	~Mesh() override = default;
 
-	void applyTransformation(Mode::ModeEnum mode, Vector3 transformation);
+	void applyTransformation(Mode::ModeEnum mode, const Matrix4& transformation);
 	std::vector<Triangle> getTriangles();
 	void buildEdgeToFaceMap();
 	[[nodiscard]] Vector3 faceNormal(int faceIndex) const;
