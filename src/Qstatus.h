@@ -22,7 +22,7 @@ struct Qstatus {
 	}
 };
 
-#define SPECIFIC_ERROR Qstatus(0x42, "This is an error message");
-#define ANOTHER_ERROR Qstatus(0x43, "This is a different error");
+const Qstatus SPECIFIC_ERROR(0x42, "This is an error message");
+const Qstatus ANOTHER_ERROR(0x43, "This is a different error");
 
 #endif // STATUS_H
