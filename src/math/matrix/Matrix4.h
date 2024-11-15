@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <cmath> // For sin, cos, etc.
 
+#include "../../Qstatus.h"
 #include "../Util.h"
 #include "../vector/Vector4.h"
 

@@ -2,6 +2,7 @@
 .clang-format
 cmake-build-debug/
 libs/
+chcodes.sh
 codegen.sh
 
 # Prerequisites

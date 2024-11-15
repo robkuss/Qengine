@@ -1,5 +1,6 @@
 #include "Viewport.h"
 
+#include "../../Qstatus.h"
 #include "../../math/Util.h"
 #include "../../math/vector/Vector2.h"
 #include "color/Colors.h"
@@ -63,7 +64,7 @@ void Viewport::start() {
 	gluLookAt(camPos, lookAt, up);   // Initialize view matrix
 
 	#ifdef TEXT
-		text = new Text();			// Initialize FreeType for on-screen debug text
+		text = new Text();	// Initialize FreeType for on-screen debug text
 	#endif
 
 	// Start rendering the Viewport
