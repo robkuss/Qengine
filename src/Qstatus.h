@@ -4,10 +4,10 @@
 /**
  * Status codes for Qengine
  *
- * 0x00 - 0x1F: Success codes
- * 0x20 - 0x5F: Warnings (non-fatal errors)
- * 0x60 - 0x9F: Non-fatal errors (which may be recoverable)
- * 0xA0 - 0xFF: Fatal errors (which typically stop execution)
+ * 0x0000 - 0x0FFF: Success codes
+ * 0x1000 - 0x4FFF: Warnings (non-fatal errors)
+ * 0x5000 - 0x9FFF: Non-fatal errors (which may be recoverable)
+ * 0xA000 - 0xFFFF: Fatal errors (which typically stop execution)
  */
 
 struct Qstatus {
@@ -22,8 +22,7 @@ struct Qstatus {
 	}
 };
 
-const Qstatus ERROR(0x42, "reverted");
-const Qstatus ANOTHER(0x69, "This is an error");
-const Qstatus YET_ANOTHER(0x88, "This is an error");
+// Errors
+#define UNKNOWN_ERROR Qstatus(0xFFFF, "Unknown error")
 
 #endif // STATUS_H

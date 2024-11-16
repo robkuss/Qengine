@@ -9,7 +9,7 @@ constexpr int DEFAULT_WIDTH  = 1920;
 constexpr int DEFAULT_HEIGHT = 1080;
 
 int main() {
-	std::cout << SPECIFIC_ERROR << std::endl;
+	std::cout << UNKNOWN_ERROR << std::endl;
 
     try {
         // Initialize and start Viewport
