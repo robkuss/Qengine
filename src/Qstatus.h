@@ -11,10 +11,10 @@
  */
 
 struct Qstatus {
-	int code;
+	uint16_t code;
 	const char *msg;
 
-	Qstatus(const int code, const char* msg) : code(code), msg(msg) {}
+	Qstatus(const uint16_t code, const char* msg) : code(code), msg(msg) {}
 
 	friend std::ostream& operator<<(std::ostream& os, const Qstatus& status) {
 		os << status.msg;
@@ -22,7 +22,8 @@ struct Qstatus {
 	}
 };
 
-const Qstatus SPECIFIC_ERROR(0x42, "This is an error message");
-const Qstatus ANOTHER_ERROR(0x43, "This is a different error");
+const Qstatus ERROR(0x42, "reverted");
+const Qstatus ANOTHER(0x69, "This is an error");
+const Qstatus YET_ANOTHER(0x88, "This is an error");
 
 #endif // STATUS_H
