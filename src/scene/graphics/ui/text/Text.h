@@ -10,7 +10,7 @@
 
 #include "scene/graphics/color/Colors.h"
 
-// Define a struct to represent each character glyph
+// Struct to represent each character glyph
 struct Character {
 	GLuint textureID;		    // ID handle of the glyph texture
 	unsigned int sizeX, sizeY;	// Size of glyph
@@ -20,11 +20,11 @@ struct Character {
 
 class Text {
 public:
-	static constexpr float firstLineX = 10.0f;
-	static constexpr float firstLineY = 45.0f;
+	static constexpr float firstLineX  = 10.0f;
+	static constexpr float firstLineY  = 45.0f;
 	static constexpr float bottomLineY = 10.0f;
 	static constexpr float lineSpacing = 1.2f;
-	static constexpr float fontScale = 0.5f;
+	static constexpr float fontScale   = 0.5f;
 	std::string nonFatalErrorText;
 
 	double errorTime = 0.0;

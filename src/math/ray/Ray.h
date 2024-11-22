@@ -47,8 +47,8 @@ inline bool Ray::intersects(const Triangle &triangle) const {
 	}
 
 	const auto f = 1.0f / a;
-	const auto s = (origin - vertex0);
-	const auto u = f * (s.dot(h));
+	const auto s = origin - vertex0;
+	const auto u = f * s.dot(h);
 
 	// Check if the intersection is outside the triangle
 	if (u < 0.0f || u > 1.0f) {
@@ -58,12 +58,12 @@ inline bool Ray::intersects(const Triangle &triangle) const {
 	const auto q = s.cross(edge1);
 
 	// If the intersection lies outside the triangle
-	if (const auto v = f * (direction.dot(q)); v < 0.0f || u + v > 1.0f) {
+	if (const auto v = f * direction.dot(q); v < 0.0f || u + v > 1.0f) {
 		return false;
 	}
 
 	// At this stage, we can compute t to find out where the intersection point is on the line
-	const auto t = f * (edge2.dot(q));
+	const auto t = f * edge2.dot(q);
 
 	// Check if the ray intersects the triangle (t > 0 indicates a valid intersection)
 	return t > EPSILON;

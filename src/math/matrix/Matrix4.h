@@ -1,7 +1,7 @@
 #ifndef MATRIX4_H
 #define MATRIX4_H
 
-#include <cmath> // For sin, cos, etc.
+#include <cmath>
 
 #include "math/Util.h"
 #include "math/vector/Vector4.h"

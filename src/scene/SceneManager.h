@@ -17,7 +17,7 @@ public:
 	explicit SceneManager() {
 		// Add Default Cube to scene
 		addObject(
-			std::make_shared<Cube>("Cube", Vector3(.5f, .5f, .5f), 1.0f)
+			std::make_shared<Cube>("Cube", Vector3(0.5f, 0.5f, 0.5f), 1.0f)
 		);
 	}
 	~SceneManager() = default;
