@@ -14,9 +14,10 @@ public:
     explicit Matrix4(const std::array<float, 16>& m);
     ~Matrix4() = default;
 
-    float operator[](int) const;                    // Access matrix elements
-    Vector4 operator*(const Vector4&) const;        // Matrix * vector
-    Matrix4 operator*(const Matrix4&) const;        // Matrix * matrix
+    float operator[](int) const;                    // Access Matrix elements
+    Vector4 operator*(const Vector4&) const;        // Matrix * Vector
+    Matrix4 operator*(const Matrix4&) const;        // Matrix * Matrix
+    [[nodiscard]] Matrix4 invert() const;           // Matrix inversion
 
     static Matrix4 translate(const Vector3& t);
     static Matrix4 scale(const Vector3& s);
@@ -25,10 +26,8 @@ public:
     static Matrix4 rotateZ(float angle);
     static Matrix4 createTransformationMatrix(const Vector3& t, const Vector3& r, const Vector3& s);
 
-    [[nodiscard]] Matrix4 invert() const;           // Invert a 4x4 Matrix
-
 private:
-    std::array<float, 16> m{};  // Matrix stored in a std::array for safety and ease of use
+    std::array<float, 16> m{};
 };
 
 

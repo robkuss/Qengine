@@ -24,16 +24,16 @@ private:
     /** Initialize the cube vertices based on side length and position */
     void initializeVertices() {
         // Front face
-        vertices.emplace_back(-s / 2 + position.x, -s / 2 + position.y,  s / 2 + position.z);  // Bottom-left
-        vertices.emplace_back( s / 2 + position.x, -s / 2 + position.y,  s / 2 + position.z);  // Bottom-right
-        vertices.emplace_back( s / 2 + position.x,  s / 2 + position.y,  s / 2 + position.z);  // Top-right
-        vertices.emplace_back(-s / 2 + position.x,  s / 2 + position.y,  s / 2 + position.z);  // Top-left
+        vertices.emplace_back(-s / 2.0f + position.x, -s / 2.0f + position.y,  s / 2.0f + position.z);  // Bottom-left
+        vertices.emplace_back( s / 2.0f + position.x, -s / 2.0f + position.y,  s / 2.0f + position.z);  // Bottom-right
+        vertices.emplace_back( s / 2.0f + position.x,  s / 2.0f + position.y,  s / 2.0f + position.z);  // Top-right
+        vertices.emplace_back(-s / 2.0f + position.x,  s / 2.0f + position.y,  s / 2.0f + position.z);  // Top-left
 
         // Back face
-        vertices.emplace_back(-s / 2 + position.x, -s / 2 + position.y, -s / 2 + position.z);  // Bottom-left
-        vertices.emplace_back( s / 2 + position.x, -s / 2 + position.y, -s / 2 + position.z);  // Bottom-right
-        vertices.emplace_back( s / 2 + position.x,  s / 2 + position.y, -s / 2 + position.z);  // Top-right
-        vertices.emplace_back(-s / 2 + position.x,  s / 2 + position.y, -s / 2 + position.z);  // Top-left
+        vertices.emplace_back(-s / 2.0f + position.x, -s / 2.0f + position.y, -s / 2.0f + position.z);  // Bottom-left
+        vertices.emplace_back( s / 2.0f + position.x, -s / 2.0f + position.y, -s / 2.0f + position.z);  // Bottom-right
+        vertices.emplace_back( s / 2.0f + position.x,  s / 2.0f + position.y, -s / 2.0f + position.z);  // Top-right
+        vertices.emplace_back(-s / 2.0f + position.x,  s / 2.0f + position.y, -s / 2.0f + position.z);  // Top-left
     }
 
     void initializeFaceIndices() {
