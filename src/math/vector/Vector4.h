@@ -6,13 +6,13 @@
 
 class Vector4 {
 public:
-	float x, y, z, w;
+	double x, y, z, w;
 
 	// Constructor
-	Vector4(const float x, const float y, const float z, const float w) : x(x), y(y), z(z), w(w) {}
+	Vector4(const double x, const double y, const double z, const double w) : x(x), y(y), z(z), w(w) {}
 
 	// Access by index
-	float operator[](const int index) const {
+	double operator[](const int index) const {
 		switch (index) {
 			case 0: return x;
 			case 1: return y;
@@ -31,7 +31,7 @@ public:
 		return {x - other.x, y - other.y, z - other.z, w - other.w};
 	}
 
-	Vector4 operator*(const float scalar) const {
+	Vector4 operator*(const double scalar) const {
 		return {x * scalar, y * scalar, z * scalar, w * scalar};
 	}
 
@@ -39,7 +39,7 @@ public:
 		return {x * other.x, y * other.y, z * other.z, w * other.w};
 	}
 
-	Vector4 operator/(const float scalar) const {
+	Vector4 operator/(const double scalar) const {
 		return {x / scalar, y / scalar, z / scalar, w / scalar};
 	}
 
@@ -52,7 +52,7 @@ public:
 	}
 
 	// Utility functions
-	[[nodiscard]] float length() const {
+	[[nodiscard]] double length() const {
 		return std::sqrt(x * x + y * y + z * z + w * w);
 	}
 
@@ -60,11 +60,11 @@ public:
 		return length() > 0 ? *this / length() : *this; // Return normalized vector
 	}
 
-	[[nodiscard]] float distance(const Vector4& other) const {
+	[[nodiscard]] double distance(const Vector4& other) const {
 		return std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) + (z - other.z) * (z - other.z) + (w - other.w) * (w - other.w));
 	}
 
-	[[nodiscard]] float dot(const Vector4& other) const {
+	[[nodiscard]] double dot(const Vector4& other) const {
 		return x * other.x + y * other.y + z * other.z + w * other.w;
 	}
 };

@@ -9,10 +9,10 @@
 
 class Vector3 {
 public:
-	float x, y, z;
+	double x, y, z;
 
 	// Constructor
-	Vector3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
+	Vector3(const double x, const double y, const double z) : x(x), y(y), z(z) {}
 
 	// Static constants
 	static const Vector3& ZERO;
@@ -25,7 +25,7 @@ public:
 	}
 
 	// Access by index
-	float operator[](const int index) const {
+	double operator[](const int index) const {
 		switch (index) {
 			case 0: return x;
 			case 1: return y;
@@ -43,7 +43,7 @@ public:
 		return {x - other.x, y - other.y, z - other.z};
 	}
 
-	Vector3 operator*(const float scalar) const {
+	Vector3 operator*(const double scalar) const {
 		return {x * scalar, y * scalar, z * scalar};
 	}
 
@@ -51,7 +51,7 @@ public:
 		return {x * other.x, y * other.y, z * other.z};
 	}
 
-	Vector3 operator/(const float scalar) const {
+	Vector3 operator/(const double scalar) const {
 		return {x / scalar, y / scalar, z / scalar};
 	}
 
@@ -64,19 +64,19 @@ public:
 	}
 
 	// Utility functions
-	[[nodiscard]] float length() const {
+	[[nodiscard]] double length() const {
 		return std::sqrt(x * x + y * y + z * z);
 	}
 
 	[[nodiscard]] Vector3 normalize() const {
-		return length() > 0 ? *this / length() : *this; // Return normalized vector
+		return length() > 0.0 ? *this / length() : *this; // Return normalized vector
 	}
 
-	[[nodiscard]] float distance(const Vector3& other) const {
+	[[nodiscard]] double distance(const Vector3& other) const {
 		return std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) + (z - other.z) * (z - other.z));
 	}
 
-	[[nodiscard]] float dot(const Vector3& other) const {
+	[[nodiscard]] double dot(const Vector3& other) const {
 		return x * other.x + y * other.y + z * other.z;
 	}
 
@@ -93,8 +93,8 @@ public:
 	}
 };
 
-inline const Vector3& Vector3::ZERO		 = Vector3(0.0f, 0.0f, 0.0f);
-inline const Vector3& Vector3::ONE		 = Vector3(1.0f, 1.0f, 1.0f);
-inline const Vector3& Vector3::MINUS_ONE = Vector3(-1.0f, -1.0f, -1.0f);
+inline const Vector3& Vector3::ZERO		 = Vector3(0.0, 0.0, 0.0);
+inline const Vector3& Vector3::ONE		 = Vector3(1.0, 1.0, 1.0);
+inline const Vector3& Vector3::MINUS_ONE = Vector3(-1.0, -1.0, -1.0);
 
 #endif // VECTOR3_H

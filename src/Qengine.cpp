@@ -9,8 +9,6 @@ constexpr int DEFAULT_WIDTH  = 1920;
 constexpr int DEFAULT_HEIGHT = 1080;
 
 int main() {
-	std::cout << UNKNOWN_ERROR << std::endl;
-
     try {
         // Initialize and start Viewport
         Viewport(TITLE, DEFAULT_WIDTH, DEFAULT_HEIGHT, SceneManager()).start();

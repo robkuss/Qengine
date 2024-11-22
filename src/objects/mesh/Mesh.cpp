@@ -7,9 +7,9 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
         case Mode::GRAB: {
         	// Extract translation from the transformation matrix (last column of the matrix)
 	        const Vector3 translation(
-        		transformation[3],
-        		transformation[7],
-        		transformation[11]
+        		transformation.m14,
+        		transformation.m24,
+        		transformation.m34
         	);
         	position = position + translation;
 
