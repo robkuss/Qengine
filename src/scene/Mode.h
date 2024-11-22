@@ -1,5 +1,4 @@
-#ifndef MODE_H
-#define MODE_H
+#pragma once
 
 #include <iostream>
 
@@ -77,5 +76,3 @@ inline Mode ROTATE	(Mode::ROTATE,  ModeType::TRANSFORM);
 inline Mode EXTRUDE	(Mode::EXTRUDE, ModeType::MESHDATA);
 inline Mode FILL	(Mode::FILL,	 ModeType::MESHDATA);
 inline Mode MERGE	(Mode::MERGE,	 ModeType::MESHDATA);
-
-#endif // MODE_H

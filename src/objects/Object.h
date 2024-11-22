@@ -1,5 +1,4 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#pragma once
 
 #include <utility>
 #include <string>
@@ -26,5 +25,3 @@ private:
 
 // Initialize Object ID
 inline int Object::nextID = 0;
-
-#endif // OBJECT_H

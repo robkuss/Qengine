@@ -1,5 +1,4 @@
-#ifndef MATRIX4_H
-#define MATRIX4_H
+#pragma once
 
 #include <cmath>
 
@@ -194,5 +193,3 @@ struct Matrix4 {
     	values[15] = m44;
     }
 };
-
-#endif // MATRIX4_H

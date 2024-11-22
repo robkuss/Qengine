@@ -1,5 +1,4 @@
-#ifndef STATUS_H
-#define STATUS_H
+#pragma once
 
 #include <stdint.h>
 #include <sstream>
@@ -28,5 +27,3 @@ struct Qstatus {
 
 // Errors
 #define UNKNOWN_ERROR Qstatus(0xFFFF, "Unknown error")
-
-#endif // STATUS_H

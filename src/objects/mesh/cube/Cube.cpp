@@ -1,5 +1,4 @@
-#ifndef CUBE_C
-#define CUBE_C
+#pragma once
 
 #include "objects/mesh/Mesh.h"
 
@@ -65,5 +64,3 @@ private:
         };
     }
 };
-
-#endif // CUBE_C

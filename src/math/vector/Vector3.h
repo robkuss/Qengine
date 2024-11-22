@@ -1,5 +1,4 @@
-#ifndef VECTOR3_H
-#define VECTOR3_H
+#pragma once
 
 #include <string>
 #include <stdexcept>
@@ -96,5 +95,3 @@ public:
 inline const Vector3& Vector3::ZERO		 = Vector3(0.0f, 0.0f, 0.0f);
 inline const Vector3& Vector3::ONE		 = Vector3(1.0f, 1.0f, 1.0f);
 inline const Vector3& Vector3::MINUS_ONE = Vector3(-1.0f, -1.0f, -1.0f);
-
-#endif // VECTOR3_H

@@ -1,5 +1,4 @@
-#ifndef MESH_RENDERER_H
-#define MESH_RENDERER_H
+#pragma once
 
 #include "math/vector/Vector3.h"
 #include "objects/mesh/Mesh.h"
@@ -11,5 +10,3 @@ public:
 private:
 	static bool isSilhouetteEdge(const Mesh& mesh, const std::vector<int>& faces, Vector3 camPos);
 };
-
-#endif // MESH_RENDERER_H

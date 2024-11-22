@@ -1,5 +1,4 @@
-#ifndef RAY_C
-#define RAY_C
+#pragma once
 
 #include <algorithm>
 #include <optional>
@@ -89,5 +88,3 @@ inline std::optional<Vector3> Ray::intersectWithPlane(const Vector3 planePoint, 
 	// Compute the intersection point as rayOrigin + t * rayDirection
 	return origin + (direction * t);
 }
-
-#endif // RAY_C

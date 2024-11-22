@@ -1,5 +1,4 @@
-#ifndef VIEWPORT_H
-#define VIEWPORT_H
+#pragma once
 
 #define GLFW_INCLUDE_GLEXT
 
@@ -111,5 +110,3 @@ private:
 
 	void getFPS();
 };
-
-#endif //VIEWPORT_H

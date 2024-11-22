@@ -1,5 +1,4 @@
-#ifndef VECTOR2_C
-#define VECTOR2_C
+#pragma once
 
 #include <stdexcept>
 #include <cmath>
@@ -66,5 +65,3 @@ public:
 		return x * other.x + y * other.y;
 	}
 };
-
-#endif // VECTOR2_C

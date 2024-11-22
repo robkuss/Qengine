@@ -1,5 +1,4 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -33,5 +32,3 @@ public:
 private:
 	void addEdgeToMap(int v0, int v1, int faceIndex);
 };
-
-#endif // MESH_H

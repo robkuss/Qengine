@@ -1,5 +1,4 @@
-#ifndef VECTOR4_H
-#define VECTOR4_H
+#pragma once
 
 #include <stdexcept>
 #include <cmath>
@@ -68,5 +67,3 @@ public:
 		return x * other.x + y * other.y + z * other.z + w * other.w;
 	}
 };
-
-#endif // VECTOR4_H

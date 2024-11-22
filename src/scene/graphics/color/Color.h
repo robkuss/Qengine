@@ -1,5 +1,4 @@
-#ifndef COLOR_H
-#define COLOR_H
+#pragma once
 
 // Ensure proper linkage and calling convention for Windows API functions
 #define WINGDIAPI __declspec(dllimport)
@@ -28,5 +27,3 @@ inline void clearColor(const Color& color) {
 inline void color3f(const Color& color) {
 	glColor3f(color.red(), color.green(), color.blue());
 }
-
-#endif // COLOR_H

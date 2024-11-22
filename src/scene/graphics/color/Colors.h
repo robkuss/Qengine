@@ -1,5 +1,4 @@
-#ifndef COLORS_H
-#define COLORS_H
+#pragma once
 
 #include "Color.h"
 
@@ -15,5 +14,3 @@ const Color MESH_VERT_COLOR		( 25,  25,  25);
 const Color MESH_SELECT_COLOR	(240, 150,  60);
 const Color RAY_COLOR			(255, 255,   0);
 const Color TEXT_COLOR			(192, 192, 192);
-
-#endif // COLORS_H

@@ -1,5 +1,4 @@
-#ifndef MATH_UTIL
-#define MATH_UTIL
+#pragma once
 
 #include <numbers>
 
@@ -9,5 +8,3 @@ constexpr double PI			= 3.14159265358979323846;	// Because for some reason there
 inline double radians(const double deg) {
 	return deg * std::numbers::pi / 180.0;
 }
-
-#endif // MATH_UTIL

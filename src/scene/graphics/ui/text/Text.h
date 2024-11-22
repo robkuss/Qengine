@@ -1,5 +1,4 @@
-#ifndef TEXT_H
-#define TEXT_H
+#pragma once
 
 #include <map>
 #include <fstream>
@@ -49,5 +48,3 @@ private:
 
 	std::atomic<bool> errorTimerRunning = false;
 };
-
-#endif // TEXT_H

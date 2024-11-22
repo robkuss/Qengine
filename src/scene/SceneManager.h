@@ -1,5 +1,4 @@
-#ifndef SCENE_MANAGER_H
-#define SCENE_MANAGER_H
+#pragma once
 
 #include "objects/mesh/cube/Cube.cpp"
 #include "math/ray/Ray.h"
@@ -39,5 +38,3 @@ private:
 	float scaleSens			= 1000.0f;
 	Vector3 lastTransform   = Vector3::ZERO;
 };
-
-#endif // SCENE_MANAGER_H
