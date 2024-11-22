@@ -136,7 +136,7 @@ void Viewport::centerWindow() const {
 
 void Viewport::drawOnScreenText() const {
 	const auto cube = *sceneManager.sceneObjects[0];
-	const auto mouseWorld = screenToWorld(mouseX[0], mouseY[0], 0.0f);
+	const auto mouseWorld = unproject(mouseX[0], mouseY[0], 0.0f);
 	for (int i = 0; i <= 10; i++) {
 		std::ostringstream out;
 		switch (i) {
@@ -272,7 +272,7 @@ void Viewport::togglePerspective(const float h, const float v) {
  *
  * @return the world space coordinates for the given mouse position as a Vector3
  */
-Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const float depth) const {
+Vector3 Viewport::unproject(const double mouseX, const double mouseY, const float depth) const {
 	// Lambda function to convert GLfloat* to std::array<float, 16>
 	auto toArray = [](const GLfloat* matrix) {
 		std::array<float, 16> arr{};
@@ -298,7 +298,7 @@ Vector3 Viewport::screenToWorld(const double mouseX, const double mouseY, const 
 }
 
 Ray Viewport::getMouseRay(const double mouseX, const double mouseY) {
-	return {camPos, screenToWorld(mouseX, mouseY, 1.0f).normalize()};
+	return {camPos, unproject(mouseX, mouseY, 1.0f).normalize()};
 }
 
 // Drawing functions

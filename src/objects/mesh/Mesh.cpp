@@ -7,9 +7,9 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
         case Mode::GRAB: {
         	// Extract translation from the transformation matrix (last column of the matrix)
 	        const Vector3 translation(
-        		transformation.m14,
-        		transformation.m24,
-        		transformation.m34
+        		transformation[3],
+        		transformation[7],
+        		transformation[11]
         	);
         	position = position + translation;
 
@@ -44,7 +44,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
         }
         case Mode::ROTATE: {
             rotation = rotation + Vector3(
-                transformation[0],  // This assumes rotationMatrix is set up for x, y, z rotations
+                transformation[0],
                 transformation[5],
                 transformation[10]
             );

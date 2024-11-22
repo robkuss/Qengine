@@ -103,7 +103,7 @@ private:
 	static void gluLookAt(Vector3 eye, Vector3 center, Vector3 up);
 	void updateCameraPosition();
 
-	[[nodiscard]] Vector3 screenToWorld(double mouseX, double mouseY, float depth) const;
+	[[nodiscard]] Vector3 unproject(double mouseX, double mouseY, float depth) const;
 	Ray getMouseRay(double mouseX, double mouseY);
 
 	static void drawAxes();

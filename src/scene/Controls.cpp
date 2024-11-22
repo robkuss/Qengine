@@ -54,7 +54,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 					vp->rotate(mouseX, mouseY); // Regular rotation handling if no transformation mode is active
 				}
 			} else {
-				vp->sceneManager.transform(mouseX, mouseY, vp->width, vp->height, vp->screenToWorld(mouseX, mouseY, 0), vp->camPos);
+				vp->sceneManager.transform(mouseX, mouseY, vp->width, vp->height, vp->unproject(mouseX, mouseY, 0), vp->camPos);
 			}
 		}
 	});
