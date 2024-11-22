@@ -8,7 +8,9 @@ class Cube final : public Mesh {
 public:
     float s;  // side length
 
-    // Constructor & Destructor
+    /**
+    * Construct a named Cube Mesh with given side length and position and default scale and rotation
+    */
     Cube(const std::string& name, const Vector3& position, const float s)
             : Mesh{name, position, Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f)}, s{s} {
         initializeVertices();

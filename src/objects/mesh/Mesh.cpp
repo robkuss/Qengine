@@ -1,16 +1,11 @@
 #include "Mesh.h"
 
-#include "../../math/Util.h"
-
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
+	const Vector3 translation = {transformation[3], transformation[7], transformation[11]};
+	const Vector3 scaleFactors = {transformation[0], transformation[5], transformation[10]};
+
     switch (mode) {
         case Mode::GRAB: {
-        	// Extract translation from the transformation matrix (last column of the matrix)
-	        const Vector3 translation(
-        		transformation[3],
-        		transformation[7],
-        		transformation[11]
-        	);
         	position = position + translation;
 
         	// Apply the translation to each vertex
@@ -21,12 +16,6 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
             break;
         }
         case Mode::SCALE: {
-            // Extract scale values from the matrix
-            const Vector3 scaleFactors(
-                transformation[0],
-                transformation[5],
-                transformation[10]
-            );
             const Vector3 oldScale = scale;
             scale = scaleFactors;
 
@@ -43,11 +32,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
             break;
         }
         case Mode::ROTATE: {
-            rotation = rotation + Vector3(
-                transformation[0],
-                transformation[5],
-                transformation[10]
-            );
+            rotation = rotation + scaleFactors;
 
             // Apply the rotation to each vertex
             for (Vector3& vertex : vertices) {
