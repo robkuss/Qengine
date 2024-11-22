@@ -1,13 +1,13 @@
-#include <algorithm>
 #ifndef RAY_C
 #define RAY_C
 
+#include <algorithm>
 #include <optional>
 
-#include "../Util.h"
-#include "../Triangle.h"
-#include "../vector/Vector3.h"
-#include "../../objects/mesh/Mesh.h"
+#include "math/Util.h"
+#include "math/Triangle.h"
+#include "math/vector/Vector3.h"
+#include "objects/mesh/Mesh.h"
 
 
 class Ray {

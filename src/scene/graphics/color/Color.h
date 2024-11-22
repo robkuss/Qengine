@@ -4,6 +4,7 @@
 // Ensure proper linkage and calling convention for Windows API functions
 #define WINGDIAPI __declspec(dllimport)
 #define APIENTRY __stdcall
+
 #include <GL/gl.h>
 
 class Color {

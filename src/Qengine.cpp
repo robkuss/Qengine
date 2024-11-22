@@ -1,7 +1,6 @@
 #include <chrono>
 #include <iostream>
 
-#include "Qstatus.h"
 #include "scene/graphics/Viewport.h"
 
 constexpr auto TITLE         = "Qengine";

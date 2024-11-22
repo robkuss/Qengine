@@ -3,8 +3,8 @@
 
 #include <cmath> // For sin, cos, etc.
 
-#include "../Util.h"
-#include "../vector/Vector4.h"
+#include "math/Util.h"
+#include "math/vector/Vector4.h"
 
 #include <array>
 

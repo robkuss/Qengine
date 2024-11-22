@@ -1,8 +1,8 @@
 #ifndef SCENE_MANAGER_H
 #define SCENE_MANAGER_H
 
-#include "../objects/mesh/cube/Cube.cpp"
-#include "../math/ray/Ray.h"
+#include "objects/mesh/cube/Cube.cpp"
+#include "math/ray/Ray.h"
 
 class SceneManager {
 public:

@@ -39,6 +39,7 @@ add_executable(Qengine
 target_compile_definitions(Qengine PRIVATE GLEW_STATIC FREETYPE_STATIC)
 
 target_include_directories(Qengine PRIVATE
+	${CMAKE_SOURCE_DIR}/src
 	${GLEW_INCLUDE_DIR}
 	${FREETYPE_INCLUDE_DIRS}
 )

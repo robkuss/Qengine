@@ -6,10 +6,10 @@
 #include <vector>
 #include <utility>  // For std::pair
 
-#include "../Object.h"
-#include "../../scene/Mode.h"
-#include "../../math/Triangle.h"
-#include "../../math/matrix/Matrix4.h"
+#include "objects/Object.h"
+#include "scene/Mode.h"
+#include "math/Triangle.h"
+#include "math/matrix/Matrix4.h"
 
 class Mesh : public Object {
 public:

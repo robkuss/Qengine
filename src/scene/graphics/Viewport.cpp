@@ -1,8 +1,7 @@
 #include "Viewport.h"
 
-#include "../../Qstatus.h"
-#include "../../math/Util.h"
-#include "../../math/vector/Vector2.h"
+#include "math/Util.h"
+#include "math/vector/Vector2.h"
 #include "color/Colors.h"
 
 #include <cmath>

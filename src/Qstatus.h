@@ -1,6 +1,10 @@
 #ifndef STATUS_H
 #define STATUS_H
 
+#include <stdint.h>
+#include <sstream>
+
+
 /**
  * Status codes for Qengine
  *
