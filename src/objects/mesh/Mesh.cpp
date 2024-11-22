@@ -1,8 +1,8 @@
 #include "Mesh.h"
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
-	const Vector3 translation = {transformation[3], transformation[7], transformation[11]};
-	const Vector3 scaleFactors = {transformation[0], transformation[5], transformation[10]};
+	const Vector3 translation = {transformation.m14, transformation.m24, transformation.m34};
+	const Vector3 scaleFactors = {transformation.m11, transformation.m22, transformation.m33};
 
     switch (mode) {
         case Mode::GRAB: {

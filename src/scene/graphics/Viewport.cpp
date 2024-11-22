@@ -272,12 +272,12 @@ void Viewport::togglePerspective(const float h, const float v) {
  * @return the world space coordinates for the given mouse position as a Vector3
  */
 Vector3 Viewport::unproject(const double mouseX, const double mouseY, const float depth) const {
-	// Lambda function to convert GLfloat* to std::array<float, 16>
+	/*// Lambda function to convert GLfloat* to std::array<float, 16>
 	auto toArray = [](const GLfloat* matrix) {
 		std::array<float, 16> arr{};
 		std::copy_n(matrix, 16, arr.begin());
 		return arr;
-	};
+	};*/
 
 	// Get viewport, projection, and modelview matrices
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -288,10 +288,10 @@ Vector3 Viewport::unproject(const double mouseX, const double mouseY, const floa
 	const auto x = static_cast<float>(2.0f * mouseX / viewport[2] - 1.0f);
 	const auto y = static_cast<float>(1.0f - 2.0f * mouseY / viewport[3]);
 
-	const auto viewSpace = Vector4(x, y, depth, 1.0f);											// Create a vector in clip space
-	const auto clipSpace = Matrix4(toArray(projMatrix)).invert() * viewSpace;				// Transform from clip space to view space by applying the inverse of the projection matrix
-	const auto unprojectedClipSpace = Vector4(clipSpace.x, clipSpace.y, -1.0f, 0.0f);			// Set the Z to -1 for proper unprojection and W to 0 for direction vector in the case of a ray
-	const auto worldSpace = Matrix4(toArray(viewMatrix)).invert() * unprojectedClipSpace;  // Transform from clip space to world space by applying the inverse of the view matrix
+	const auto viewSpace = Vector4(x, y, depth, 1.0f);									// Create a vector in clip space
+	const auto clipSpace = Matrix4(projMatrix).invert() * viewSpace;					// Transform from clip space to view space by applying the inverse of the projection matrix
+	const auto unprojectedClipSpace = Vector4(clipSpace.x, clipSpace.y, -1.0f, 0.0f);	// Set the Z to -1 for proper unprojection and W to 0 for direction vector in the case of a ray
+	const auto worldSpace = Matrix4(viewMatrix).invert() * unprojectedClipSpace;		// Transform from clip space to world space by applying the inverse of the view matrix
 
 	return {worldSpace.x, worldSpace.y, worldSpace.z};
 }
