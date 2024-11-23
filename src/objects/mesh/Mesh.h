@@ -26,7 +26,7 @@ public:
 	~Mesh() override = default;
 
 	void applyTransformation(Mode::ModeEnum mode, const Matrix4& transformation);
-	std::vector<Triangle> getTriangles();
+	[[nodiscard]] std::vector<Triangle> getTriangles() const;
 	void buildEdgeToFaceMap();
 	[[nodiscard]] Vector3 faceNormal(int faceIndex) const;
 

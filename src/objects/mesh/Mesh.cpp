@@ -84,7 +84,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
     }
 }
 
-std::vector<Triangle> Mesh::getTriangles() {
+std::vector<Triangle> Mesh::getTriangles() const {
 	std::vector<Triangle> triangles;
 
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
