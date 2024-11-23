@@ -104,23 +104,23 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 
     switch (transformMode.mode) {
         case Mode::GRAB: {
-        	const float grabZ = (mesh->getPosition() - camPos).length();						// Get distance of the Object from the camera
-        	lastTransform = lastTransform == Vector3::ZERO ? dirWorldPos : lastTransform;		// Ensure last transformation is non-zero
-	        const Matrix4 transformMatrix = Matrix4::translate((dirWorldPos - lastTransform) * grabZ);		// Calculate transformation matrix
-        	lastTransform = dirWorldPos;														// Store new transformation for next frame
+        	lastTransform = lastTransform == Vector3::ZERO ? dirWorldPos : lastTransform;					// Ensure last transformation is non-zero
+        	const float grabZ = (mesh->getPosition() - camPos).length();									// Get distance of the Object from the camera
+	        const Matrix4 transformMatrix = Matrix4::translate((dirWorldPos - lastTransform) * grabZ);	// Calculate transformation matrix
+        	lastTransform = dirWorldPos;																	// Store new transformation for next frame
         	mesh->applyTransformation(transformMode.mode, transformMatrix);
             break;
         }
         case Mode::SCALE: {
         	// Compute scaling factor based on mouse position and object distance
         	const float objDist     = mesh->getPosition().distance(camPos);
-        	const auto screenCenter = Vector2(static_cast<float>(width) / 2.0f, static_cast<float>(height) / 2.0f);
-        	const auto mousePos     = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
-        	const float scale       = screenCenter.distance(mousePos) * (objDist / scaleSens);
+        	const auto screenCenter = Vector2(width / 2.0, height / 2.0);
+        	const auto mousePos     = Vector2(mouseX, mouseY);
+        	const float scale       = static_cast<float>(screenCenter.distance(mousePos)) * (objDist / scaleSens);
 
-        	const Vector3 currentScale = mesh->getScale();										// Retrieve the current scale of the Mesh
-        	const Vector3 newScale = direction * scale / currentScale;						// Scale factor adjustment
-	        const Matrix4 transformMatrix = Matrix4::scale(newScale);											// Calculate transformation matrix
+        	const Vector3 currentScale = mesh->getScale();													// Retrieve the current scale of the Mesh
+        	const Vector3 newScale = direction * scale / currentScale;										// Scale factor adjustment
+	        const Matrix4 transformMatrix = Matrix4::scale(newScale);										// Calculate transformation matrix
         	mesh->applyTransformation(transformMode.mode, transformMatrix);
         	break;
         }
@@ -135,9 +135,6 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
         }
     	default: break;
     }
-
-	// Apply the calculated transformation matrix to the Mesh
-
 }
 
 void SceneManager::toggleViewportMode() {

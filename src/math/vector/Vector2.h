@@ -5,13 +5,13 @@
 
 class Vector2 {
 public:
-	float x, y;
+	double x, y;
 
 	// Constructor
-	Vector2(const float x, const float y) : x(x), y(y) {}
+	Vector2(const double x, const double y) : x(x), y(y) {}
 
 	// Access by index
-	float operator[](const int index) const {
+	double operator[](const int index) const {
 		switch (index) {
 			case 0: return x;
 			case 1: return y;
@@ -28,7 +28,7 @@ public:
 		return {x - other.x, y - other.y};
 	}
 
-	Vector2 operator*(const float scalar) const {
+	Vector2 operator*(const double scalar) const {
 		return {x * scalar, y * scalar};
 	}
 
@@ -36,7 +36,7 @@ public:
 		return {x * other.x, y * other.y};
 	}
 
-	Vector2 operator/(const float scalar) const {
+	Vector2 operator/(const double scalar) const {
 		return {x / scalar, y / scalar};
 	}
 
@@ -49,7 +49,7 @@ public:
 	}
 
 	// Utility functions
-	[[nodiscard]] float length() const {
+	[[nodiscard]] double length() const {
 		return std::sqrt(x * x + y * y);
 	}
 
@@ -57,11 +57,11 @@ public:
 		return length() > 0 ? *this / length() : *this; // Return normalized vector
 	}
 
-	[[nodiscard]] float distance(const Vector2& other) const {
+	[[nodiscard]] double distance(const Vector2& other) const {
 		return std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
 	}
 
-	[[nodiscard]] float dot(const Vector2& other) const {
+	[[nodiscard]] double dot(const Vector2& other) const {
 		return x * other.x + y * other.y;
 	}
 };
