@@ -1,84 +1,19 @@
 #include "Mesh.h"
-#include "math/Util.h"
 #include "math/matrix/Matrix4.h"
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
-	const Vector3 translation  = {transformation.m41, transformation.m42, transformation.m43};
-	const Vector3 scaleFactors = {transformation.m11, transformation.m22, transformation.m33};
-
     switch (mode) {
-        /*case Mode::GRAB: {
-        	position = position + translation;
-
-        	// Apply the translation to each vertex
-        	for (Vector3& vertex : vertices) {
-		        const Vector4 transformedVertex = transformation * vector4(vertex);
-        		vertex = vector3(transformedVertex);
-        	}
-            break;
-        }
-        case Mode::SCALE: {
-            const Vector3 oldScale = scale;
-            scale = scaleFactors;
-
-            // Apply scaling relative to the mesh position
-            for (Vector3& vertex : vertices) {
-                const Vector3 relativePosition = (vertex - position) * (scale / oldScale);
-                vertex = relativePosition + position;
-            }
-            break;
-        }
-        case Mode::ROTATE: {
-            rotation = rotation + scaleFactors;
-
-            // Apply the rotation to each vertex
-            for (Vector3& vertex : vertices) {
-	            const Vector3 relativePosition = vertex - position;
-                const Vector4 rotatedPosition  = transformation * vector4(relativePosition);
-            	vertex = vector3(rotatedPosition) + position;
-            }
-            break;
-        }*/
     	case Mode::GRAB: {
-    		position = Matrix4::translate(translation);
-
-    		// Apply the translation to each vertex
-    		for (Vector3& vertex : vertices) {
-    			const Vector4 transformedVertex = transformation * vector4(vertex);
-    			vertex = vector3(transformedVertex);
-    		}
+    		position = transformation * position;
     		break;
     	}
-    	/*case Mode::SCALE: {
-    		const Vector3 oldScale = scale;
-    		scale = scaleFactors;
-
-    		// Apply scaling relative to the mesh position
-    		for (Vector3& vertex : vertices) {
-    			const Vector3 relativePosition = (vertex - position) * (scale / oldScale);
-    			vertex = relativePosition + position;
-    		}
+    	case Mode::SCALE: {
+    		scale = transformation;
     		break;
     	}
     	case Mode::ROTATE: {
-    		rotation = rotation + scaleFactors;
-
-    		// Apply the rotation to each vertex
-    		for (Vector3& vertex : vertices) {
-    			const Vector3 relativePosition = vertex - position;
-    			const Vector4 rotatedPosition  = transformation * vector4(relativePosition);
-    			vertex = vector3(rotatedPosition) + position;
-    		}
+    		rotation = transformation * rotation;
     		break;
-    	}*/
-    	case Mode::EXTRUDE: {
-        	break;
-    	}
-    	case Mode::FILL: {
-        	break;
-    	}
-    	case Mode::MERGE: {
-        	break;
     	}
     	default: break;
     }
@@ -87,7 +22,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
 std::vector<Triangle> Mesh::getTriangles() const {
 	std::vector<Triangle> triangles;
 
-	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
+	for (int i = 0; i + 2 < faceIndices.size(); i += 3) {
 		triangles.emplace_back(
 			vertices[faceIndices[i]],
 			vertices[faceIndices[i + 1]],
@@ -102,10 +37,9 @@ std::vector<Triangle> Mesh::getTriangles() const {
 void Mesh::buildEdgeToFaceMap() {
 	edgeToFaceMap.clear();
 
-	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
+	for (int i = 0; i + 2 < faceIndices.size(); i += 3) {
 		const int faceIndex = i / 3;
 
-		// Get the 3 vertices that form a Triangle
 		const int v0 = faceIndices[i];
 		const int v1 = faceIndices[i + 1];
 		const int v2 = faceIndices[i + 2];
@@ -117,10 +51,9 @@ void Mesh::buildEdgeToFaceMap() {
 	}
 }
 
-/** Helper function to add an edge to the map */
 void Mesh::addEdgeToMap(int v0, int v1, const int faceIndex) {
 	// Ensure that the order of the vertices is consistent
-	if (const std::pair<int, int> edge = (v0 < v1)
+	if (const std::pair<int, int> edge = v0 < v1
 			? std::make_pair(v0, v1)
 			: std::make_pair(v1, v0);
 			!edgeToFaceMap.contains(edge)) {
@@ -134,9 +67,9 @@ void Mesh::addEdgeToMap(int v0, int v1, const int faceIndex) {
 
 /** Calculate the normal for a face in the Mesh */
 Vector3 Mesh::faceNormal(const int faceIndex) const {
-	const Vector3 v0 = vertices[faceIndices[faceIndex * 3]];
-	const Vector3 v1 = vertices[faceIndices[faceIndex * 3 + 1]];
-	const Vector3 v2 = vertices[faceIndices[faceIndex * 3 + 2]];
+	const Vertex v0 = vertices[faceIndices[faceIndex * 3]];
+	const Vertex v1 = vertices[faceIndices[faceIndex * 3 + 1]];
+	const Vertex v2 = vertices[faceIndices[faceIndex * 3 + 2]];
 
 	// Compute the two edge vectors
 	const Vector3 e1 = v1 - v0;

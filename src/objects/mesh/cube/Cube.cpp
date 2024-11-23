@@ -8,7 +8,7 @@ public:
     explicit Cube(const std::string& name) : Mesh{name, position, scale, rotation} {
         initializeVertices();
         initializeFaceIndices();
-        initializeEdgeIndices();
+        initializeEdges();
 
         buildEdgeToFaceMap();
     }
@@ -17,7 +17,7 @@ public:
 
 private:
     /** Initialize the Cube's vertices based on side length and position */
-    void initializeVertices() {
+    void initializeVertices() override {
         // Front face
         vertices.emplace_back(Vector3(-1, -1,  1));  // Bottom-left
         vertices.emplace_back(Vector3( 1, -1,  1));  // Bottom-right
@@ -31,7 +31,7 @@ private:
         vertices.emplace_back(Vector3(-1,  1, -1));  // Top-left
     }
 
-    void initializeFaceIndices() {
+    void initializeFaceIndices() override {
         faceIndices = {
             // Front face
             0, 1, 2,  2, 3, 0,
@@ -48,7 +48,7 @@ private:
         };
     }
 
-    void initializeEdgeIndices() {
+    void initializeEdges() override {
         edgeIndices = {
             // Front face edges
             0, 1, 1, 2, 2, 3, 3, 0,

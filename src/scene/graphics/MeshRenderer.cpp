@@ -3,33 +3,33 @@
 #include "color/Colors.h"	// Also includes <GL/gl.h>
 
 /** Reinterpret Vertex as GLfloat* */
-void vertex3fv(Vertex& v) {
-	glVertex3fv(reinterpret_cast<float *>(&v));
+void vertex3fv(const Vertex& v) {
+	glVertex3fv(reinterpret_cast<const float *>(&v));
 }
 
-void MeshRenderer::renderVertex(Vertex v) {
+void MeshRenderer::renderVertex(const Vertex& v) {
 	glBegin(GL_POINTS);
 	vertex3fv(v);
 	glEnd();
 }
 
-void MeshRenderer::renderEdge(Vertex v0, Vertex v1) {
+void MeshRenderer::renderEdge(const Vertex &v0, const Vertex &v1) {
 	glBegin(GL_LINES);
 	vertex3fv(v0);
 	vertex3fv(v1);
 	glEnd();
 }
 
-void MeshRenderer::renderTriangle(Triangle& triangle) {
+void MeshRenderer::renderTriangle(const Triangle& t) {
 	glBegin(GL_TRIANGLES);
-	vertex3fv(triangle.v0);
-	vertex3fv(triangle.v1);
-	vertex3fv(triangle.v2);
+	vertex3fv(t.v0);
+	vertex3fv(t.v1);
+	vertex3fv(t.v2);
 	glEnd();
 }
 
 void MeshRenderer::renderVertices(const Mesh& mesh) {
-	for (const auto vertex : mesh.vertices) {
+	for (auto vertex : mesh.vertices) {
 		renderVertex(vertex);
 	}
 }
@@ -49,7 +49,7 @@ void MeshRenderer::renderTriangles(const Mesh& mesh) {
 	}
 }
 
-void MeshRenderer::render(Mesh mesh, const Vector3 camPos, const bool isSelected, const bool isEditMode) {
+void MeshRenderer::render(const Mesh& mesh, const Vector3 camPos, const bool isSelected, const bool isEditMode) {
 	glPushMatrix();
 
 	const Matrix4 worldMatrix = mesh.position * mesh.rotation * mesh.scale;
@@ -57,36 +57,34 @@ void MeshRenderer::render(Mesh mesh, const Vector3 camPos, const bool isSelected
 	worldMatrix.toColumnMajor(worldMatrixF);
 	glMultMatrixf(worldMatrixF);
 
-	// Draw the faces in one color
+	// Draw the faces
 	color3f(MESH_FACE_COLOR);
 	renderTriangles(mesh);
 
 	if (isEditMode) {
-		// Draw the edges in a different color
-		const Color edgeColor = isSelected ? MESH_SELECT_COLOR : MESH_EDGE_COLOR;
-		color3f(edgeColor);
+		// Draw the edges
+		color3f(isSelected ? MESH_SELECT_COLOR : MESH_EDGE_COLOR);
 		renderEdges(mesh);
 
-		// Draw the vertices in another color
-		const Color vertexColor = isSelected ? MESH_SELECT_COLOR : MESH_VERT_COLOR;
-		color3f(vertexColor);
+		// Draw the vertices
+		color3f(isSelected ? MESH_SELECT_COLOR : MESH_VERT_COLOR);
 		glPointSize(4.0f);
 		renderVertices(mesh);
 
 	} else if (isSelected) {
 		// Highlight only the outline of the Mesh in Object Mode
-		const Color outlineColor = MESH_SELECT_COLOR;
-		color3f(outlineColor);
-		glLineWidth(4.0f);	// Set a thicker line width for the outline
+		color3f(MESH_SELECT_COLOR);
+		glLineWidth(4.0f);
+		glPointSize(3.0f);
 		for (const auto& [edge, faces] : mesh.edgeToFaceMap) {
 			if (isSilhouetteEdge(mesh, faces, camPos)) {
+				// Highlight the silhouette edges
 				renderEdge(
 					mesh.vertices[edge.first],
 					mesh.vertices[edge.second]
 				);
 
 				// Also highlight the vertices of the silhouette edges
-				glPointSize(3.0f);
 				renderVertex(mesh.vertices[edge.first]);
 				renderVertex(mesh.vertices[edge.second]);
 			}

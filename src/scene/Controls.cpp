@@ -47,13 +47,16 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	// Cursor position callback
 	glfwSetCursorPosCallback(window, [](GLFWwindow* cbWindow, const double mouseX, const double mouseY) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
-			glfwGetCursorPos(cbWindow, vp->mouseX, vp->mouseY); // Update the mouse position in the Viewport
+			// Update the mouse position in the Viewport
+			glfwGetCursorPos(cbWindow, vp->mouseX, vp->mouseY);
 
 			if (vp->sceneManager.transformMode.mode == Mode::NONE) {
+				// Viewport rotation
 				if (vp->rotating) {
-					vp->rotate(mouseX, mouseY); // Regular rotation handling if no transformation mode is active
+					vp->rotate(mouseX, mouseY);
 				}
 			} else {
+				// Object transformation
 				vp->sceneManager.transform(mouseX, mouseY, vp->width, vp->height, vp->unproject(mouseX, mouseY, 0), vp->camPos);
 			}
 		}

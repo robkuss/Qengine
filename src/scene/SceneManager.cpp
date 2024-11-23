@@ -126,15 +126,6 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
             mesh->applyTransformation(transformMode.mode, rotationMatrix);
             break;
         }
-    	case Mode::EXTRUDE: {
-        	break;
-    	}
-    	case Mode::FILL: {
-        	break;
-    	}
-    	case Mode::MERGE: {
-        	break;
-    	}
     	default: break;
     }
 }
