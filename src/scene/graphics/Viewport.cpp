@@ -136,7 +136,7 @@ void Viewport::centerWindow() const {
 void Viewport::drawOnScreenText() const {
 	const auto cube = *sceneManager.sceneObjects[0];
 	const auto mouseWorld = unproject(mouseX[0], mouseY[0], 0.0f);
-	for (int i = 0; i <= 10; i++) {
+	for (int i = 0; i <= 11; i++) {
 		std::ostringstream out;
 		switch (i) {
 			case 0:  out << "FPS: " << fps; break;

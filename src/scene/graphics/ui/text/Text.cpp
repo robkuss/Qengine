@@ -123,12 +123,12 @@ inline void Text::renderText(const char* text, const float x, const float y, con
     for (int i = 0; text[i] != '\0'; ++i) {
         char c = text[i];
         auto it = characters.find(c);
-        if (it == characters.end()) continue;  // Skip to the next iteration if the character is not in the map
+        if (it == characters.end()) std::cerr << "Character " << c << " not found in the map" << std::endl;
         auto&[textureID, sizeX, sizeY, bearingX, bearingY, advance] = it->second;
 
         // Correct kerning by considering the glyph's bearing.x
         const auto xpos = static_cast<float>(bearingX);
-        const auto ypos = static_cast<float>(sizeY - bearingY);
+        const auto ypos = static_cast<float>(sizeY) - static_cast<float>(bearingY);
 
         // Bind the character's texture
         glBindTexture(GL_TEXTURE_2D, textureID);

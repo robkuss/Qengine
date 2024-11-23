@@ -8,6 +8,8 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
         case Mode::GRAB: {
         	position = position + translation;
 
+        	std::cout << position.toString() << std::endl;
+
         	// Apply the translation to each vertex
         	for (Vector3& vertex : vertices) {
 		        const Vector4 transformedVertex = transformation * vertex.toVector4();

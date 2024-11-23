@@ -21,7 +21,7 @@ public:
     ~Cube() override = default;
 
 private:
-    /** Initialize the cube vertices based on side length and position */
+    /** Initialize the Cube's vertices based on side length and position */
     void initializeVertices() {
         // Front face
         vertices.emplace_back(-s / 2.0f + position.x, -s / 2.0f + position.y,  s / 2.0f + position.z);  // Bottom-left
