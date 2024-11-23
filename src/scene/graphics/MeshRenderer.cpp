@@ -2,14 +2,27 @@
 
 #include "color/Colors.h"	// Also includes <GL/gl.h>
 
+/** Reinterpret Vertex as GLfloat* */
+void vertex3fv(Vertex* v) {
+	glVertex3fv(reinterpret_cast<float *>(v));
+}
+
 void MeshRenderer::render(Mesh mesh, Vector3 camPos, const bool isSelected, const bool isEditMode) {
+	const Matrix4 worldMatrix = mesh.position * mesh.rotation * mesh.scale;
+
+	glPushMatrix();
+
+	float worldMatrixF[16];
+	worldMatrix.toColumnMajor(worldMatrixF);
+	glMultMatrixf(worldMatrixF);
+
 	// Draw the faces in one color
 	color3f(MESH_FACE_COLOR);
 	glBegin(GL_TRIANGLES);
-	for (const auto triangle : mesh.getTriangles()) {
-		glVertex3f(triangle.v0.x, triangle.v0.y, triangle.v0.z);
-		glVertex3f(triangle.v1.x, triangle.v1.y, triangle.v1.z);
-		glVertex3f(triangle.v2.x, triangle.v2.y, triangle.v2.z);
+	for (auto triangle : mesh.getTriangles()) {
+		vertex3fv(&triangle.v0);
+		vertex3fv(&triangle.v1);
+		vertex3fv(&triangle.v2);
 	}
 	glEnd();
 
@@ -19,10 +32,10 @@ void MeshRenderer::render(Mesh mesh, Vector3 camPos, const bool isSelected, cons
 		color3f(edgeColor);
 		glBegin(GL_LINES);
 		for (int i = 0; i < mesh.edgeIndices.size(); i += 2) {
-			const Vector3 v0 = mesh.vertices[mesh.edgeIndices[i]];
-			const Vector3 v1 = mesh.vertices[mesh.edgeIndices[i + 1]];
-			glVertex3f(v0.x, v0.y, v0.z);
-			glVertex3f(v1.x, v1.y, v1.z);
+			Vertex v0 = mesh.vertices[mesh.edgeIndices[i]];
+			Vertex v1 = mesh.vertices[mesh.edgeIndices[i + 1]];
+			vertex3fv(&v0);
+			vertex3fv(&v1);
 		}
 		glEnd();
 
@@ -31,8 +44,8 @@ void MeshRenderer::render(Mesh mesh, Vector3 camPos, const bool isSelected, cons
 		color3f(vertexColor);
 		glPointSize(4.0f);
 		glBegin(GL_POINTS);
-		for (const auto vertex : mesh.vertices) {
-			glVertex3f(vertex.x, vertex.y, vertex.z);
+		for (auto vertex : mesh.vertices) {
+			vertex3fv(&vertex);
 		}
 		glEnd();
 	} else if (isSelected) {
@@ -43,17 +56,17 @@ void MeshRenderer::render(Mesh mesh, Vector3 camPos, const bool isSelected, cons
 		for (const auto& [edge, faces] : mesh.edgeToFaceMap) {
 			if (isSilhouetteEdge(mesh, faces, camPos)) {
 				glBegin(GL_LINES);
-				const Vector3 v0 = mesh.vertices[edge.first];
-				const Vector3 v1 = mesh.vertices[edge.second];
-				glVertex3f(v0.x, v0.y, v0.z);
-				glVertex3f(v1.x, v1.y, v1.z);
+				Vertex v0 = mesh.vertices[edge.first];
+				Vertex v1 = mesh.vertices[edge.second];
+				vertex3fv(&v0);
+				vertex3fv(&v1);
 				glEnd();
 
 				// Also highlight the vertices of the silhouette edges
 				glPointSize(3.0f);
 				glBegin(GL_POINTS);
-				glVertex3f(v0.x, v0.y, v0.z);
-				glVertex3f(v1.x, v1.y, v1.z);
+				vertex3fv(&v0);
+				vertex3fv(&v1);
 				glEnd();
 			}
 		}
@@ -61,6 +74,8 @@ void MeshRenderer::render(Mesh mesh, Vector3 camPos, const bool isSelected, cons
 		// Reset line width back to default
 		glLineWidth(1.0f);
 	}
+
+	glPopMatrix();
 }
 
 bool MeshRenderer::isSilhouetteEdge(const Mesh& mesh, const std::vector<int>& faces, const Vector3 camPos) {
@@ -71,7 +86,7 @@ bool MeshRenderer::isSilhouetteEdge(const Mesh& mesh, const std::vector<int>& fa
 	const Vector3 normal2 = mesh.faceNormal(faces[1]);
 
 	// Use any point from the first face to compute the direction to the camera
-	const Vector3 pointOnFace = mesh.vertices[mesh.faceIndices[faces[0] * 3]];
+	const Vertex pointOnFace = mesh.vertices[mesh.faceIndices[faces[0] * 3]];
 	const Vector3 camDir = (pointOnFace - camPos).normalize();
 
 	// Compute the dot products of the camera direction with the face normals

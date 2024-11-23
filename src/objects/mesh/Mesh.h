@@ -7,20 +7,21 @@
 
 #include "objects/Object.h"
 #include "scene/Mode.h"
-#include "math/Triangle.h"
+#include "math/geometry/Vertex.h"
+#include "math/geometry/Triangle.h"
 #include "math/matrix/Matrix4.h"
 
 class Mesh : public Object {
 public:
-	std::vector<Vector3> vertices;
-	std::vector<int> faceIndices;
-	std::vector<int> edgeIndices;
+	std::vector<Vertex> vertices = {};
+	std::vector<int> faceIndices = {};
+	std::vector<int> edgeIndices = {};
 
 	// Edge-to-face adjacency information
 	std::map<std::pair<int, int>, std::vector<int>> edgeToFaceMap;
 
 	// Constructor & Destructor
-	Mesh(const std::string& name, const Vector3& position, const Vector3& scale, const Vector3& rotation)
+	Mesh(const std::string& name, const Matrix4& position, const Matrix4& scale, const Matrix4& rotation)
 		: Object{name, position, scale, rotation} {}
 	~Mesh() override = default;
 

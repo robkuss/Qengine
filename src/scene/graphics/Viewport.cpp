@@ -149,11 +149,13 @@ void Viewport::drawOnScreenText() const {
 				if (sceneManager.transformMode.mode    != Mode::NONE)	out << " " << modeToString(sceneManager.transformMode.mode);
 				if (sceneManager.transformMode.subMode != SubMode::NONE) out << " " << subModeToString(sceneManager.transformMode.subMode); break;
 			case 7:  out << "Cube:"; break;
-			case 8:  out << "    Pos: "   << std::fixed << std::setprecision(3) << cube.position.x  << " " << cube.position.y  << " " << cube.position.z;  break;
-			case 9:  out << "    Scale: " << std::fixed << std::setprecision(3) << cube.scale.x     << " " << cube.scale.y     << " " << cube.scale.z;     break;
-			default: out << "    Rot: "   << std::fixed << std::setprecision(3) << cube.rotation.x  << " " << cube.rotation.y  << " " << cube.rotation.z;  break;
+			case 8:  out << "    Pos: "   << std::fixed << std::setprecision(3) << cube.getPosition().x  << " " << cube.getPosition().y  << " " << cube.getPosition().z;  break;
+			case 9:  out << "    Scale: " << std::fixed << std::setprecision(3) << cube.getScale().x     << " " << cube.getScale().y     << " " << cube.getScale().z;     break;
+			default: out << "    Rot: "   << std::fixed << std::setprecision(3) << cube.getRotation().x  << " " << cube.getRotation().y  << " " << cube.getRotation().z;  break;
 		}
-		text->renderText(out.str().c_str(), Text::firstLineX, Text::line(i), width, height, TEXT_COLOR);
+		#ifdef TEXT
+			text->renderText(out.str().c_str(), Text::firstLineX, Text::line(i), width, height, TEXT_COLOR);
+		#endif
 	}
 }
 

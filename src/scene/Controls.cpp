@@ -95,15 +95,12 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 		case GLFW_KEY_R : sceneManager.setTransformMode(Mode::ROTATE); break; 	// R -> Rotate
 		case GLFW_KEY_E : {														// E -> Extrude
 			sceneManager.setTransformMode(Mode::EXTRUDE);
-			text->setErrorText("Extruding is not yet implemented."); break;
 		}
 		case GLFW_KEY_F : {														// F -> Fill
 			sceneManager.setTransformMode(Mode::FILL);
-			text->setErrorText("Filling is not yet implemented."); break;
 		}
 		case GLFW_KEY_M : {														// M -> Merge
 			sceneManager.setTransformMode(Mode::MERGE);
-			text->setErrorText("Merging is not yet implemented."); break;
 		}
 
 		// Set Transform SubMode
@@ -111,6 +108,10 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 		case GLFW_KEY_Y : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.setTransformSubMode(SubMode::Y); break; // Y -> Snap transformation to Y direction
 		case GLFW_KEY_Z : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.setTransformSubMode(SubMode::Z); break; // Z -> Snap transformation to Z direction
 
-		default: text->setErrorText("Invalid key.");
+		default: {
+			#ifdef TEXT
+				text->setErrorText("Invalid key.");
+			#endif
+		}
 	}
 }

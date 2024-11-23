@@ -4,7 +4,7 @@
 #include <optional>
 
 #include "math/Util.h"
-#include "math/Triangle.h"
+#include "math/geometry/Triangle.h"
 #include "math/vector/Vector3.h"
 #include "objects/mesh/Mesh.h"
 

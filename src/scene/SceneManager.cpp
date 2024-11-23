@@ -57,7 +57,7 @@ void SceneManager::select(const Ray& ray) {
 			*std::ranges::min_element(
 				intersectingObjects,
 				[&ray](const std::shared_ptr<Object>& a, const std::shared_ptr<Object>& b) {
-					return a->position.distance(ray.origin) < b->position.distance(ray.origin);
+					return a->getPosition().distance(ray.origin) < b->getPosition().distance(ray.origin);
 				}
 			)
 		);
@@ -95,7 +95,7 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
                 case SubMode::Z:	direction = Vector3(0, 0, worldPos.z); break;
             }
 
-        	const float grabZ = (mesh->position - camPos).length();										// Get distance of the object from the camera
+        	const float grabZ = (mesh->getPosition() - camPos).length();								// Get distance of the object from the camera
         	lastTransform = lastTransform == Vector3::ZERO ? direction : lastTransform;					// Ensure last transformation is non-zero
         	const auto translationMatrix = Matrix4::translate((direction - lastTransform) * grabZ);	// Calculate translation matrix
         	lastTransform = direction;																	// Store new transformation for next frame
@@ -107,7 +107,7 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
             // Compute scaling factor based on mouse position and object distance
             const auto screenCenter = Vector2(static_cast<float>(width) / 2, static_cast<float>(height) / 2);
             const auto mousePos		= Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
-            const float objDist		= mesh->position.distance(camPos);
+            const float objDist		= mesh->getPosition().distance(camPos);
             const float scale		= screenCenter.distance(mousePos) * (objDist / scaleSens);
 
             // Construct scale matrix

@@ -1,12 +1,13 @@
 #include "Mesh.h"
 #include "math/Util.h"
+#include "math/matrix/Matrix4.h"
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
 	const Vector3 translation  = {transformation.m41, transformation.m42, transformation.m43};
 	const Vector3 scaleFactors = {transformation.m11, transformation.m22, transformation.m33};
 
     switch (mode) {
-        case Mode::GRAB: {
+        /*case Mode::GRAB: {
         	position = position + translation;
 
         	// Apply the translation to each vertex
@@ -37,7 +38,39 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
             	vertex = vector3(rotatedPosition) + position;
             }
             break;
-        }
+        }*/
+    	case Mode::GRAB: {
+    		position = Matrix4::translate(translation);
+
+    		// Apply the translation to each vertex
+    		for (Vector3& vertex : vertices) {
+    			const Vector4 transformedVertex = transformation * vector4(vertex);
+    			vertex = vector3(transformedVertex);
+    		}
+    		break;
+    	}
+    	/*case Mode::SCALE: {
+    		const Vector3 oldScale = scale;
+    		scale = scaleFactors;
+
+    		// Apply scaling relative to the mesh position
+    		for (Vector3& vertex : vertices) {
+    			const Vector3 relativePosition = (vertex - position) * (scale / oldScale);
+    			vertex = relativePosition + position;
+    		}
+    		break;
+    	}
+    	case Mode::ROTATE: {
+    		rotation = rotation + scaleFactors;
+
+    		// Apply the rotation to each vertex
+    		for (Vector3& vertex : vertices) {
+    			const Vector3 relativePosition = vertex - position;
+    			const Vector4 rotatedPosition  = transformation * vector4(relativePosition);
+    			vertex = vector3(rotatedPosition) + position;
+    		}
+    		break;
+    	}*/
     	case Mode::EXTRUDE: {
         	break;
     	}

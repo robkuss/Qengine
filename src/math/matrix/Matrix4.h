@@ -7,10 +7,21 @@
 
 
 struct Matrix4 {
-    float m11, m21, m31, m41;
-    float m12, m22, m32, m42;
-    float m13, m23, m33, m43;
-    float m14, m24, m34, m44;
+    float m11{}, m21{}, m31{}, m41{};
+    float m12{}, m22{}, m32{}, m42{};
+    float m13{}, m23{}, m33{}, m43{};
+    float m14{}, m24{}, m34{}, m44{};
+
+	// Default Constructor
+	Matrix4() = default;
+
+	// Constructor with array
+	explicit Matrix4(const float* data) {
+		m11 = data[0];  m21 = data[4];  m31 = data[8];   m41 = data[12];
+		m12 = data[1];  m22 = data[5];  m32 = data[9];   m42 = data[13];
+		m13 = data[2];  m23 = data[6];  m33 = data[10];  m43 = data[14];
+		m14 = data[3];  m24 = data[7];  m34 = data[11];  m44 = data[15];
+	}
 
 	// Constructor with initializer list
 	Matrix4(const std::initializer_list<float> list) {
@@ -22,14 +33,6 @@ struct Matrix4 {
 		m12 = *it++; m22 = *it++; m32 = *it++; m42 = *it++;
 		m13 = *it++; m23 = *it++; m33 = *it++; m43 = *it++;
 		m14 = *it++; m24 = *it++; m34 = *it++; m44 = *it++;
-	}
-
-	// Constructor with array
-	explicit Matrix4(const float* data) {
-		m11 = data[0];  m21 = data[4];  m31 = data[8];   m41 = data[12];
-		m12 = data[1];  m22 = data[5];  m32 = data[9];   m42 = data[13];
-		m13 = data[2];  m23 = data[6];  m33 = data[10];  m43 = data[14];
-		m14 = data[3];  m24 = data[7];  m34 = data[11];  m44 = data[15];
 	}
 
     /**

@@ -4,13 +4,8 @@
 
 class Cube final : public Mesh {
 public:
-    float s;  // side length
-
-    /**
-    * Construct a Cube Mesh with given side length and position and default scale and rotation
-    */
-    Cube(const std::string& name, const Vector3& position, const float s)
-            : Mesh{name, position, Vector3(1.0f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f)}, s{s} {
+    /** Construct a Cube Mesh with given side length and position and default scale and rotation */
+    explicit Cube(const std::string& name) : Mesh{name, position, scale, rotation} {
         initializeVertices();
         initializeFaceIndices();
         initializeEdgeIndices();
@@ -24,16 +19,16 @@ private:
     /** Initialize the Cube's vertices based on side length and position */
     void initializeVertices() {
         // Front face
-        vertices.emplace_back(-s / 2.0f + position.x, -s / 2.0f + position.y,  s / 2.0f + position.z);  // Bottom-left
-        vertices.emplace_back( s / 2.0f + position.x, -s / 2.0f + position.y,  s / 2.0f + position.z);  // Bottom-right
-        vertices.emplace_back( s / 2.0f + position.x,  s / 2.0f + position.y,  s / 2.0f + position.z);  // Top-right
-        vertices.emplace_back(-s / 2.0f + position.x,  s / 2.0f + position.y,  s / 2.0f + position.z);  // Top-left
+        vertices.emplace_back(Vector3(-1, -1,  1));  // Bottom-left
+        vertices.emplace_back(Vector3( 1, -1,  1));  // Bottom-right
+        vertices.emplace_back(Vector3( 1,  1,  1));  // Top-right
+        vertices.emplace_back(Vector3(-1,  1,  1));  // Top-left
 
         // Back face
-        vertices.emplace_back(-s / 2.0f + position.x, -s / 2.0f + position.y, -s / 2.0f + position.z);  // Bottom-left
-        vertices.emplace_back( s / 2.0f + position.x, -s / 2.0f + position.y, -s / 2.0f + position.z);  // Bottom-right
-        vertices.emplace_back( s / 2.0f + position.x,  s / 2.0f + position.y, -s / 2.0f + position.z);  // Top-right
-        vertices.emplace_back(-s / 2.0f + position.x,  s / 2.0f + position.y, -s / 2.0f + position.z);  // Top-left
+        vertices.emplace_back(Vector3(-1, -1, -1));  // Bottom-left
+        vertices.emplace_back(Vector3( 1, -1, -1));  // Bottom-right
+        vertices.emplace_back(Vector3( 1,  1, -1));  // Top-right
+        vertices.emplace_back(Vector3(-1,  1, -1));  // Top-left
     }
 
     void initializeFaceIndices() {

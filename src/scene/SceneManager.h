@@ -15,9 +15,11 @@ public:
 	// Constructor & Destructor
 	explicit SceneManager() {
 		// Add Default Cube to scene
-		addObject(
-			std::make_shared<Cube>("Cube", Vector3(0.5f, 0.5f, 0.5f), 1.0f)
-		);
+		const auto cube = std::make_shared<Cube>("Cube");
+		cube->setPosition(Vector3(0.5f, 0.5f, 0.5f));
+		cube->setScale(Vector3(1.0f, 1.0f, 1.0f));
+		cube->setRotation(Vector3(0.0f, 0.0f, 0.0f));
+		addObject(cube);
 	}
 	~SceneManager() = default;
 

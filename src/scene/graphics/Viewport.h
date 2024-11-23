@@ -63,7 +63,9 @@ private:
 	float aspect;
 	SceneManager sceneManager;
 
-	Text* text{};		// For on-screen debug text
+	#ifdef TEXT
+		Text* text{};	// For on-screen debug text
+	#endif
 
 	// Initial values
 	Vector3 camPos		= CAMERA_POSITION_INIT;
