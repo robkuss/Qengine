@@ -27,9 +27,9 @@ public:
 	[[nodiscard]] Vector3 getRotation() const {
 		if (rotation.m13 == 1) std::cerr << "Gimbal Lock" << std::endl;
 		return {
-			static_cast<float>(atan2(-scale.m21, scale.m22) * (180.0f / PI)),
-			static_cast<float>(asin(rotation.m13) * (180.0f / PI)),
-			static_cast<float>(atan2(-rotation.m12, rotation.m11) * (180.0f / PI))
+			static_cast<float>(degrees(atan2(-scale.m21, scale.m22))),
+			static_cast<float>(degrees(asin(rotation.m13))),
+			static_cast<float>(degrees(atan2(-rotation.m12, rotation.m11)))
 		};
 	}
 

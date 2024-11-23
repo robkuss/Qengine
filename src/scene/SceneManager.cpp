@@ -6,7 +6,6 @@
 
 #include <memory>   // For std::shared_ptr
 
-
 SceneManager::SceneManager() {
 	// Add Default Cube to scene
 	const auto cube = std::make_shared<Cube>("Cube", 1.0f);

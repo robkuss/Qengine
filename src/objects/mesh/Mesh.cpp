@@ -17,7 +17,6 @@ void Mesh::setScale(const Vector3& scale) {
 
 void Mesh::setRotation(const Vector3& rotation) {
 	this->rotation = Matrix4::rotateX(rotation.x) * Matrix4::rotateY(rotation.y) * Matrix4::rotateZ(rotation.z);
-
 }
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
@@ -26,9 +25,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
 			const Vector3 oldPos = getPosition();
 			this->position = transformation * this->position;
 			for (Vector3& vertex : vertices) {
-				Vector3 relativePosition = vertex - getPosition();
-				relativePosition = relativePosition + (getPosition() - oldPos);
-				vertex = relativePosition + getPosition();
+				vertex = vertex + (getPosition() - oldPos);
 			}
 			break;
 		}
@@ -36,9 +33,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
 			const Vector3 oldScale = getScale();
 			this->scale = transformation * this->scale;
 			for (Vector3& vertex : vertices) {
-				Vector3 relativePosition = vertex - getPosition();
-				relativePosition = relativePosition * (getScale() / oldScale);
-				vertex = relativePosition + getPosition();
+				vertex = (vertex - getPosition()) * (getScale() / oldScale) + getPosition();
 			}
 			break;
 		}
@@ -46,9 +41,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
 			// Apply the rotation to each vertex
 			this->rotation = transformation * this->rotation;
 			for (Vector3& vertex : vertices) {
-				const Vector3 relativePosition = vertex - getPosition();
-				const Vector4 rotatedPosition = transformation * vector4(relativePosition);
-				vertex = vector3(rotatedPosition) + getPosition();
+				vertex = vector3(transformation * vector4(vertex - getPosition())) + getPosition();
 			}
 			break;
 		}

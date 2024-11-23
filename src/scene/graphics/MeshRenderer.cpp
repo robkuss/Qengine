@@ -54,7 +54,7 @@ void MeshRenderer::render(const Mesh& mesh, const Vector3 camPos, const bool isS
 	glPushMatrix();
 	float worldMatrixF[16];
 	worldMatrix.toColumnMajor(worldMatrixF);
-	glMultMatrixf(worldMatrixF)*/;
+	glMultMatrixf(worldMatrixF);*/
 
 	// Draw the faces
 	color3f(MESH_FACE_COLOR);
