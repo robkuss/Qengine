@@ -4,8 +4,10 @@
 
 class Cube final : public Mesh {
 public:
+    float s;    // side length
+
     /** Construct a Cube Mesh with given side length and position and default scale and rotation */
-    explicit Cube(const std::string& name) : Mesh{name, position, scale, rotation} {
+    explicit Cube(const std::string& name, const float s) : Mesh{name, position, scale, rotation}, s(s) {
         initializeVertices();
         initializeFaceIndices();
         initializeEdges();
@@ -19,16 +21,16 @@ private:
     /** Initialize the Cube's vertices based on side length and position */
     void initializeVertices() override {
         // Front face
-        vertices.emplace_back(Vector3(-1, -1,  1));  // Bottom-left
-        vertices.emplace_back(Vector3( 1, -1,  1));  // Bottom-right
-        vertices.emplace_back(Vector3( 1,  1,  1));  // Top-right
-        vertices.emplace_back(Vector3(-1,  1,  1));  // Top-left
+        vertices.emplace_back(-s/2, -s/2,  s/2);  // Bottom-left
+        vertices.emplace_back( s/2, -s/2,  s/2);  // Bottom-right
+        vertices.emplace_back( s/2,  s/2,  s/2);  // Top-right
+        vertices.emplace_back(-s/2,  s/2,  s/2);  // Top-left
 
         // Back face
-        vertices.emplace_back(Vector3(-1, -1, -1));  // Bottom-left
-        vertices.emplace_back(Vector3( 1, -1, -1));  // Bottom-right
-        vertices.emplace_back(Vector3( 1,  1, -1));  // Top-right
-        vertices.emplace_back(Vector3(-1,  1, -1));  // Top-left
+        vertices.emplace_back(-s/2, -s/2, -s/2);  // Bottom-left
+        vertices.emplace_back( s/2, -s/2, -s/2);  // Bottom-right
+        vertices.emplace_back( s/2,  s/2, -s/2);  // Top-right
+        vertices.emplace_back(-s/2,  s/2, -s/2);  // Top-left
     }
 
     void initializeFaceIndices() override {

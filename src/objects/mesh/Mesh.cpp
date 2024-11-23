@@ -1,22 +1,59 @@
 #include "Mesh.h"
 #include "math/matrix/Matrix4.h"
 
+void Mesh::setPosition(const Vector3& translation) {
+	this->position = Matrix4::translate(translation);
+	for (Vector3& vertex : vertices) {
+		vertex = vertex + translation;
+	}
+}
+
+void Mesh::setScale(const Vector3& scale) {
+	this->scale	= Matrix4::scale(scale);
+	for (Vector3& vertex : vertices) {
+		vertex = vertex * scale;
+	}
+}
+
+void Mesh::setRotation(const Vector3& rotation) {
+	this->rotation = Matrix4::rotateX(rotation.x) * Matrix4::rotateY(rotation.y) * Matrix4::rotateZ(rotation.z);
+
+}
+
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
-    switch (mode) {
-    	case Mode::GRAB: {
-    		position = transformation * position;
-    		break;
-    	}
-    	case Mode::SCALE: {
-    		scale = transformation;
-    		break;
-    	}
-    	case Mode::ROTATE: {
-    		rotation = transformation * rotation;
-    		break;
-    	}
-    	default: break;
-    }
+	switch (mode) {
+		case Mode::GRAB: {
+			const Vector3 oldPos = getPosition();
+			this->position = transformation * this->position;
+			for (Vector3& vertex : vertices) {
+				Vector3 relativePosition = vertex - getPosition();
+				relativePosition = relativePosition + (getPosition() - oldPos);
+				vertex = relativePosition + getPosition();
+			}
+			break;
+		}
+		case Mode::SCALE: {
+			const Vector3 oldScale = getScale();
+			this->scale = transformation * this->scale;
+			for (Vector3& vertex : vertices) {
+				Vector3 relativePosition = vertex - getPosition();
+				relativePosition = relativePosition * (getScale() / oldScale);
+				vertex = relativePosition + getPosition();
+			}
+			break;
+		}
+		case Mode::ROTATE: {
+			// Apply the rotation to each vertex
+			this->rotation = transformation * this->rotation;
+			for (Vector3& vertex : vertices) {
+				const Vector3 relativePosition = vertex - getPosition();
+				const Vector4 rotatedPosition = transformation * vector4(relativePosition);
+				vertex = vector3(rotatedPosition) + getPosition();
+			}
+			break;
+		}
+		default: break;
+	}
 }
 
 std::vector<Triangle> Mesh::getTriangles() const {

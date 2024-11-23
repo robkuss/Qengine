@@ -50,12 +50,11 @@ void MeshRenderer::renderTriangles(const Mesh& mesh) {
 }
 
 void MeshRenderer::render(const Mesh& mesh, const Vector3 camPos, const bool isSelected, const bool isEditMode) {
+	/*const Matrix4 worldMatrix = mesh.position * mesh.rotation * mesh.scale;
 	glPushMatrix();
-
-	const Matrix4 worldMatrix = mesh.position * mesh.rotation * mesh.scale;
 	float worldMatrixF[16];
 	worldMatrix.toColumnMajor(worldMatrixF);
-	glMultMatrixf(worldMatrixF);
+	glMultMatrixf(worldMatrixF)*/;
 
 	// Draw the faces
 	color3f(MESH_FACE_COLOR);
@@ -94,7 +93,7 @@ void MeshRenderer::render(const Mesh& mesh, const Vector3 camPos, const bool isS
 		glLineWidth(1.0f);
 	}
 
-	glPopMatrix();
+	//glPopMatrix();
 }
 
 bool MeshRenderer::isSilhouetteEdge(const Mesh& mesh, const std::vector<int>& faces, const Vector3 camPos) {

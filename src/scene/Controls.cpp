@@ -82,34 +82,30 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
 	if (action != GLFW_PRESS) return;
 	switch (key) {
-		case GLFW_KEY_TAB : sceneManager.toggleViewportMode(); break;			// TAB -> Toggle Object/Edit Mode
+		case GLFW_KEY_TAB : sceneManager.toggleViewportMode(); break;				// TAB -> Toggle Object/Edit Mode
 
 		// Number keys for perspective toggling
-		case GLFW_KEY_1 : togglePerspective(  0.0f,  0.0f); break;			// 1 -> Front View  (towards negative X)
-		case GLFW_KEY_2 : togglePerspective(-90.0f,  0.0f); break;			// 2 -> Right View  (towards negative Y)
-		case GLFW_KEY_3 : togglePerspective(  0.0f, 90.0f); break;			// 3 -> Top View    (towards negative Z)
-		case GLFW_KEY_4 : togglePerspective(180.0f,  0.0f); break;			// 4 -> Back View   (towards positive X)
-		case GLFW_KEY_5 : togglePerspective( 90.0f,  0.0f); break;			// 5 -> Left View   (towards positive Y)
-		case GLFW_KEY_6 : togglePerspective(  0.0f,-90.0f); break;			// 6 -> Bottom View (towards positive Z)
+		case GLFW_KEY_1: togglePerspective(  0.0f,  0.0f); break;				// 1 -> Front View  (towards negative X)
+		case GLFW_KEY_2: togglePerspective(-90.0f,  0.0f); break;				// 2 -> Right View  (towards negative Y)
+		case GLFW_KEY_3: togglePerspective(  0.0f, 90.0f); break;				// 3 -> Top View    (towards negative Z)
+		case GLFW_KEY_4: togglePerspective(180.0f,  0.0f); break;				// 4 -> Back View   (towards positive X)
+		case GLFW_KEY_5: togglePerspective( 90.0f,  0.0f); break;				// 5 -> Left View   (towards positive Y)
+		case GLFW_KEY_6: togglePerspective(  0.0f,-90.0f); break;				// 6 -> Bottom View (towards positive Z)
 
 		// Set Transform Mode
-		case GLFW_KEY_G : sceneManager.setTransformMode(Mode::GRAB); break;		// G -> Grab
-		case GLFW_KEY_S : sceneManager.setTransformMode(Mode::SCALE); break;	// S -> Scale
-		case GLFW_KEY_R : sceneManager.setTransformMode(Mode::ROTATE); break; 	// R -> Rotate
-		case GLFW_KEY_E : {														// E -> Extrude
-			sceneManager.setTransformMode(Mode::EXTRUDE);
-		}
-		case GLFW_KEY_F : {														// F -> Fill
-			sceneManager.setTransformMode(Mode::FILL);
-		}
-		case GLFW_KEY_M : {														// M -> Merge
-			sceneManager.setTransformMode(Mode::MERGE);
-		}
+		case GLFW_KEY_G: sceneManager.setTransformMode(Mode::GRAB); break;			// G -> Grab
+		case GLFW_KEY_S: sceneManager.setTransformMode(Mode::SCALE); break;			// S -> Scale
+		case GLFW_KEY_R: sceneManager.setTransformMode(Mode::ROTATE); break; 		// R -> Rotate
+		case GLFW_KEY_E: sceneManager.setTransformMode(Mode::EXTRUDE); break;		// E -> Extrude
+		case GLFW_KEY_F: sceneManager.setTransformMode(Mode::FILL); break;			// F -> Fill
+		case GLFW_KEY_M: sceneManager.setTransformMode(Mode::MERGE); break;			// M -> Merge
 
 		// Set Transform SubMode
-		case GLFW_KEY_X : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.setTransformSubMode(SubMode::X); break; // X -> Snap transformation to X direction
-		case GLFW_KEY_Y : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.setTransformSubMode(SubMode::Y); break; // Y -> Snap transformation to Y direction
-		case GLFW_KEY_Z : if (sceneManager.transformMode.mode != Mode::NONE) sceneManager.setTransformSubMode(SubMode::Z); break; // Z -> Snap transformation to Z direction
+		case GLFW_KEY_X || GLFW_KEY_Y || GLFW_KEY_Z: if (sceneManager.transformMode.mode != Mode::NONE) {
+			case GLFW_KEY_X: sceneManager.setTransformSubMode(SubMode::X); break;	// X -> Snap transformation to X direction
+			case GLFW_KEY_Y: sceneManager.setTransformSubMode(SubMode::Y); break;	// Y -> Snap transformation to Y direction
+			case GLFW_KEY_Z: sceneManager.setTransformSubMode(SubMode::Z); break;	// Z -> Snap transformation to Z direction
+		}
 
 		default: {
 			#ifdef TEXT

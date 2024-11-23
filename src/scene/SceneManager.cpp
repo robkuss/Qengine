@@ -7,6 +7,15 @@
 #include <memory>   // For std::shared_ptr
 
 
+SceneManager::SceneManager() {
+	// Add Default Cube to scene
+	const auto cube = std::make_shared<Cube>("Cube", 1.0f);
+	cube->setPosition(Vector3(0.5f, 0.5f, 0.5f));
+	cube->setScale(Vector3::ONE);
+	cube->setRotation(Vector3::ZERO);
+	addObject(cube);
+}
+
 void SceneManager::render(const Vector3 camPos) const {
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& obj : sceneObjects) {
@@ -84,50 +93,52 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
         return;
     }
 
+	// Define direction based on subMode
+	Vector3 direction = Vector3::ZERO;
+	switch (transformMode.subMode) {
+		case SubMode::NONE: direction = Vector3::ONE; break;
+		case SubMode::X:	direction = Vector3(1, 0, 0); break;
+		case SubMode::Y:	direction = Vector3(0, 1, 0); break;
+		case SubMode::Z:	direction = Vector3(0, 0, 1); break;
+	}
+    const Vector3 dirWorldPos = direction * worldPos;		// I forgot why
+
     switch (transformMode.mode) {
         case Mode::GRAB: {
-            // Define direction based on subMode
-            Vector3 direction = Vector3::ZERO;
-            switch (transformMode.subMode) {
-                case SubMode::NONE: direction = worldPos; break;
-                case SubMode::X:	direction = Vector3(worldPos.x, 0, 0); break;
-                case SubMode::Y:	direction = Vector3(0, worldPos.y, 0); break;
-                case SubMode::Z:	direction = Vector3(0, 0, worldPos.z); break;
-            }
-
-        	const float grabZ = (mesh->getPosition() - camPos).length();								// Get distance of the object from the camera
-        	lastTransform = lastTransform == Vector3::ZERO ? direction : lastTransform;					// Ensure last transformation is non-zero
-        	const auto translationMatrix = Matrix4::translate((direction - lastTransform) * grabZ);	// Calculate translation matrix
-        	lastTransform = direction;																	// Store new transformation for next frame
-
-        	mesh->applyTransformation(transformMode.mode, translationMatrix);
+        	const float grabZ = (mesh->getPosition() - camPos).length();						// Get distance of the Object from the camera
+        	lastTransform = lastTransform == Vector3::ZERO ? dirWorldPos : lastTransform;		// Ensure last transformation is non-zero
+	        const Matrix4 transformMatrix = Matrix4::translate((dirWorldPos - lastTransform) * grabZ);		// Calculate transformation matrix
+        	lastTransform = dirWorldPos;														// Store new transformation for next frame
+        	mesh->applyTransformation(transformMode.mode, transformMatrix);
             break;
         }
         case Mode::SCALE: {
-            // Compute scaling factor based on mouse position and object distance
-            const auto screenCenter = Vector2(static_cast<float>(width) / 2, static_cast<float>(height) / 2);
-            const auto mousePos		= Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
-            const float objDist		= mesh->getPosition().distance(camPos);
-            const float scale		= screenCenter.distance(mousePos) * (objDist / scaleSens);
+        	// Compute scaling factor based on mouse position and object distance
+        	const float objDist     = mesh->getPosition().distance(camPos);
+        	const auto screenCenter = Vector2(static_cast<float>(width) / 2.0f, static_cast<float>(height) / 2.0f);
+        	const auto mousePos     = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+        	const float scale       = screenCenter.distance(mousePos) * (objDist / scaleSens);
 
-            // Construct scale matrix
-        	const Matrix4 scaleMatrix = Matrix4::scale(Vector3(scale, scale, scale));
-
-            mesh->applyTransformation(transformMode.mode, scaleMatrix);
-            break;
+        	const Vector3 currentScale = mesh->getScale();										// Retrieve the current scale of the Mesh
+        	const Vector3 newScale = direction * scale / currentScale;						// Scale factor adjustment
+	        const Matrix4 transformMatrix = Matrix4::scale(newScale);											// Calculate transformation matrix
+        	mesh->applyTransformation(transformMode.mode, transformMatrix);
+        	break;
         }
         case Mode::ROTATE: {
             // Example for rotation: Calculate a basic rotation matrix for illustration
             // Assume rotation about Z-axis as an example (replace with desired axis/mouse inputs)
             constexpr float angle = 0.01f; // TODO (Replace with calculated rotation angle based on mouse input)
 
-        	const Matrix4 rotationMatrix = Matrix4::rotateZ(angle);
-
-            mesh->applyTransformation(transformMode.mode, rotationMatrix);
+            const Matrix4 transformMatrix = Matrix4::rotateZ(angle);
+        	mesh->applyTransformation(transformMode.mode, transformMatrix);
             break;
         }
     	default: break;
     }
+
+	// Apply the calculated transformation matrix to the Mesh
+
 }
 
 void SceneManager::toggleViewportMode() {

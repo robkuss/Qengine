@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -25,6 +24,10 @@ public:
 	Mesh(const std::string& name, const Matrix4& position, const Matrix4& scale, const Matrix4& rotation)
 		: Object{name, position, scale, rotation} {}
 	~Mesh() override = default;
+
+	void setPosition(const Vector3 &translation);
+	void setScale(const Vector3 &scale);
+	void setRotation(const Vector3& rotation);
 
 	virtual void initializeVertices()	 = 0;
 	virtual void initializeFaceIndices() = 0;

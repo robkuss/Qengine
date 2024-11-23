@@ -13,14 +13,7 @@ public:
 	Mode transformMode = NONE;
 
 	// Constructor & Destructor
-	explicit SceneManager() {
-		// Add Default Cube to scene
-		const auto cube = std::make_shared<Cube>("Cube");
-		cube->setPosition(Vector3(0.5f, 0.5f, 0.5f));
-		cube->setScale(Vector3(1.0f, 1.0f, 1.0f));
-		cube->setRotation(Vector3(0.0f, 0.0f, 0.0f));
-		addObject(cube);
-	}
+	explicit SceneManager();
 	~SceneManager() = default;
 
 	void render(Vector3 camPos) const;

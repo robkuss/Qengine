@@ -3,9 +3,8 @@
 #include "math/vector/Vector3.h"
 
 struct Vertex : Vector3 {
-	explicit Vertex(const Vector3 &position) : Vector3(position.x, position.y, position.z), position(position) {}
-
-	Vector3 position;
+	explicit Vertex(const Vector3 &position) : Vector3(position.x, position.y, position.z) {}
+	explicit Vertex(const float x, const float y, const float z) : Vector3(x, y, z) {}
 
 	bool operator<(const Vertex& other) const {
 		if (x != other.x) return x < other.x;
