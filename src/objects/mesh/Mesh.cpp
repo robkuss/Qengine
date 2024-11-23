@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
-	const Vector3 translation = {transformation.m14, transformation.m24, transformation.m34};
+	const Vector3 translation  = {transformation.m41, transformation.m42, transformation.m43};
 	const Vector3 scaleFactors = {transformation.m11, transformation.m22, transformation.m33};
 
     switch (mode) {
@@ -11,7 +11,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
         	// Apply the translation to each vertex
         	for (Vector3& vertex : vertices) {
 		        const Vector4 transformedVertex = transformation * vertex.toVector4();
-        		vertex = Vector3(transformedVertex.x, transformedVertex.y, transformedVertex.z) + translation;
+        		vertex = Vector3(transformedVertex.x, transformedVertex.y, transformedVertex.z);
         	}
             break;
         }

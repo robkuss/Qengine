@@ -84,7 +84,6 @@ struct Matrix4 {
         });
     }
 
-
 	static Matrix4 translate(const Vector3& t) {
     	return Matrix4({
 			1, 0, 0, t.x,

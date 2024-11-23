@@ -272,21 +272,14 @@ void Viewport::togglePerspective(const float h, const float v) {
  * @return the world space coordinates for the given mouse position as a Vector3
  */
 Vector3 Viewport::unproject(const double mouseX, const double mouseY, const float depth) const {
-	/*// Lambda function to convert GLfloat* to std::array<float, 16>
-	auto toArray = [](const GLfloat* matrix) {
-		std::array<float, 16> arr{};
-		std::copy_n(matrix, 16, arr.begin());
-		return arr;
-	};*/
-
 	// Get viewport, projection, and modelview matrices
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glGetFloatv(GL_PROJECTION_MATRIX, projMatrix);
 	glGetFloatv(GL_MODELVIEW_MATRIX, viewMatrix);
 
 	// Convert mouse coordinates to normalized device coordinates (NDC)
-	const auto x = static_cast<float>(2.0f * mouseX / viewport[2] - 1.0f);
-	const auto y = static_cast<float>(1.0f - 2.0f * mouseY / viewport[3]);
+	const auto x = static_cast<float>(2.0 * mouseX / viewport[2] - 1.0);
+	const auto y = static_cast<float>(1.0 - 2.0 * mouseY / viewport[3]);
 
 	const auto viewSpace = Vector4(x, y, depth, 1.0f);									// Create a vector in clip space
 	const auto clipSpace = Matrix4(projMatrix).invert() * viewSpace;					// Transform from clip space to view space by applying the inverse of the projection matrix

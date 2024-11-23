@@ -18,16 +18,17 @@
 
 // Constants
 const auto CAMERA_POSITION_INIT			= Vector3(10, 0, 0);			// Default camera position
-const float CAMERA_DISTANCE_INIT		= CAMERA_POSITION_INIT.length();	// Camera distance from the origin
 const auto LOOK_AT_POINT_INIT			= Vector3(0, 0, 0);			// Default: Looking at origin
 const auto UP_VECTOR_INIT				= Vector3(0, 0, 1);			// Default: Up direction is positive Z
+const float CAMERA_DISTANCE_INIT		= CAMERA_POSITION_INIT.length();	// Camera distance from the origin
 
 constexpr float CAMERA_DISTANCE_MIN		= 0.02f;
 constexpr float CAMERA_DISTANCE_MAX		= 10000.0f;
-constexpr float Z_NEAR					= CAMERA_DISTANCE_MIN / 2;			// Near Clipping Plane: The distance from the camera to the near clipping plane. Objects closer than this distance are not rendered.
-constexpr float Z_FAR					= CAMERA_DISTANCE_MAX * 2;			//  Far Clipping Plane: The distance from the camera to the far clipping plane. Objects further than this distance are not rendered.
+constexpr float Z_NEAR					= CAMERA_DISTANCE_MIN / 2.0f;		// Near Clipping Plane: The distance from the camera to the near clipping plane. Objects closer than this distance are not rendered.
+constexpr float Z_FAR					= CAMERA_DISTANCE_MAX * 2.0f;		//  Far Clipping Plane: The distance from the camera to the far clipping plane. Objects further than this distance are not rendered.
 constexpr float FOV_Y					= 45.0f;							// Field of View in Y dimension
 constexpr float ZOOM_SENSITIVITY		= 2.0f;
+
 constexpr float AXES_LENGTH				= 100.0f;
 constexpr float MOUSE_RAY_LENGTH		= 1000.0f;
 
