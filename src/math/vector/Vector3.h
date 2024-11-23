@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <cmath>
 
-#include "Vector4.h"
 
 class Vector3 {
 public:
@@ -81,10 +80,6 @@ public:
 
 	[[nodiscard]] Vector3 cross(const Vector3& other) const {
 		return {y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x};
-	}
-
-	[[nodiscard]] Vector4 toVector4() const {
-		return {x, y, z, 1.0f};
 	}
 
 	[[nodiscard]] std::string toString() const {

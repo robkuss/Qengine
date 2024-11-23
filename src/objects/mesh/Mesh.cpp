@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "math/Util.h"
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
 	const Vector3 translation  = {transformation.m41, transformation.m42, transformation.m43};
@@ -8,12 +9,10 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
         case Mode::GRAB: {
         	position = position + translation;
 
-        	std::cout << position.toString() << std::endl;
-
         	// Apply the translation to each vertex
         	for (Vector3& vertex : vertices) {
-		        const Vector4 transformedVertex = transformation * vertex.toVector4();
-        		vertex = Vector3(transformedVertex.x, transformedVertex.y, transformedVertex.z);
+		        const Vector4 transformedVertex = transformation * vector4(vertex);
+        		vertex = vector3(transformedVertex);
         	}
             break;
         }
@@ -23,12 +22,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
 
             // Apply scaling relative to the mesh position
             for (Vector3& vertex : vertices) {
-                Vector3 relativePosition = vertex - position;
-                relativePosition = Vector3(
-                    relativePosition.x * (scale.x / oldScale.x),
-                    relativePosition.y * (scale.y / oldScale.y),
-                    relativePosition.z * (scale.z / oldScale.z)
-                );
+                const Vector3 relativePosition = (vertex - position) * (scale / oldScale);
                 vertex = relativePosition + position;
             }
             break;
@@ -38,13 +32,9 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
 
             // Apply the rotation to each vertex
             for (Vector3& vertex : vertices) {
-                Vector3 relativePosition = vertex - position;
-                const Vector4 rotatedPosition = transformation * relativePosition.toVector4();
-            	vertex = Vector3(
-					rotatedPosition.x + position.x,
-					rotatedPosition.y + position.y,
-					rotatedPosition.z + position.z
-				);
+	            const Vector3 relativePosition = vertex - position;
+                const Vector4 rotatedPosition  = transformation * vector4(relativePosition);
+            	vertex = vector3(rotatedPosition) + position;
             }
             break;
         }
