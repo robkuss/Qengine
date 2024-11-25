@@ -10,7 +10,6 @@ public:
     explicit Cube(const std::string& name, const float s) : Mesh{name, position, scale, rotation}, s(s) {
         initializeVertices();
         initializeFaceIndices();
-        initializeEdges();
 
         buildEdgeToFaceMap();
     }
@@ -47,17 +46,6 @@ private:
             3, 2, 6,  6, 7, 3,
             // Bottom face
             4, 5, 1,  1, 0, 4
-        };
-    }
-
-    void initializeEdges() override {
-        edgeIndices = {
-            // Front face edges
-            0, 1, 1, 2, 2, 3, 3, 0,
-            // Back face edges
-            4, 5, 5, 6, 6, 7, 7, 4,
-            // Connect front and back faces
-            0, 4, 1, 5, 2, 6, 3, 7
         };
     }
 };

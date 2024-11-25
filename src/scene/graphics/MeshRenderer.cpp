@@ -1,5 +1,7 @@
 #include "MeshRenderer.h"
 
+#include <ranges>
+
 #include "color/Colors.h"	// Also includes <GL/gl.h>
 
 /** Reinterpret Vertex as GLfloat* */
@@ -13,10 +15,10 @@ void MeshRenderer::renderVertex(const Vertex& v) {
 	glEnd();
 }
 
-void MeshRenderer::renderEdge(const Vertex &v0, const Vertex &v1) {
+void MeshRenderer::renderEdge(const Edge& e) {
 	glBegin(GL_LINES);
-	vertex3fv(v0);
-	vertex3fv(v1);
+	vertex3fv(e.v0);
+	vertex3fv(e.v1);
 	glEnd();
 }
 
@@ -29,27 +31,24 @@ void MeshRenderer::renderTriangle(const Triangle& t) {
 }
 
 void MeshRenderer::renderVertices(const Mesh& mesh) {
-	for (auto vertex : mesh.vertices) {
+	for (const auto& vertex : mesh.vertices) {
 		renderVertex(vertex);
 	}
 }
 
 void MeshRenderer::renderEdges(const Mesh& mesh) {
-	for (int i = 0; i < mesh.edgeIndices.size(); i += 2) {
-		renderEdge(
-			mesh.vertices[mesh.edgeIndices[i]],
-			mesh.vertices[mesh.edgeIndices[i + 1]]
-		);
+	for (const auto& edge: mesh.edgeToFaceMap | std::views::keys) {
+		renderEdge(edge);
 	}
 }
 
 void MeshRenderer::renderTriangles(const Mesh& mesh) {
-	for (auto triangle : mesh.getTriangles()) {
+	for (const auto& triangle : mesh.getTriangles()) {
 		renderTriangle(triangle);
 	}
 }
 
-void MeshRenderer::render(const Mesh& mesh, const Vector3 camPos, const bool isSelected, const bool isEditMode) {
+void MeshRenderer::render(Mesh& mesh, const Vector3 camPos, const bool isSelected, const bool isEditMode) {
 	/*const Matrix4 worldMatrix = mesh.position * mesh.rotation * mesh.scale;
 	glPushMatrix();
 	float worldMatrixF[16];
@@ -75,17 +74,14 @@ void MeshRenderer::render(const Mesh& mesh, const Vector3 camPos, const bool isS
 		color3f(MESH_SELECT_COLOR);
 		glLineWidth(4.0f);
 		glPointSize(3.0f);
-		for (const auto& [edge, faces] : mesh.edgeToFaceMap) {
-			if (isSilhouetteEdge(mesh, faces, camPos)) {
+		for (const auto& [edge, triangle] : mesh.edgeToFaceMap) {
+			if (Mesh::isSilhouetteEdge(triangle, camPos)) {
 				// Highlight the silhouette edges
-				renderEdge(
-					mesh.vertices[edge.first],
-					mesh.vertices[edge.second]
-				);
+				renderEdge(edge);
 
 				// Also highlight the vertices of the silhouette edges
-				renderVertex(mesh.vertices[edge.first]);
-				renderVertex(mesh.vertices[edge.second]);
+				renderVertex(edge.v0);
+				renderVertex(edge.v1);
 			}
 		}
 
@@ -95,23 +91,3 @@ void MeshRenderer::render(const Mesh& mesh, const Vector3 camPos, const bool isS
 
 	//glPopMatrix();
 }
-
-bool MeshRenderer::isSilhouetteEdge(const Mesh& mesh, const std::vector<int>& faces, const Vector3 camPos) {
-	if (faces.size() == 1) return true;	  // If only one face shares this edge, it's on the silhouette
-
-	// Get the normals of the two faces
-	const Vector3 normal1 = mesh.faceNormal(faces[0]);
-	const Vector3 normal2 = mesh.faceNormal(faces[1]);
-
-	// Use any point from the first face to compute the direction to the camera
-	const Vertex pointOnFace = mesh.vertices[mesh.faceIndices[faces[0] * 3]];
-	const Vector3 camDir = (pointOnFace - camPos).normalize();
-
-	// Compute the dot products of the camera direction with the face normals
-	const float dot1 = normal1.dot(camDir);
-	const float dot2 = normal2.dot(camDir);
-
-	// If one face is front-facing and the other is back-facing, the edge is part of the silhouette
-	return (dot1 > 0 && dot2 < 0) || (dot1 < 0 && dot2 > 0);
-}
-

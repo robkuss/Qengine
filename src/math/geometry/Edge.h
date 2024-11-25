@@ -5,13 +5,17 @@
 struct Edge {
 	Vertex v0, v1;
 
-	// Constructor that ensures the vertices are ordered consistently
-	Edge(const Vertex& v0, const Vertex& v1)
-		: v0(v0 < v1 ? v0 : v1), v1(v0 < v1 ? v1 : v0) {}
+	// Constructor to ensure the smaller vertex comes first (based on the lexicographical comparison of Vertex)
+	Edge(const Vertex& a, const Vertex& b) : v0(a), v1(b) {
+		if (v1 < v0) std::swap(v0, v1); // Ensure that v0 is the smaller vertex
+	}
 
-	// Comparison operator for the set (lexicographical comparison of v0, v1)
+	// Lexicographical comparison based on v0 first, then v1 if necessary
 	bool operator<(const Edge& other) const {
-		if (v0 != other.v0) return v0 < other.v0;
-		return v1 < other.v1;
+		return std::tie(v0, v1) < std::tie(other.v0, other.v1);
+	}
+
+	bool operator==(const Edge& other) const {
+		return v0 == other.v0 && v1 == other.v1;
 	}
 };

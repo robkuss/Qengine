@@ -22,7 +22,7 @@ void SceneManager::render(const Vector3 camPos) const {
 		const bool isSelected = selectedObject && selectedObject == obj;
 
 		// Attempt to cast Object to Mesh using dynamic_cast
-		if (const auto mesh = dynamic_cast<const Mesh*>(obj.get())) {
+		if (const auto mesh = dynamic_cast<Mesh*>(obj.get())) {
 			MeshRenderer::render(*mesh, camPos, isSelected, viewportMode.mode == Mode::EDIT);
 		}
 	}

@@ -13,31 +13,33 @@
 
 class Mesh : public Object {
 public:
-	std::vector<Vertex> vertices = {};
-	std::vector<int> edgeIndices = {};
+	std::vector<Vertex>	vertices = {};
 	std::vector<int> faceIndices = {};
 
 	// Edge-to-face adjacency information
-	std::map<std::pair<int, int>, std::vector<int>> edgeToFaceMap;
+	std::map<Edge, std::vector<Triangle>> edgeToFaceMap;
 
 	// Constructor & Destructor
 	Mesh(const std::string& name, const Matrix4& position, const Matrix4& scale, const Matrix4& rotation)
 		: Object{name, position, scale, rotation} {}
 	~Mesh() override = default;
 
-	void setPosition(const Vector3 &translation);
-	void setScale(const Vector3 &scale);
-	void setRotation(const Vector3& rotation);
-
 	virtual void initializeVertices()	 = 0;
 	virtual void initializeFaceIndices() = 0;
-	virtual void initializeEdges()		 = 0;
 
-	void applyTransformation(Mode::ModeEnum mode, const Matrix4& transformation);
+	[[nodiscard]] Triangle getTriangle(int index) const;
 	[[nodiscard]] std::vector<Triangle> getTriangles() const;
+
 	void buildEdgeToFaceMap();
-	[[nodiscard]] Vector3 faceNormal(int faceIndex) const;
+
+	void setPosition(const Vector3& translation);
+	void setScale(const Vector3& scale);
+	void setRotation(const Vector3& rotation);
+	void applyTransformation(Mode::ModeEnum mode, const Matrix4& transformation);
+
+	static Vector3 faceNormal(const Triangle& t) ;
+	static bool isSilhouetteEdge(const std::vector<Triangle>& triangles, Vector3 camPos) ;
 
 private:
-	void addEdgeToMap(int v0, int v1, int faceIndex);
+	void addEdgeToMap(const Edge &edge, const Triangle &t);
 };
