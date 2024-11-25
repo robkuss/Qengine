@@ -95,32 +95,3 @@ void Mesh::addEdgeToMap(const Edge& edge, const Triangle& t) {
 		edgeToFaceMap[edge].push_back(t);
 	}
 }
-
-/** Calculate the normal for a face in the Mesh */
-Vector3 Mesh::faceNormal(const Triangle& t) {
-	// Compute the two edge vectors
-	const Vector3 e1 = t.v1 - t.v0;
-	const Vector3 e2 = t.v2 - t.v0;
-
-	// Compute the normal using the cross product
-	return e1.cross(e2).normalize();
-}
-
-bool Mesh::isSilhouetteEdge(const std::vector<Triangle>& triangles, const Vector3 camPos) {
-	if (triangles.size() == 1) return true;  // If only one face shares this edge, it's on the silhouette
-
-	// Retrieve the normals of the two faces
-	const Vector3 normal1 = faceNormal(triangles[0]);
-	const Vector3 normal2 = faceNormal(triangles[1]);
-
-	// Use any point from the first face to compute the direction to the camera
-	const Vertex pointOnFace = triangles[0].v0; // Arbitrary point on the first face
-	const Vector3 camDir = (pointOnFace - camPos).normalize();
-
-	// Compute the dot products of the camera direction with the face normals
-	const float dot1 = normal1.dot(camDir);
-	const float dot2 = normal2.dot(camDir);
-
-	// If one face is front-facing and the other is back-facing, the edge is part of the silhouette
-	return (dot1 > 0 && dot2 < 0) || (dot1 < 0 && dot2 > 0);
-}

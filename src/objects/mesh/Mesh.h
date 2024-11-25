@@ -37,9 +37,6 @@ public:
 	void setRotation(const Vector3& rotation);
 	void applyTransformation(Mode::ModeEnum mode, const Matrix4& transformation);
 
-	static Vector3 faceNormal(const Triangle& t) ;
-	static bool isSilhouetteEdge(const std::vector<Triangle>& triangles, Vector3 camPos) ;
-
 private:
 	void addEdgeToMap(const Edge &edge, const Triangle &t);
 };

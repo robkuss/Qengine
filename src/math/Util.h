@@ -1,5 +1,6 @@
 #pragma once
 
+#include "geometry/Triangle.h"
 #include "math/vector/Vector3.h"
 #include "math/vector/Vector4.h"
 
@@ -20,4 +21,14 @@ inline Vector4 vector4(Vector3 v) {
 
 inline Vector3 vector3(Vector4 v) {
 	return {v.x, v.y, v.z};
+}
+
+/** Calculate the normal for a face in the Mesh */
+inline Vector3 faceNormal(const Triangle& t) {
+	// Compute the two edge vectors
+	const Vector3 e1 = t.v1 - t.v0;
+	const Vector3 e2 = t.v2 - t.v0;
+
+	// Compute the normal using the cross product
+	return e1.cross(e2).normalize();
 }

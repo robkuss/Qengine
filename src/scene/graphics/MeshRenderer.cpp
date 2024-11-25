@@ -75,7 +75,7 @@ void MeshRenderer::render(Mesh& mesh, const Vector3 camPos, const bool isSelecte
 		glLineWidth(4.0f);
 		glPointSize(3.0f);
 		for (const auto& [edge, triangle] : mesh.edgeToFaceMap) {
-			if (Mesh::isSilhouetteEdge(triangle, camPos)) {
+			if (isSilhouetteEdge(triangle, camPos)) {
 				// Highlight the silhouette edges
 				renderEdge(edge);
 
@@ -90,4 +90,23 @@ void MeshRenderer::render(Mesh& mesh, const Vector3 camPos, const bool isSelecte
 	}
 
 	//glPopMatrix();
+}
+
+bool MeshRenderer::isSilhouetteEdge(const std::vector<Triangle>& triangles, const Vector3 camPos) {
+	if (triangles.size() == 1) return true;  // If only one face shares this edge, it's on the silhouette
+
+	// Retrieve the normals of the two faces
+	const Vector3 normal1 = faceNormal(triangles[0]);
+	const Vector3 normal2 = faceNormal(triangles[1]);
+
+	// Use any point from the first face to compute the direction to the camera
+	const Vertex pointOnFace = triangles[0].v0; // Arbitrary point on the first face
+	const Vector3 camDir = (pointOnFace - camPos).normalize();
+
+	// Compute the dot products of the camera direction with the face normals
+	const float dot1 = normal1.dot(camDir);
+	const float dot2 = normal2.dot(camDir);
+
+	// If one face is front-facing and the other is back-facing, the edge is part of the silhouette
+	return (dot1 > 0 && dot2 < 0) || (dot1 < 0 && dot2 > 0);
 }
