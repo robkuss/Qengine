@@ -22,21 +22,23 @@ void Mesh::setRotation(const Vector3& rotation) {
 }
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
-	// Preserve the old transformation
+	// Preserve the old transformation and get the new one
 	Vector3 prsv{};
-	switch (mode) {
-		case Mode::GRAB:   prsv = getPosition(); break;
-		case Mode::SCALE:  prsv = getScale();    break;
-		case Mode::ROTATE: prsv = getRotation(); break;	// Technically not needed
-		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
-	}
-
 	Matrix4* toChange = nullptr;
+
 	switch (mode) {
-		case Mode::GRAB:   toChange = &position; break;
-		case Mode::SCALE:  toChange = &scale;    break;
-		case Mode::ROTATE: toChange = &rotation; break;
-		default: ;
+		case Mode::GRAB: {
+			prsv = getPosition();
+			toChange = &position; break;
+		}
+		case Mode::SCALE: {
+			prsv = getScale();
+			toChange = &scale; break;
+		}
+		case Mode::ROTATE: {
+			toChange = &rotation; break;	// No prsv needed
+		}
+		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
 	}
 
 	// Update the Mesh's transformation based on the given Mode
