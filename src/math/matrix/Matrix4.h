@@ -35,6 +35,14 @@ struct Matrix4 {
 		m14 = *it++; m24 = *it++; m34 = *it++; m44 = *it++;
 	}
 
+	// Helper function to convert the matrix to a float array
+	void toFloatArray(float out[16]) const {
+		out[0] = m11;  out[4] = m21;  out[8]  = m31;  out[12] = m41;
+		out[1] = m12;  out[5] = m22;  out[9]  = m32;  out[13] = m42;
+		out[2] = m13;  out[6] = m23;  out[10] = m33;  out[14] = m43;
+		out[3] = m14;  out[7] = m24;  out[11] = m34;  out[15] = m44;
+	}
+
     /**
      * @brief Multiplies this matrix by a given Vector4.
      *

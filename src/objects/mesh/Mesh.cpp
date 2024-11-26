@@ -1,5 +1,4 @@
 #include "Mesh.h"
-#include "math/matrix/Matrix4.h"
 
 void Mesh::setPosition(const Vector3& translation) {
 	this->position = Matrix4::translate(translation);
@@ -23,32 +22,47 @@ void Mesh::setRotation(const Vector3& rotation) {
 }
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
+	// Preserve the old transformation
+	Vector3 prsv{};
+	switch (mode) {
+		case Mode::GRAB:   prsv = getPosition(); break;
+		case Mode::SCALE:  prsv = getScale();    break;
+		case Mode::ROTATE: prsv = getRotation(); break;	// Technically not needed
+		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
+	}
+
+	Matrix4* toChange = nullptr;
+	switch (mode) {
+		case Mode::GRAB:   toChange = &position; break;
+		case Mode::SCALE:  toChange = &scale;    break;
+		case Mode::ROTATE: toChange = &rotation; break;
+		default: ;
+	}
+
+	// Update the Mesh's transformation based on the given Mode
+	*toChange = transformation * *toChange;
+
+	// Update Vertex data	// TODO: This can probably be improved upon (simplification, GPU utilization)
 	switch (mode) {
 		case Mode::GRAB: {
-			const Vector3 oldPos = getPosition();
-			this->position = transformation * this->position;
 			for (Vector3& vertex : vertices) {
-				vertex = vertex + (getPosition() - oldPos);
+				vertex = vertex + (getPosition() - prsv);
 			}
 			break;
 		}
 		case Mode::SCALE: {
-			const Vector3 oldScale = getScale();
-			this->scale = transformation * this->scale;
 			for (Vector3& vertex : vertices) {
-				vertex = (vertex - getPosition()) * (getScale() / oldScale) + getPosition();
+				vertex = (vertex - getPosition()) * (getScale() / prsv) + getPosition();
 			}
 			break;
 		}
 		case Mode::ROTATE: {
-			// Apply the rotation to each vertex
-			this->rotation = transformation * this->rotation;
 			for (Vector3& vertex : vertices) {
 				vertex = vector3(transformation * vector4(vertex - getPosition())) + getPosition();
 			}
 			break;
 		}
-		default: break;
+		default: ;
 	}
 
 	buildEdgeToFaceMap();	// TODO: This should not be necessary here
@@ -76,10 +90,7 @@ std::vector<Triangle> Mesh::getTriangles() const {
 void Mesh::buildEdgeToFaceMap() {
 	edgeToFaceMap.clear();
 
-	for (int i = 0; i + 2 < faceIndices.size(); i += 3) {
-		const Triangle& t = getTriangle(i);
-
-		// Add edges to the adjacency map
+	for (const Triangle& t : getTriangles()) {
 		addEdgeToMap(Edge(t.v0, t.v1), t);
 		addEdgeToMap(Edge(t.v1, t.v2), t);
 		addEdgeToMap(Edge(t.v2, t.v0), t);

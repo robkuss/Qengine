@@ -7,7 +7,7 @@ struct Edge {
 
 	// Constructor to ensure the smaller vertex comes first (based on the lexicographical comparison of Vertex)
 	Edge(const Vertex& a, const Vertex& b) : v0(a), v1(b) {
-		if (v1 < v0) std::swap(v0, v1); // Ensure that v0 is the smaller vertex TODO: This doesn't do the trick
+		if (v1 < v0) std::swap(v0, v1); // Ensure that v0 is the smaller vertex
 	}
 
 	// Lexicographical comparison based on v0 first, then v1 if necessary

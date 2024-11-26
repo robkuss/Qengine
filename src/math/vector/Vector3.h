@@ -10,6 +10,7 @@ public:
 	float x, y, z;
 
 	// Constructor
+	Vector3() = default;
 	Vector3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
 
 	// Static constants

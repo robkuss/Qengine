@@ -1,7 +1,7 @@
 #pragma once
 
-#include <map>
 #include <string>
+#include <map>
 #include <vector>
 
 #include "objects/Object.h"
@@ -9,7 +9,6 @@
 #include "math/geometry/Vertex.h"
 #include "math/geometry/Edge.h"
 #include "math/geometry/Triangle.h"
-#include "math/matrix/Matrix4.h"
 
 class Mesh : public Object {
 public:
@@ -38,5 +37,5 @@ public:
 	void applyTransformation(Mode::ModeEnum mode, const Matrix4& transformation);
 
 private:
-	void addEdgeToMap(const Edge &edge, const Triangle &t);
+	void addEdgeToMap(const Edge& edge, const Triangle& t);
 };

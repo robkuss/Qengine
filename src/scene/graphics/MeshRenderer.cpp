@@ -74,8 +74,8 @@ void MeshRenderer::render(Mesh& mesh, const Vector3 camPos, const bool isSelecte
 		color3f(MESH_SELECT_COLOR);
 		glLineWidth(4.0f);
 		glPointSize(3.0f);
-		for (const auto& [edge, triangle] : mesh.edgeToFaceMap) {
-			if (isSilhouetteEdge(triangle, camPos)) {
+		for (const auto& [edge, triangles] : mesh.edgeToFaceMap) {
+			if (isSilhouetteEdge(triangles, camPos)) {
 				// Highlight the silhouette edges
 				renderEdge(edge);
 
