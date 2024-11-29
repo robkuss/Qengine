@@ -22,7 +22,6 @@ void Mesh::setRotation(const Vector3& rotation) {
 }
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
-	// TODO: This can probably be improved upon (simplification, GPU utilization)
 	switch (mode) {
 		case Mode::GRAB: {
 			const Vector3& oldPos = getPosition();
@@ -48,7 +47,6 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
 		}
 		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
 	}
-
 	buildEdgeToFaceMap();	// TODO: This should not be necessary here
 }
 
