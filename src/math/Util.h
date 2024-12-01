@@ -1,8 +1,9 @@
 #pragma once
 
-#include "geometry/Triangle.h"
-#include "math/vector/Vector3.h"
-#include "math/vector/Vector4.h"
+#include <math/vector/Vector3.h>
+#include <math/vector/Vector4.h>
+#include <math/geometry/Triangle.h>
+#include <scene/Mode.h>
 
 constexpr float EPSILON		= 1e-9f;					// Infinitesimal
 constexpr double PI			= 3.14159265358979323846;	// Because for some reason there is no Pi in cmath
@@ -31,4 +32,13 @@ inline Vector3 faceNormal(const Triangle& t) {
 
 	// Compute the normal using the cross product
 	return e1.cross(e2).normalize();
+}
+
+inline Vector3 getDirection(const SubMode subMode) {
+	switch (subMode) {
+		case SubMode::X: return {1, 0, 0};
+		case SubMode::Y: return {0, 1, 0};
+		case SubMode::Z: return {0, 0, 1};
+		default: return Vector3::ONE;
+	}
 }

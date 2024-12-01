@@ -22,26 +22,30 @@ void Mesh::setRotation(const Vector3& rotation) {
 }
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
+	const auto oldPos = getPosition();
+	const auto oldScale = getScale();
+
 	switch (mode) {
 		case Mode::GRAB: {
-			const Vector3& oldPos = getPosition();
 			position = transformation * position;
+			const auto dPos = getPosition() - oldPos;
 			for (Vector3& vertex : vertices) {
-				vertex = vertex + (getPosition() - oldPos);
+				vertex = vertex + dPos;
 			}
 			break;
 		}
 		case Mode::SCALE: {
-			const Vector3& oldScale = getScale();
 			scale = transformation * scale;
+			const auto dScale = getScale() / oldScale;
 			for (Vector3& vertex : vertices) {
-				vertex = (vertex - getPosition()) * (getScale() / oldScale) + getPosition();
+				vertex = (vertex - oldPos) * dScale + oldPos;
 			}
 			break;
 		}
 		case Mode::ROTATE: {
+			rotation = transformation * rotation;
 			for (Vector3& vertex : vertices) {
-				vertex = vector3(transformation * vector4(vertex - getPosition())) + getPosition();
+				vertex = vector3(transformation * vector4(vertex - oldPos)) + oldPos;
 			}
 			break;
 		}

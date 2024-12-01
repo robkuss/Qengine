@@ -1,8 +1,8 @@
 #include "SceneManager.h"
 
-#include "math/matrix/Matrix4.h"
-#include "math/vector/Vector2.h"
-#include "scene/graphics/MeshRenderer.h"
+#include <math/matrix/Matrix4.h>
+#include <math/vector/Vector2.h>
+#include <scene/graphics/MeshRenderer.h>
 
 #include <memory>   // For std::shared_ptr
 
@@ -79,57 +79,51 @@ void SceneManager::select(const Ray& ray) {
 	}
 }
 
-void SceneManager::transform(const double mouseX, const double mouseY, const int width, const int height, const Vector3 worldPos, const Vector3 camPos) {
+void SceneManager::transform(const double mouseX, const double mouseY, const int width, const int height, Vector3 worldPos, const Vector3 camPos) {
     // Get the selected Object
     const auto obj = selectedObject.get();
-    if (!obj) {
-        //text->setErrorText("No object selected.");
-        return;
-    }
-    const auto mesh = dynamic_cast<Mesh*>(obj);
-    if (!mesh) {
-        //text->setErrorText("Selected Object is not a Mesh.");
-        return;
-    }
+    if (!obj) return;	// No Object selected
 
-	// Define direction based on subMode
-	Vector3 direction = Vector3::ZERO;
-	switch (transformMode.subMode) {
-		case SubMode::NONE: direction = Vector3::ONE; break;
-		case SubMode::X:	direction = Vector3(1, 0, 0); break;
-		case SubMode::Y:	direction = Vector3(0, 1, 0); break;
-		case SubMode::Z:	direction = Vector3(0, 0, 1); break;
-	}
-    const Vector3 dirWorldPos = direction * worldPos;		// I forgot why
+    const auto mesh = dynamic_cast<Mesh*>(obj);
+    if (!mesh) return;	// Selected Object is not a Mesh
+
+	// Determine transformation direction
+	const Vector3 direction = getDirection(transformMode.subMode);
+	if (direction == Vector3::ZERO) return;
+
+	// Initialize lastTransform if zero
+	if (lastTransform == Vector3::ZERO) lastTransform = worldPos;
+
 
     switch (transformMode.mode) {
         case Mode::GRAB: {
-        	lastTransform = lastTransform == Vector3::ZERO ? dirWorldPos : lastTransform;					// Ensure last transformation is non-zero
-        	const float grabZ = (mesh->getPosition() - camPos).length();									// Get distance of the Object from the camera
-	        const Matrix4 transformMatrix = Matrix4::translate((dirWorldPos - lastTransform) * grabZ);	// Calculate transformation matrix
-        	lastTransform = dirWorldPos;																	// Store new transformation for next frame
-        	mesh->applyTransformation(transformMode.mode, transformMatrix);
+	        const Matrix4 transform = Matrix4::translate(
+	        	direction													// Clamp direction
+	        	* mesh->getPosition().distance(camPos)						// Distance from Object to camera
+	        	* (worldPos - lastTransform)								// Difference from last transform
+	        );
+        	lastTransform = worldPos;										// Update lastTransform for next frame
+        	mesh->applyTransformation(transformMode.mode, transform);
             break;
         }
         case Mode::SCALE: {
-        	// Compute scaling factor based on mouse position and object distance
-        	const float objDist     = mesh->getPosition().distance(camPos);
+        	// Compute scaling matrix based on mouse position and object distance
         	const auto screenCenter = Vector2(width / 2.0, height / 2.0);
-        	const auto mousePos     = Vector2(mouseX, mouseY);
-        	const float scale       = static_cast<float>(screenCenter.distance(mousePos)) * (objDist / scaleSens);
-
-        	const Vector3 currentScale = mesh->getScale();													// Retrieve the current scale of the Mesh
-        	const Vector3 newScale = direction * scale / currentScale;										// Scale factor adjustment
-	        const Matrix4 transformMatrix = Matrix4::scale(newScale);										// Calculate transformation matrix
-        	mesh->applyTransformation(transformMode.mode, transformMatrix);
+        	const auto mousePos		= Vector2(mouseX, mouseY);
+	        const Matrix4 transform	= Matrix4::scale(
+	        	direction													// Clamp direction
+	        	* (static_cast<float>(screenCenter.distance(mousePos))		// Distance from mouse position to center of screen
+	        	* (mesh->getPosition().distance(camPos) / scalingSens))		// Adjust for Object distance and scaling sensitivity
+	        	/ mesh->getScale()											// Difference from last transform
+	        );
+        	mesh->applyTransformation(transformMode.mode, transform);
         	break;
         }
         case Mode::ROTATE: {
             // Example for rotation: Calculate a basic rotation matrix for illustration
-            // Assume rotation about Z-axis as an example (replace with desired axis/mouse inputs)
             constexpr float angle = 0.01f; // TODO (Replace with calculated rotation angle based on mouse input)
 
-            const Matrix4 transformMatrix = Matrix4::rotateZ(angle);
+            const Matrix4 transformMatrix = Matrix4::rotateX(angle) * Matrix4::rotateY(angle) * Matrix4::rotateZ(angle);
         	mesh->applyTransformation(transformMode.mode, transformMatrix);
             break;
         }
