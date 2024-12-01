@@ -79,7 +79,7 @@ void SceneManager::select(const Ray& ray) {
 	}
 }
 
-void SceneManager::transform(const double mouseX, const double mouseY, const int width, const int height, Vector3 worldPos, const Vector3 camPos) {
+void SceneManager::transform(const double mouseX, const double mouseY, const int width, const int height, const Vector3 worldPos, const Vector3 camPos) {
     // Get the selected Object
     const auto obj = selectedObject.get();
     if (!obj) return;	// No Object selected
@@ -88,7 +88,7 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
     if (!mesh) return;	// Selected Object is not a Mesh
 
 	// Determine transformation direction
-	const Vector3 direction = getDirection(transformMode.subMode);
+	const Vector3 direction = clampDirection(transformMode.subMode);
 	if (direction == Vector3::ZERO) return;
 
 	// Initialize lastTransform if zero
@@ -102,7 +102,6 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 	        	* mesh->getPosition().distance(camPos)						// Distance from Object to camera
 	        	* (worldPos - lastTransform)								// Difference from last transform
 	        );
-        	lastTransform = worldPos;										// Update lastTransform for next frame
         	mesh->applyTransformation(transformMode.mode, transform);
             break;
         }
@@ -113,7 +112,7 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 	        const Matrix4 transform	= Matrix4::scale(
 	        	direction													// Clamp direction
 	        	* (static_cast<float>(screenCenter.distance(mousePos))		// Distance from mouse position to center of screen
-	        	* (mesh->getPosition().distance(camPos) / scalingSens))		// Adjust for Object distance and scaling sensitivity
+	        	* (mesh->getPosition().distance(camPos) / scalingSens))		// Distance from Object to camera
 	        	/ mesh->getScale()											// Difference from last transform
 	        );
         	mesh->applyTransformation(transformMode.mode, transform);
@@ -129,10 +128,15 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
         }
     	default: break;
     }
+
+	// Update lastTransform for next frame
+	lastTransform = worldPos;
 }
 
 void SceneManager::toggleViewportMode() {
-	viewportMode.mode = viewportMode.mode == Mode::OBJECT ? Mode::EDIT : Mode::OBJECT;
+	viewportMode.mode = viewportMode.mode == Mode::OBJECT
+		? Mode::EDIT
+		: Mode::OBJECT;
 }
 
 void SceneManager::setTransformMode(const Mode::ModeEnum mode) {

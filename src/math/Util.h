@@ -34,7 +34,7 @@ inline Vector3 faceNormal(const Triangle& t) {
 	return e1.cross(e2).normalize();
 }
 
-inline Vector3 getDirection(const SubMode subMode) {
+inline Vector3 clampDirection(const SubMode subMode) {
 	switch (subMode) {
 		case SubMode::X: return {1, 0, 0};
 		case SubMode::Y: return {0, 1, 0};
