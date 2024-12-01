@@ -132,11 +132,7 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 }
 
 void SceneManager::toggleViewportMode() {
-	switch (viewportMode.mode) {
-		case Mode::OBJECT: viewportMode.mode = Mode::EDIT; break;
-		case Mode::EDIT: viewportMode.mode = Mode::OBJECT; break;
-		default: {}
-	}
+	viewportMode.mode = viewportMode.mode == Mode::OBJECT ? Mode::EDIT : Mode::OBJECT;
 }
 
 void SceneManager::setTransformMode(const Mode::ModeEnum mode) {
