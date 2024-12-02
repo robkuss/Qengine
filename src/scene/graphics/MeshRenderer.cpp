@@ -23,6 +23,11 @@ void MeshRenderer::renderEdge(const Edge& e) {
 }
 
 void MeshRenderer::renderTriangle(const Triangle& t) {
+	// Enable flat shading
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT1);
+	glEnable(GL_LIGHT2);
+
 	// Compute and apply the normal for the Triangle
 	const Vector3 normal = faceNormal(t);
 	glNormal3f(normal.x, normal.y, normal.z);
@@ -38,6 +43,9 @@ void MeshRenderer::renderTriangle(const Triangle& t) {
 	vertex3fv(t.v1);
 	vertex3fv(t.v2);
 	glEnd();
+
+	// Disable flat shading
+	glDisable(GL_LIGHTING);
 }
 
 void MeshRenderer::renderVertices(const Mesh& mesh) {
@@ -59,15 +67,13 @@ void MeshRenderer::renderTriangles(const Mesh& mesh) {
 }
 
 void MeshRenderer::render(Mesh& mesh, const Vector3& camPos, const bool isSelected, const bool isEditMode) {
-	// Draw the faces (with flat shading)
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT1);
+	// Draw the faces
 	renderTriangles(mesh);
-	glDisable(GL_LIGHTING);
 
 	if (isEditMode) {
 		// Draw the edges
 		color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_EDGE_COLOR);
+		glLineWidth(2.0f);
 		renderEdges(mesh);
 
 		// Draw the vertices
@@ -89,10 +95,10 @@ void MeshRenderer::render(Mesh& mesh, const Vector3& camPos, const bool isSelect
 				renderVertex(edge.v1);
 			}
 		}
-
-		// Reset line width back to default
-		glLineWidth(1.0f);
 	}
+
+	// Reset line width back to default
+	glLineWidth(1.0f);
 }
 
 bool MeshRenderer::isSilhouetteEdge(const std::vector<Triangle>& triangles, const Vector3 camPos) {

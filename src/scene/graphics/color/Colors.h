@@ -16,7 +16,7 @@ namespace Colors {
 
 	const auto BG_COLOR				= Color( 60,  60,  60);
 	const auto GRID_COLOR			= Color( 80,  80,  80);
-	const auto MESH_FACE_COLOR		= Color(230, 230, 230);
+	const auto MESH_FACE_COLOR		= Color(220, 220, 220);
 	const auto MESH_EDGE_COLOR		= Color( 50,  50,  50);
 	const auto MESH_VERT_COLOR		= Color( 25,  25,  25);
 	const auto MESH_SELECT_COLOR	= Color(240, 150,  60);

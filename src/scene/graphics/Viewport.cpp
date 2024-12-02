@@ -93,7 +93,8 @@ void Viewport::render() const {
 	drawGrid();
 
 	// Render scene objects
-	glLightfv(GL_LIGHT1, GL_POSITION, lightPos);
+	glLightfv(GL_LIGHT1, GL_POSITION, light1Pos);
+	glLightfv(GL_LIGHT2, GL_POSITION, light2Pos);
 	sceneManager.render(camPos);
 
 	#ifdef DRAW_MOUSE_RAY
@@ -365,13 +366,17 @@ void Viewport::setLight(const Color& diffuse, const Color& ambient, const Color&
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
 
 	glEnable(GL_LIGHT1);
+	glEnable(GL_LIGHT2);
 
 	const float diffuseF[3] = {diffuse.red(), diffuse.green(), diffuse.blue()};
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseF);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, diffuseF);
 
 	const float ambientF[3] = {ambient.red(), ambient.green(), ambient.blue()};
 	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientF);
+	glLightfv(GL_LIGHT2, GL_AMBIENT, ambientF);
 
 	const float specularF[3] = {specular.red(), specular.green(), specular.blue()};
 	glLightfv(GL_LIGHT1, GL_SPECULAR, specularF);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, specularF);
 }

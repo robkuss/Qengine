@@ -99,7 +99,8 @@ private:
 	GLdouble* mouseY	= new double[1];
 
 	// Lighting
-	GLfloat lightPos[4] = {200, 300, 600, 0};
+	GLfloat light1Pos[4] = {2, 3, 6, 0};
+	GLfloat light2Pos[4] = {-2, -3, -6, 0};
 
 	// Functions
 	void gluPerspective() const;
