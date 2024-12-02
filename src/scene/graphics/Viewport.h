@@ -6,8 +6,7 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-#include "scene/Mode.h"
-#include "scene/SceneManager.h"
+#include <scene/SceneManager.h>
 
 // Options
 #define TEXT	// For on-screen debug text
@@ -52,7 +51,7 @@ public:
 	void initRotation(bool isRotating);
 	void rotate(double mouseX, double mouseY);
 	void zoom(double yoffset);
-	void togglePerspective(float h, float v);
+	void setPerspective(float h, float v);
 
 	void onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
 

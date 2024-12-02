@@ -6,8 +6,8 @@
 #include <string>
 #include <cmath>
 
-#include "math/vector/Vector3.h"
-#include "math/matrix/Matrix4.h"
+#include <math/vector/Vector3.h>
+#include <math/matrix/Matrix4.h>
 
 class Object {
 public:

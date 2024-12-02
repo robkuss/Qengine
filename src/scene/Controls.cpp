@@ -1,4 +1,4 @@
-#include "graphics/Viewport.h"
+#include <scene/graphics/Viewport.h>
 
 // Controls
 
@@ -85,12 +85,12 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 		case GLFW_KEY_TAB : sceneManager.toggleViewportMode(); break;				// TAB -> Toggle Object/Edit Mode
 
 		// Number keys for perspective toggling
-		case GLFW_KEY_1: togglePerspective(  0.0f,  0.0f); break;				// 1 -> Front View  (towards negative X)
-		case GLFW_KEY_2: togglePerspective(-90.0f,  0.0f); break;				// 2 -> Right View  (towards negative Y)
-		case GLFW_KEY_3: togglePerspective(  0.0f, 90.0f); break;				// 3 -> Top View    (towards negative Z)
-		case GLFW_KEY_4: togglePerspective(180.0f,  0.0f); break;				// 4 -> Back View   (towards positive X)
-		case GLFW_KEY_5: togglePerspective( 90.0f,  0.0f); break;				// 5 -> Left View   (towards positive Y)
-		case GLFW_KEY_6: togglePerspective(  0.0f,-90.0f); break;				// 6 -> Bottom View (towards positive Z)
+		case GLFW_KEY_1: setPerspective(  0.0f,  0.0f); break;					// 1 -> Front View  (towards negative X)
+		case GLFW_KEY_2: setPerspective(-90.0f,  0.0f); break;					// 2 -> Right View  (towards negative Y)
+		case GLFW_KEY_3: setPerspective(  0.0f, 90.0f); break;					// 3 -> Top View    (towards negative Z)
+		case GLFW_KEY_4: setPerspective(180.0f,  0.0f); break;					// 4 -> Back View   (towards positive X)
+		case GLFW_KEY_5: setPerspective( 90.0f,  0.0f); break;					// 5 -> Left View   (towards positive Y)
+		case GLFW_KEY_6: setPerspective(  0.0f,-90.0f); break;					// 6 -> Bottom View (towards positive Z)
 
 		// Set Transform Mode
 		case GLFW_KEY_G: sceneManager.setTransformMode(Mode::GRAB); break;			// G -> Grab
@@ -103,8 +103,8 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 		// Set Transform SubMode
 		case GLFW_KEY_X || GLFW_KEY_Y || GLFW_KEY_Z: if (sceneManager.transformMode.mode != Mode::NONE) {
 			case GLFW_KEY_X: sceneManager.setTransformSubMode(SubMode::X); break;	// X -> Snap transformation to X direction
-			case GLFW_KEY_Y: sceneManager.setTransformSubMode(SubMode::Y); break;	// Y -> Snap transformation to Y direction
-			case GLFW_KEY_Z: sceneManager.setTransformSubMode(SubMode::Z); break;	// Z -> Snap transformation to Z direction
+			case GLFW_KEY_Z: sceneManager.setTransformSubMode(SubMode::Y); break;	// Z -> Snap transformation to Y direction TODO: Make this depend on scancode, not key
+			case GLFW_KEY_Y: sceneManager.setTransformSubMode(SubMode::Z); break;	// Y -> Snap transformation to Z direction TODO: Make this depend on scancode, not key
 		}
 
 		// Toggle Shading
@@ -112,7 +112,7 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 
 		default: {
 			#ifdef TEXT
-				text->setErrorText("Invalid key.");
+				// text->setErrorText("Invalid key.");
 			#endif
 		}
 	}

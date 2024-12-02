@@ -1,12 +1,12 @@
 #include "Viewport.h"
 
-#include "math/Util.h"
-#include "math/vector/Vector2.h"
-#include "color/Colors.h"
-
 #include <cmath>
 #include <sstream>
 #include <iomanip>
+
+#include <math/Util.h>
+#include <math/vector/Vector2.h>
+#include <scene/graphics/color/Colors.h>
 
 
 Viewport::Viewport(const std::string &title, const int width, const int height, const SceneManager& sceneManager)
@@ -260,7 +260,7 @@ void Viewport::zoom(const double yoffset) {
 	gluLookAt(camPos, lookAt, up);
 }
 
-void Viewport::togglePerspective(const float h, const float v) {
+void Viewport::setPerspective(const float h, const float v) {
 	rotH = h;
 	rotV = v;
 	updateCameraPosition();	 // Apply camera rotation

@@ -1,10 +1,9 @@
 #pragma once
 
 #include <cmath>
-#include <objects/mesh/Mesh.h>
 
-#include "math/Util.h"
-#include "math/vector/Vector4.h"
+#include <math/Util.h>
+#include <math/vector/Vector4.h>
 
 
 struct Matrix4 {

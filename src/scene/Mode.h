@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 enum class ModeType {
     NONE,
     VIEW,       // Select (Object & Edit Mode)

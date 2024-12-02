@@ -4,10 +4,10 @@
 #include <map>
 #include <vector>
 
-#include "objects/Object.h"
-#include "scene/Mode.h"
-#include "math/geometry/Vertex.h"
-#include "math/geometry/Triangle.h"
+#include <objects/Object.h>
+#include <scene/Mode.h>
+#include <math/geometry/Vertex.h>
+#include <math/geometry/Triangle.h>
 
 enum class ShadingMode {
 	FLAT,
@@ -32,8 +32,8 @@ public:
 	virtual void initializeVertices()	 = 0;
 	virtual void initializeFaceIndices() = 0;
 
-	static Vector3 faceNormal(const Triangle &t);
-	Vector3 vertexNormal(const Vertex &vertex) const;
+	static Vector3 faceNormal(const Triangle& t);
+	[[nodiscard]] Vector3 vertexNormal(const Vertex& v) const;
 
 	[[nodiscard]] Triangle getTriangle(int index) const;
 	[[nodiscard]] std::vector<Triangle> getTriangles() const;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "math/vector/Vector3.h"
-#include "objects/mesh/Mesh.h"
+#include <math/vector/Vector3.h>
+#include <objects/mesh/Mesh.h>
 
 class MeshRenderer {
 public:

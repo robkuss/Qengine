@@ -2,7 +2,7 @@
 
 #include <ranges>
 
-#include "color/Colors.h"	// Also includes <GL/gl.h>
+#include <scene/graphics/color/Colors.h>	// Also includes <GL/gl.h>
 
 /** Reinterpret Vertex as GLfloat* */
 void vertex3fv(const Vertex& v) {

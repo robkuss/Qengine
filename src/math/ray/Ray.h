@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <optional>
 
-#include "math/Util.h"
-#include "math/geometry/Triangle.h"
-#include "math/vector/Vector3.h"
-#include "objects/mesh/Mesh.h"
+#include <math/Util.h>
+#include <math/geometry/Triangle.h>
+#include <math/vector/Vector3.h>
+#include <objects/mesh/Mesh.h>
 
 
 class Ray {

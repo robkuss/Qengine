@@ -1,6 +1,6 @@
-#include <iostream>
-
 #include "Text.h"
+
+#include <iostream>
 
 // Function to initialize FreeType and load the font
 inline Text::Text() {

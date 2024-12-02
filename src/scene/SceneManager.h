@@ -1,7 +1,6 @@
 #pragma once
 
-#include "objects/mesh/cube/Cube.cpp"
-#include "math/ray/Ray.h"
+#include <math/ray/Ray.h>
 
 class SceneManager {
 public:

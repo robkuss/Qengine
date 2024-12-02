@@ -1,6 +1,6 @@
 #pragma once
 
-#include "objects/mesh/Mesh.h"
+#include <objects/mesh/Mesh.h>
 
 class Cube final : public Mesh {
 public:

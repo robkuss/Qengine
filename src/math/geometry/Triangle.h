@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/geometry/Vertex.h"
+#include <math/geometry/Vertex.h>
 
 struct Triangle {
 	Vertex v0, v1, v2;
