@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <objects/mesh/Mesh.h>
 
 #include "math/Util.h"
 #include "math/vector/Vector4.h"
@@ -41,6 +42,31 @@ struct Matrix4 {
 		out[1] = m12;  out[5] = m22;  out[9]  = m32;  out[13] = m42;
 		out[2] = m13;  out[6] = m23;  out[10] = m33;  out[14] = m43;
 		out[3] = m14;  out[7] = m24;  out[11] = m34;  out[15] = m44;
+	}
+
+	Matrix4 operator-(const Matrix4& other) const {
+		Matrix4 result;
+		result.m11 = m11 - other.m11;
+		result.m21 = m21 - other.m21;
+		result.m31 = m31 - other.m31;
+		result.m41 = m41 - other.m41;
+
+		result.m12 = m12 - other.m12;
+		result.m22 = m22 - other.m22;
+		result.m32 = m32 - other.m32;
+		result.m42 = m42 - other.m42;
+
+		result.m13 = m13 - other.m13;
+		result.m23 = m23 - other.m23;
+		result.m33 = m33 - other.m33;
+		result.m43 = m43 - other.m43;
+
+		result.m14 = m14 - other.m14;
+		result.m24 = m24 - other.m24;
+		result.m34 = m34 - other.m34;
+		result.m44 = m44 - other.m44;
+
+		return result;
 	}
 
     /**
@@ -95,7 +121,7 @@ struct Matrix4 {
         });
     }
 
-	static Matrix4 translate(const Vector3& t) {
+    static Matrix4 translate(const Vector3& t) {
     	return Matrix4({
 			1, 0, 0, t.x,
 			0, 1, 0, t.y,

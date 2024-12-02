@@ -19,44 +19,25 @@ void Mesh::setRotation(const Vector3& rotation) {
 }
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
-	const auto oldPos = getPosition();
-	const auto oldScale = getScale();
+	const auto oldPos	= getPosition();
+	const auto oldScale	= getScale();
 
+	// Update Object transformation
 	switch (mode) {
-		case Mode::GRAB: {
-			position = transformation * position;
-			const auto dPos = getPosition() - oldPos;
-			for (Vertex& vertex : vertices) {
-				vertex += dPos;
-			}
-			break;
-		}
-		case Mode::SCALE: {
-			scale = transformation * scale;
-			const auto dScale = getScale() / oldScale;
-			for (Vertex& vertex : vertices) {
-				vertex -= oldPos;	// Translate to origin
-				vertex *= dScale;
-				vertex += oldPos;	// Translate back
-			}
-			break;
-		}
-		case Mode::ROTATE: {
-			rotation = transformation * rotation;
-			for (Vertex& vertex : vertices) {
-				vertex -= oldPos; // Translate to origin
-
-				// Transform vertex in place
-				const Vector4 temp = transformation * vector4(vertex);
-				vertex.x = temp.x;
-				vertex.y = temp.y;
-				vertex.z = temp.z;
-
-				vertex += oldPos; // Translate back
-			}
-			break;
-		}
+		case Mode::GRAB:   position = transformation * position; break;
+		case Mode::SCALE:  scale	= transformation * scale;	 break;
+		case Mode::ROTATE: rotation = transformation * rotation; break;
 		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
+	}
+
+	// Update vertex data
+	for (Vertex& vertex : vertices) {
+		switch (mode) {
+			case Mode::GRAB:   vertex += getPosition() - oldPos; break;
+			case Mode::SCALE:  vertex = Vertex(oldPos + (vertex - oldPos) * (getScale() / oldScale)); break;
+			case Mode::ROTATE: vertex = Vertex(oldPos + vector3(transformation * vector4(vertex - oldPos))); break;
+			default: ;
+		}
 	}
 }
 
@@ -83,14 +64,14 @@ void Mesh::buildEdgeToFaceMap() {
 	edgeToFaceMap.clear();
 
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
-		const auto t = getTriangle(i);
-
 		// Get the 3 vertices that form a Triangle
 		const int v0 = faceIndices[i];
 		const int v1 = faceIndices[i + 1];
 		const int v2 = faceIndices[i + 2];
 
-		// Add edges to the adjacency map (ensure that smaller index comes first for consistency)
+		const Triangle t = getTriangle(i);
+
+		// Add edges to the adjacency map
 		addEdgeToMap(v0, v1, t);
 		addEdgeToMap(v1, v2, t);
 		addEdgeToMap(v2, v0, t);
