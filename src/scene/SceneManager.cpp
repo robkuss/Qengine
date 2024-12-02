@@ -12,6 +12,7 @@ SceneManager::SceneManager() {
 	cube->setPosition(Vector3(0.5f, 0.5f, 0.5f));
 	cube->setScale(Vector3::ONE);
 	cube->setRotation(Vector3::ZERO);
+	cube->buildEdgeToFaceMap();
 	addObject(cube);
 }
 

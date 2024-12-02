@@ -1,6 +1,5 @@
 #pragma once
 
-#include "math/geometry/Edge.h"
 #include "math/vector/Vector3.h"
 #include "objects/mesh/Mesh.h"
 
@@ -12,7 +11,7 @@ public:
 
 private:
 	static void renderVertex(const Vertex& v);
-	static void renderEdge(const Edge &e);
+	static void renderEdge(const Mesh &mesh, const std::pair<int, int> &e);
 	static void renderTriangle(const Triangle& t);
 
 	static void renderVertices(const Mesh& mesh);

@@ -15,10 +15,10 @@ void MeshRenderer::renderVertex(const Vertex& v) {
 	glEnd();
 }
 
-void MeshRenderer::renderEdge(const Edge& e) {
+void MeshRenderer::renderEdge(const Mesh& mesh, const std::pair<int, int>& e) {
 	glBegin(GL_LINES);
-	vertex3fv(e.v0);
-	vertex3fv(e.v1);
+	vertex3fv(mesh.vertices[e.first]);
+	vertex3fv(mesh.vertices[e.second]);
 	glEnd();
 }
 
@@ -56,7 +56,7 @@ void MeshRenderer::renderVertices(const Mesh& mesh) {
 
 void MeshRenderer::renderEdges(const Mesh& mesh) {
 	for (const auto& edge: mesh.edgeToFaceMap | std::views::keys) {
-		renderEdge(edge);
+		renderEdge(mesh, edge);
 	}
 }
 
@@ -88,11 +88,11 @@ void MeshRenderer::render(Mesh& mesh, const Vector3& camPos, const bool isSelect
 		for (const auto& [edge, triangles] : mesh.edgeToFaceMap) {
 			if (isSilhouetteEdge(triangles, camPos)) {
 				// Highlight the silhouette edges
-				renderEdge(edge);
+				renderEdge(mesh, edge);
 
 				// Also highlight the vertices of the silhouette edges
-				renderVertex(edge.v0);
-				renderVertex(edge.v1);
+				renderVertex(mesh.vertices[edge.first]);
+				renderVertex(mesh.vertices[edge.second]);
 			}
 		}
 	}

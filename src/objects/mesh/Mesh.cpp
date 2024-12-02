@@ -5,7 +5,6 @@ void Mesh::setPosition(const Vector3& translation) {
 	for (Vector3& vertex : vertices) {
 		vertex = vertex + translation;
 	}
-	buildEdgeToFaceMap();	// TODO: This should not be necessary here
 }
 
 void Mesh::setScale(const Vector3& scale) {
@@ -13,12 +12,10 @@ void Mesh::setScale(const Vector3& scale) {
 	for (Vector3& vertex : vertices) {
 		vertex = vertex * scale;
 	}
-	buildEdgeToFaceMap();	// TODO: This should not be necessary here
 }
 
 void Mesh::setRotation(const Vector3& rotation) {
 	this->rotation = Matrix4::rotateX(rotation.x) * Matrix4::rotateY(rotation.y) * Matrix4::rotateZ(rotation.z);
-	buildEdgeToFaceMap();	// TODO: This should not be necessary here
 }
 
 void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
@@ -29,29 +26,38 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
 		case Mode::GRAB: {
 			position = transformation * position;
 			const auto dPos = getPosition() - oldPos;
-			for (Vector3& vertex : vertices) {
-				vertex = vertex + dPos;
+			for (Vertex& vertex : vertices) {
+				vertex += dPos;
 			}
 			break;
 		}
 		case Mode::SCALE: {
 			scale = transformation * scale;
 			const auto dScale = getScale() / oldScale;
-			for (Vector3& vertex : vertices) {
-				vertex = (vertex - oldPos) * dScale + oldPos;
+			for (Vertex& vertex : vertices) {
+				vertex -= oldPos;	// Translate to origin
+				vertex *= dScale;
+				vertex += oldPos;	// Translate back
 			}
 			break;
 		}
 		case Mode::ROTATE: {
 			rotation = transformation * rotation;
-			for (Vector3& vertex : vertices) {
-				vertex = vector3(transformation * vector4(vertex - oldPos)) + oldPos;
+			for (Vertex& vertex : vertices) {
+				vertex -= oldPos; // Translate to origin
+
+				// Transform vertex in place
+				const Vector4 temp = transformation * vector4(vertex);
+				vertex.x = temp.x;
+				vertex.y = temp.y;
+				vertex.z = temp.z;
+
+				vertex += oldPos; // Translate back
 			}
 			break;
 		}
 		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
 	}
-	buildEdgeToFaceMap();	// TODO: This should not be necessary here
 }
 
 Triangle Mesh::getTriangle(const int index) const {
@@ -76,19 +82,32 @@ std::vector<Triangle> Mesh::getTriangles() const {
 void Mesh::buildEdgeToFaceMap() {
 	edgeToFaceMap.clear();
 
-	for (const Triangle& t : getTriangles()) {
-		addEdgeToMap(Edge(t.v0, t.v1), t);
-		addEdgeToMap(Edge(t.v1, t.v2), t);
-		addEdgeToMap(Edge(t.v2, t.v0), t);
+	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
+		const auto t = getTriangle(i);
+
+		// Get the 3 vertices that form a Triangle
+		const int v0 = faceIndices[i];
+		const int v1 = faceIndices[i + 1];
+		const int v2 = faceIndices[i + 2];
+
+		// Add edges to the adjacency map (ensure that smaller index comes first for consistency)
+		addEdgeToMap(v0, v1, t);
+		addEdgeToMap(v1, v2, t);
+		addEdgeToMap(v2, v0, t);
 	}
 }
 
-void Mesh::addEdgeToMap(const Edge& edge, const Triangle& t) {
-	if (!edgeToFaceMap.contains(edge)) {
-		// If the edge is not in the map, initialize it with a new vector containing the face
+/** Helper function to add an edge to the map */
+void Mesh::addEdgeToMap(int v0, int v1, const Triangle& t) {
+	// Ensure that the order of the vertices is consistent
+	if (const std::pair<int, int> edge = v0 < v1
+				? std::make_pair(v0, v1)
+				: std::make_pair(v1, v0);
+			!edgeToFaceMap.contains(edge)) {
+		// If the edge is not in the map, initialize it with a new vector containing faceIndex
 		edgeToFaceMap[edge] = std::vector {t};
 	} else {
-		// If the edge already exists, add face to the existing vector
+		// If the edge already exists, add faceIndex to the existing vector
 		edgeToFaceMap[edge].push_back(t);
 	}
 }

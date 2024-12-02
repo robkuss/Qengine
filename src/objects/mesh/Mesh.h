@@ -7,16 +7,15 @@
 #include "objects/Object.h"
 #include "scene/Mode.h"
 #include "math/geometry/Vertex.h"
-#include "math/geometry/Edge.h"
 #include "math/geometry/Triangle.h"
 
 class Mesh : public Object {
 public:
-	std::vector<Vertex>	vertices = {};
+	std::vector<Vertex> vertices = {};
 	std::vector<int> faceIndices = {};
 
 	// Edge-to-face adjacency information
-	std::map<Edge, std::vector<Triangle>> edgeToFaceMap;
+	std::map<std::pair<int, int>, std::vector<Triangle>> edgeToFaceMap;
 
 	// Constructor & Destructor
 	Mesh(const std::string& name, const Matrix4& position, const Matrix4& scale, const Matrix4& rotation)
@@ -34,8 +33,9 @@ public:
 	void setPosition(const Vector3& translation);
 	void setScale(const Vector3& scale);
 	void setRotation(const Vector3& rotation);
+
 	void applyTransformation(Mode::ModeEnum mode, const Matrix4& transformation);
 
 private:
-	void addEdgeToMap(const Edge& edge, const Triangle& t);
+	void addEdgeToMap(int v0, int v1, const Triangle& t);
 };

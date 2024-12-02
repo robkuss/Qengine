@@ -9,15 +9,15 @@
 #include "math/vector/Vector3.h"
 #include "math/matrix/Matrix4.h"
 
-
 class Object {
 public:
 	std::string name;
+
 	Matrix4 position, scale, rotation;
 
 	// Constructor & Destructor
 	Object(std::string name, const Matrix4& position, const Matrix4& scale, const Matrix4& rotation)
-		: name(std::move(name)), position(position), scale(scale), rotation(rotation), id(nextID++) {}
+			: name(std::move(name)), position(position), scale(scale), rotation(rotation), id(nextID++) {}
 	virtual ~Object() = default;	// Virtual destructor to enable dynamic_cast
 
 	bool operator==(const Object& other) const { return id == other.id; }	// Object == Object
