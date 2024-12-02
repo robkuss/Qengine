@@ -37,13 +37,13 @@ constexpr int ANTIALIASING_SAMPLES		= 10;
 
 class Viewport {
 public:
-	explicit Viewport(const std::string &title, int width, int height, const SceneManager& sceneManager);
+	explicit Viewport(const std::string& title, int width, int height, const SceneManager& sceneManager);
 	~Viewport();
 
 	void setCallbacks(GLFWwindow* window);
 
 	void start();
-	void render();
+	void render() const;
 
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
@@ -63,9 +63,9 @@ private:
 	float aspect;
 	SceneManager sceneManager;
 
-	#ifdef TEXT
-		Text* text{};	// For on-screen debug text
-	#endif
+#ifdef TEXT
+	Text* text{};	// For on-screen debug text
+#endif
 
 	// Initial values
 	Vector3 camPos		= CAMERA_POSITION_INIT;
@@ -98,9 +98,12 @@ private:
 	GLdouble* mouseX	= new double[1];
 	GLdouble* mouseY	= new double[1];
 
+	// Lighting
+	GLfloat lightPos[4] = {200, 300, 600, 0};
+
 	// Functions
 	void gluPerspective() const;
-	static void gluLookAt(Vector3 eye, Vector3 center, Vector3 up);
+	static void gluLookAt(const Vector3& eye, const Vector3& center, const Vector3& up) ;
 	void updateCameraPosition();
 
 	[[nodiscard]] Vector3 unproject(double mouseX, double mouseY, float depth) const;
@@ -110,6 +113,8 @@ private:
 	static void drawGrid();
 	void drawMouseRay() const;
 	void drawOnScreenText() const;
+
+	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
 
 	void getFPS();
 };

@@ -43,35 +43,76 @@ void MeshRenderer::renderEdges(const Mesh& mesh) {
 }
 
 void MeshRenderer::renderTriangles(const Mesh& mesh) {
+	// Enable lighting
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT1);
+
+	// Set up material properties for flat shading
+	const GLfloat materialDiffuse[] = {
+		Colors::LIGHT_SUN.red(),
+		Colors::LIGHT_SUN.green(),
+		Colors::LIGHT_SUN.blue(),
+		Colors::LIGHT_SUN.alpha()
+	};
+	const GLfloat materialAmbient[] = {
+		Colors::LIGHT_SUN.red(),
+		Colors::LIGHT_SUN.green(),
+		Colors::LIGHT_SUN.blue(),
+		Colors::LIGHT_SUN.alpha()
+	};
+	const GLfloat materialSpecular[] = {
+		Colors::WHITE.red(),
+		Colors::WHITE.green(),
+		Colors::WHITE.blue(),
+		Colors::WHITE.alpha()
+	};
+	constexpr GLfloat materialShininess[] = {
+		32.0f
+	};
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
+
+	// Render triangles with flat shading
+	glBegin(GL_TRIANGLES);
 	for (const auto& triangle : mesh.getTriangles()) {
-		renderTriangle(triangle);
+		// Compute the normal for the triangle
+		Vector3 edge1 = triangle.v1 - triangle.v0;
+		Vector3 edge2 = triangle.v2 - triangle.v0;
+		const Vector3 normal = edge1.cross(edge2).normalize();
+
+		// Apply the normal for the face
+		glNormal3f(normal.x, normal.y, normal.z);
+
+		// Draw the triangle
+		vertex3fv(triangle.v0);
+		vertex3fv(triangle.v1);
+		vertex3fv(triangle.v2);
 	}
+	glEnd();
+
+	// Disable lighting after rendering
+	glDisable(GL_LIGHTING);
 }
 
-void MeshRenderer::render(Mesh& mesh, const Vector3 camPos, const bool isSelected, const bool isEditMode) {
-	/*const Matrix4 worldMatrix = mesh.position * mesh.rotation * mesh.scale;
-	glPushMatrix();
-	float worldMatrixF[16];
-	worldMatrix.toColumnMajor(worldMatrixF);
-	glMultMatrixf(worldMatrixF);*/
-
-	// Draw the faces
-	color3f(MESH_FACE_COLOR);
+void MeshRenderer::render(Mesh& mesh, const Vector3& camPos, const bool isSelected, const bool isEditMode) {
+	// Draw the faces with flat shading
 	renderTriangles(mesh);
 
 	if (isEditMode) {
 		// Draw the edges
-		color3f(isSelected ? MESH_SELECT_COLOR : MESH_EDGE_COLOR);
+		color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_EDGE_COLOR);
 		renderEdges(mesh);
 
 		// Draw the vertices
-		color3f(isSelected ? MESH_SELECT_COLOR : MESH_VERT_COLOR);
+		color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_VERT_COLOR);
 		glPointSize(4.0f);
 		renderVertices(mesh);
-
 	} else if (isSelected) {
 		// Highlight only the outline of the Mesh in Object Mode
-		color3f(MESH_SELECT_COLOR);
+		color3f(Colors::MESH_SELECT_COLOR);
 		glLineWidth(4.0f);
 		glPointSize(3.0f);
 		for (const auto& [edge, triangles] : mesh.edgeToFaceMap) {
@@ -88,8 +129,6 @@ void MeshRenderer::render(Mesh& mesh, const Vector3 camPos, const bool isSelecte
 		// Reset line width back to default
 		glLineWidth(1.0f);
 	}
-
-	//glPopMatrix();
 }
 
 bool MeshRenderer::isSilhouetteEdge(const std::vector<Triangle>& triangles, const Vector3 camPos) {

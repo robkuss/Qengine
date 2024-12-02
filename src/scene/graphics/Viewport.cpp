@@ -39,10 +39,12 @@ Viewport::Viewport(const std::string &title, const int width, const int height, 
 	setCallbacks(window);
 
 	// OpenGL setup
-	glEnable(GL_DEPTH_TEST); // Enable depth testing
-	glEnable(GL_MULTISAMPLE); // Enable multi-sampling (antialiasing)
+	glEnable(GL_MULTISAMPLE);		// Enable multi-sampling (antialiasing)
+	// glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);		// Enable depth testing
+	// glEnable(GL_RESCALE_NORMAL);
 
-	glfwSwapInterval(0); // Disable v-sync
+	glfwSwapInterval(0);				// Disable v-sync
 
 	aspect = static_cast<float>(width) / static_cast<float>(height);
 }
@@ -58,16 +60,24 @@ Viewport::~Viewport() {
 }
 
 void Viewport::start() {
-	// Init matrices
-	gluPerspective();						  // Initialize projection matrix
-	gluLookAt(camPos, lookAt, up);   // Initialize view matrix
-
 	#ifdef TEXT
 		text = new Text();	// Initialize FreeType for on-screen debug text
 	#endif
 
+	clearColor(Colors::BG_COLOR);	// Background color
+	setLight(Colors::LIGHT_SUN, Colors::LIGHT_AMBIENT, Colors::WHITE);
+
+	// Get matrices
+	gluPerspective();						  // projection matrix
+	gluLookAt(camPos, lookAt, up);   // view matrix
+
 	// Start rendering the Viewport
 	while (!glfwWindowShouldClose(window)) {
+		glfwGetFramebufferSize(window, &width, &height);
+		glViewport(0, 0, width, height);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear the framebuffer
+
 		render();
 
 		glfwSwapBuffers(window);
@@ -78,18 +88,13 @@ void Viewport::start() {
 }
 
 /** Viewport rendering loop called every frame */
-void Viewport::render() {
-	glfwGetFramebufferSize(window, &width, &height);
-	glViewport(0, 0, width, height);
-
-	clearColor(BG_COLOR);										// Background color
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear the framebuffer
-
+void Viewport::render() const {
 	// Draw the coordinate system
 	drawAxes();
 	drawGrid();
 
 	// Render scene objects
+	glLightfv(GL_LIGHT1, GL_POSITION, lightPos);
 	sceneManager.render(camPos);
 
 	#ifdef DRAW_MOUSE_RAY
@@ -154,7 +159,7 @@ void Viewport::drawOnScreenText() const {
 			default: out << "    Rot: "   << std::fixed << std::setprecision(3) << cube.getRotation().x  << " " << cube.getRotation().y  << " " << cube.getRotation().z;  break;
 		}
 		#ifdef TEXT
-			text->renderText(out.str().c_str(), Text::firstLineX, Text::line(i), width, height, TEXT_COLOR);
+			text->renderText(out.str().c_str(), Text::firstLineX, Text::line(i), width, height, Colors::TEXT_COLOR);
 		#endif
 	}
 }
@@ -183,7 +188,7 @@ void Viewport::gluPerspective() const {
  * @param up     Coordinates of the up vector, which defines the upwards direction relative to the camera.
  *               It typically points upwards in the world coordinate system but can be adjusted to tilt the camera.
  */
-void Viewport::gluLookAt(const Vector3 eye, const Vector3 center, const Vector3 up) {
+void Viewport::gluLookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {
 	glMatrixMode(GL_MODELVIEW);      // Subsequent matrix operations will affect the modelview matrix
 
 	const Vector3 forward = (center - eye).normalize();	 // Calculate the forward vector (direction from eye to center)
@@ -302,17 +307,17 @@ void Viewport::drawAxes() {
 	glBegin(GL_LINES);
 
 	// X-axis in red
-	color3f(RED);
+	color3f(Colors::RED);
 	glVertex3f(-AXES_LENGTH, 0, 0);    // Start point
 	glVertex3f( AXES_LENGTH, 0, 0);    // End point
 
 	// Y-axis in green
-	color3f(GREEN);
+	color3f(Colors::GREEN);
 	glVertex3f(0, -AXES_LENGTH, 0);
 	glVertex3f(0,  AXES_LENGTH, 0);
 
 	// Z-axis in blue
-	color3f(BLUE);
+	color3f(Colors::BLUE);
 	glVertex3f(0, 0, -AXES_LENGTH);
 	glVertex3f(0, 0,  AXES_LENGTH);
 
@@ -324,7 +329,7 @@ void Viewport::drawGrid() {
 	glBegin(GL_LINES);
 
 	// Grid lines in the x direction (front-back lines)
-	color3f(GRID_COLOR);
+	color3f(Colors::GRID_COLOR);
 	for (int x = static_cast<int>(-AXES_LENGTH); x <= static_cast<int>(AXES_LENGTH); x++) {
 		// Horizontal line at y = constant, spanning x-axis
 		glVertex3f(static_cast<float>(x), -AXES_LENGTH, 0);
@@ -344,14 +349,30 @@ void Viewport::drawGrid() {
 void Viewport::drawMouseRay() const {
 	glPointSize(5);
 	glBegin(GL_POINTS);
-	color3f(RED);
+	color3f(Colors::RED);
 	glVertex3f(rayStart.x, rayStart.y, rayStart.z);
 	glVertex3f(rayEnd.x, rayEnd.y, rayEnd.z);
 	glEnd();
 
 	glBegin(GL_LINES);
-	color3f(RAY_COLOR);
+	color3f(Colors::RAY_COLOR);
 	glVertex3f(rayStart.x, rayStart.y, rayStart.z);
 	glVertex3f(rayEnd.x, rayEnd.y, rayEnd.z);
 	glEnd();
+}
+
+void Viewport::setLight(const Color& diffuse, const Color& ambient, const Color& specular) {
+	constexpr float noLight[4] = {0.0, 0.0, 0.0, 1.0};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
+
+	glEnable(GL_LIGHT1);
+
+	const float diffuseF[3] = {diffuse.red(), diffuse.green(), diffuse.blue()};
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseF);
+
+	const float ambientF[3] = {ambient.red(), ambient.green(), ambient.blue()};
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientF);
+
+	const float specularF[3] = {specular.red(), specular.green(), specular.blue()};
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specularF);
 }

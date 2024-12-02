@@ -15,7 +15,7 @@ SceneManager::SceneManager() {
 	addObject(cube);
 }
 
-void SceneManager::render(const Vector3 camPos) const {
+void SceneManager::render(const Vector3& camPos) const {
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& obj : sceneObjects) {
 		// Check if the current Object is selected

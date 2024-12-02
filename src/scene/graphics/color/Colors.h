@@ -3,14 +3,25 @@
 #include "Color.h"
 
 // Predefined colors
-const Color RED					(255,   0,   0);
-const Color GREEN				(  0, 255,   0);
-const Color BLUE				(  0,   0, 255);
-const Color BG_COLOR			( 60,  60,  60);
-const Color GRID_COLOR			( 80,  80,  80);
-const Color MESH_FACE_COLOR		(150, 150, 150);
-const Color MESH_EDGE_COLOR		( 50,  50,  50);
-const Color MESH_VERT_COLOR		( 25,  25,  25);
-const Color MESH_SELECT_COLOR	(240, 150,  60);
-const Color RAY_COLOR			(255, 255,   0);
-const Color TEXT_COLOR			(192, 192, 192);
+namespace Colors {
+	const auto WHITE				= Color(255, 255, 255);
+	const auto BLACK				= Color(  0,   0,   0);
+
+	const auto RED					= Color(255,   0,   0);
+	const auto YELLOW				= Color(255, 255,   0);
+	const auto GREEN				= Color(  0, 255,   0);
+	const auto CYAN 				= Color(  0, 255, 255);
+	const auto BLUE					= Color(  0,   0, 255);
+	const auto MAGENTA				= Color(255,   0, 255);
+
+	const auto BG_COLOR				= Color( 60,  60,  60);
+	const auto GRID_COLOR			= Color( 80,  80,  80);
+	const auto MESH_FACE_COLOR		= Color(150, 150, 150);
+	const auto MESH_EDGE_COLOR		= Color( 50,  50,  50);
+	const auto MESH_VERT_COLOR		= Color( 25,  25,  25);
+	const auto MESH_SELECT_COLOR	= Color(240, 150,  60);
+	const auto RAY_COLOR			= YELLOW;
+	const auto TEXT_COLOR			= Color(192, 192, 192);
+	const auto LIGHT_SUN			= Color(230, 230, 230);
+	const auto LIGHT_AMBIENT		= Color( 13,  13,  13);
+}

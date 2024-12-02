@@ -191,5 +191,5 @@ inline void Text::setErrorText(const std::string& text) {
 /** Draw a non-fatal error text at the bottom of the screen */
 inline void Text::drawErrorText(const int windowW, const int windowH) {
     if (!nonFatalErrorText.empty())
-        renderText(nonFatalErrorText.c_str(), firstLineX, static_cast<float>(windowH) - bottomLineY, windowW, windowH, RED);
+        renderText(nonFatalErrorText.c_str(), firstLineX, static_cast<float>(windowH) - bottomLineY, windowW, windowH, Colors::RED);
 }

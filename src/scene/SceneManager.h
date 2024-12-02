@@ -16,7 +16,7 @@ public:
 	explicit SceneManager();
 	~SceneManager() = default;
 
-	void render(Vector3 camPos) const;
+	void render(const Vector3 &camPos) const;
 
 	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }

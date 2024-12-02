@@ -6,7 +6,7 @@
 
 class MeshRenderer {
 public:
-	static void render(Mesh& mesh, Vector3 camPos, bool isSelected, bool isEditMode);
+	static void render(Mesh &mesh, const Vector3 &camPos, bool isSelected, bool isEditMode);
 
 	static bool isSilhouetteEdge(const std::vector<Triangle> &triangles, Vector3 camPos);
 
@@ -17,5 +17,5 @@ private:
 
 	static void renderVertices(const Mesh& mesh);
 	static void renderEdges(const Mesh& mesh);
-	static void renderTriangles(const Mesh& mesh);
+	static void renderTriangles(const Mesh &mesh);
 };
