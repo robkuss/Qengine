@@ -92,3 +92,36 @@ void Mesh::addEdgeToMap(int v0, int v1, const Triangle& t) {
 		edgeToFaceMap[edge].push_back(t);
 	}
 }
+
+void Mesh::setShadingMode(const ShadingMode shadingMode) {
+	this->shadingMode = shadingMode;
+}
+
+
+// Helpers
+
+/** Calculate the normal for a face in the Mesh */
+Vector3 Mesh::faceNormal(const Triangle& t) {
+	// Compute the two edge vectors
+	const Vector3 e1 = t.v1 - t.v0;
+	const Vector3 e2 = t.v2 - t.v0;
+
+	// Compute the normal using the cross product
+	return e1.cross(e2).normalize();
+}
+
+/** Calculate the normal for a vertex in the Mesh */
+Vector3 Mesh::vertexNormal(const Vertex& vertex) const {
+	Vector3 accNormal(0.0f, 0.0f, 0.0f);
+
+	for (int i = 0; i + 2 < faceIndices.size(); i += 3) {
+		// Check if the current triangle contains the vertex
+		if (const auto t = getTriangle(i); vertex == t.v0 || vertex == t.v1 || vertex == t.v2) {
+			// Accumulate the face normal
+			accNormal = accNormal + faceNormal(t);
+		}
+	}
+
+	// Normalize the accumulated normal
+	return accNormal.normalize();
+}

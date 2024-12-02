@@ -152,3 +152,15 @@ void SceneManager::setTransformSubMode(const SubMode subMode) {
 		transformMode.subMode = subMode;
 	}
 }
+
+void SceneManager::toggleShadingMode() const {
+	// Get the selected Object
+	const auto obj = selectedObject.get();
+	if (!obj) return;	// No Object selected
+
+	const auto mesh = dynamic_cast<Mesh*>(obj);
+	if (!mesh) return;	// Selected Object is not a Mesh
+
+	mesh->setShadingMode(mesh->shadingMode == ShadingMode::SMOOTH ? ShadingMode::FLAT : ShadingMode::SMOOTH);
+}
+

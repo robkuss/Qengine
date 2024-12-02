@@ -22,29 +22,44 @@ void MeshRenderer::renderEdge(const Mesh& mesh, const std::pair<int, int>& e) {
 	glEnd();
 }
 
-void MeshRenderer::renderTriangle(const Triangle& t) {
-	// Enable flat shading
+void MeshRenderer::renderTriangle(Mesh& mesh, const Triangle& t) {
+	// Enable lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT1);
 	glEnable(GL_LIGHT2);
-
-	// Compute and apply the normal for the Triangle
-	const Vector3 normal = faceNormal(t);
-	glNormal3f(normal.x, normal.y, normal.z);
 
 	// Apply material
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Colors::MESH_FACE_COLOR.toGLfloat());
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Colors::MESH_FACE_COLOR.toGLfloat());
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0f);
 
-	// Draw the Triangle
 	glBegin(GL_TRIANGLES);
-	vertex3fv(t.v0);
-	vertex3fv(t.v1);
-	vertex3fv(t.v2);
+	if (mesh.shadingMode == ShadingMode::FLAT) {
+		// Compute face normals
+		const Vector3 normal = Mesh::faceNormal(t);
+
+		// Draw the Triangle with a single normal
+		glNormal3f(normal.x, normal.y, normal.z);
+		vertex3fv(t.v0);
+		vertex3fv(t.v1);
+		vertex3fv(t.v2);
+	} else {
+		// Compute vertex normals
+		const Vector3 n0 = mesh.vertexNormal(t.v0);
+		const Vector3 n1 = mesh.vertexNormal(t.v1);
+		const Vector3 n2 = mesh.vertexNormal(t.v2);
+
+		// Draw the Triangle with per-vertex normals
+		glNormal3f(n0.x, n0.y, n0.z);
+		vertex3fv(t.v0);
+		glNormal3f(n1.x, n1.y, n1.z);
+		vertex3fv(t.v1);
+		glNormal3f(n2.x, n2.y, n2.z);
+		vertex3fv(t.v2);
+	}
 	glEnd();
 
-	// Disable flat shading
+	// Disable lighting
 	glDisable(GL_LIGHTING);
 }
 
@@ -60,9 +75,9 @@ void MeshRenderer::renderEdges(const Mesh& mesh) {
 	}
 }
 
-void MeshRenderer::renderTriangles(const Mesh& mesh) {
+void MeshRenderer::renderTriangles(Mesh& mesh) {
 	for (const auto& triangle : mesh.getTriangles()) {
-		renderTriangle(triangle);
+		renderTriangle(mesh, triangle);
 	}
 }
 
@@ -105,8 +120,8 @@ bool MeshRenderer::isSilhouetteEdge(const std::vector<Triangle>& triangles, cons
 	if (triangles.size() == 1) return true;  // If only one face shares this edge, it's on the silhouette
 
 	// Retrieve the normals of the two faces
-	const Vector3 normal1 = faceNormal(triangles[0]);
-	const Vector3 normal2 = faceNormal(triangles[1]);
+	const Vector3 normal1 = Mesh::faceNormal(triangles[0]);
+	const Vector3 normal2 = Mesh::faceNormal(triangles[1]);
 
 	// Use any point from the first face to compute the direction to the camera
 	const Vertex pointOnFace = triangles[0].v0; // Arbitrary point on the first face

@@ -29,6 +29,8 @@ public:
 	void setTransformMode(Mode::ModeEnum mode);
 	void setTransformSubMode(SubMode subMode);
 
+	void toggleShadingMode() const;
+
 private:
 	float scalingSens		= 1000.0f;
 	Vector3 lastTransform   = Vector3::ZERO;

@@ -23,20 +23,4 @@ struct Vertex : Vector3 {
 		z += other.z;
 		return *this;
 	}
-
-	// In-place subtraction operator
-	Vertex& operator-=(const Vector3& other) {
-		x -= other.x;
-		y -= other.y;
-		z -= other.z;
-		return *this;
-	}
-
-	// In-place multiplication operator
-	Vertex& operator*=(const Vector3& other) {
-		x *= other.x;
-		y *= other.y;
-		z *= other.z;
-		return *this;
-	}
 };

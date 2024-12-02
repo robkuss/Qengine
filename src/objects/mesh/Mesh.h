@@ -9,6 +9,11 @@
 #include "math/geometry/Vertex.h"
 #include "math/geometry/Triangle.h"
 
+enum class ShadingMode {
+	FLAT,
+	SMOOTH
+};
+
 class Mesh : public Object {
 public:
 	std::vector<Vertex> vertices = {};
@@ -17,6 +22,8 @@ public:
 	// Edge-to-face adjacency information
 	std::map<std::pair<int, int>, std::vector<Triangle>> edgeToFaceMap;
 
+	ShadingMode shadingMode = ShadingMode::FLAT;
+
 	// Constructor & Destructor
 	Mesh(const std::string& name, const Matrix4& position, const Matrix4& scale, const Matrix4& rotation)
 		: Object{name, position, scale, rotation} {}
@@ -24,6 +31,9 @@ public:
 
 	virtual void initializeVertices()	 = 0;
 	virtual void initializeFaceIndices() = 0;
+
+	static Vector3 faceNormal(const Triangle &t);
+	Vector3 vertexNormal(const Vertex &vertex) const;
 
 	[[nodiscard]] Triangle getTriangle(int index) const;
 	[[nodiscard]] std::vector<Triangle> getTriangles() const;
@@ -35,6 +45,8 @@ public:
 	void setRotation(const Vector3& rotation);
 
 	void applyTransformation(Mode::ModeEnum mode, const Matrix4& transformation);
+
+	void setShadingMode(ShadingMode shadingMode);
 
 private:
 	void addEdgeToMap(int v0, int v1, const Triangle& t);

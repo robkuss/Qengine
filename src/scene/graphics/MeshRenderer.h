@@ -12,9 +12,9 @@ public:
 private:
 	static void renderVertex(const Vertex& v);
 	static void renderEdge(const Mesh &mesh, const std::pair<int, int> &e);
-	static void renderTriangle(const Triangle& t);
+	static void renderTriangle(Mesh &mesh, const Triangle &t);
 
 	static void renderVertices(const Mesh& mesh);
 	static void renderEdges(const Mesh& mesh);
-	static void renderTriangles(const Mesh &mesh);
+	static void renderTriangles(Mesh &mesh);
 };

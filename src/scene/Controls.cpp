@@ -107,6 +107,9 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 			case GLFW_KEY_Z: sceneManager.setTransformSubMode(SubMode::Z); break;	// Z -> Snap transformation to Z direction
 		}
 
+		// Toggle Shading
+		case GLFW_KEY_LEFT_SHIFT: sceneManager.toggleShadingMode();					// Left Shift -> Toggle ShadingMode for selected Mesh
+
 		default: {
 			#ifdef TEXT
 				text->setErrorText("Invalid key.");
