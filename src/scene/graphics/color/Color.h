@@ -16,6 +16,8 @@ public:
 	[[nodiscard]] float blue()  const { return static_cast<float>(b) / 255.0f; }
 	[[nodiscard]] float alpha() const { return static_cast<float>(a) / 255.0f; }
 
+	[[nodiscard]] GLfloat* toGLfloat() const { return new GLfloat[4]{red(), green(), blue(), alpha()}; }
+
 private:
 	int r, g, b, a;
 };

@@ -23,6 +23,16 @@ void MeshRenderer::renderEdge(const Edge& e) {
 }
 
 void MeshRenderer::renderTriangle(const Triangle& t) {
+	// Compute and apply the normal for the Triangle
+	const Vector3 normal = faceNormal(t);
+	glNormal3f(normal.x, normal.y, normal.z);
+
+	// Apply material
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Colors::MESH_FACE_COLOR.toGLfloat());
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Colors::MESH_FACE_COLOR.toGLfloat());
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0f);
+
+	// Draw the Triangle
 	glBegin(GL_TRIANGLES);
 	vertex3fv(t.v0);
 	vertex3fv(t.v1);
@@ -43,63 +53,17 @@ void MeshRenderer::renderEdges(const Mesh& mesh) {
 }
 
 void MeshRenderer::renderTriangles(const Mesh& mesh) {
-	// Enable lighting
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT1);
-
-	// Set up material properties for flat shading
-	const GLfloat materialDiffuse[] = {
-		Colors::LIGHT_SUN.red(),
-		Colors::LIGHT_SUN.green(),
-		Colors::LIGHT_SUN.blue(),
-		Colors::LIGHT_SUN.alpha()
-	};
-	const GLfloat materialAmbient[] = {
-		Colors::LIGHT_SUN.red(),
-		Colors::LIGHT_SUN.green(),
-		Colors::LIGHT_SUN.blue(),
-		Colors::LIGHT_SUN.alpha()
-	};
-	const GLfloat materialSpecular[] = {
-		Colors::WHITE.red(),
-		Colors::WHITE.green(),
-		Colors::WHITE.blue(),
-		Colors::WHITE.alpha()
-	};
-	constexpr GLfloat materialShininess[] = {
-		32.0f
-	};
-
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
-
-	// Render triangles with flat shading
-	glBegin(GL_TRIANGLES);
 	for (const auto& triangle : mesh.getTriangles()) {
-		// Compute the normal for the triangle
-		Vector3 edge1 = triangle.v1 - triangle.v0;
-		Vector3 edge2 = triangle.v2 - triangle.v0;
-		const Vector3 normal = edge1.cross(edge2).normalize();
-
-		// Apply the normal for the face
-		glNormal3f(normal.x, normal.y, normal.z);
-
-		// Draw the triangle
-		vertex3fv(triangle.v0);
-		vertex3fv(triangle.v1);
-		vertex3fv(triangle.v2);
+		renderTriangle(triangle);
 	}
-	glEnd();
-
-	// Disable lighting after rendering
-	glDisable(GL_LIGHTING);
 }
 
 void MeshRenderer::render(Mesh& mesh, const Vector3& camPos, const bool isSelected, const bool isEditMode) {
-	// Draw the faces with flat shading
+	// Draw the faces (with flat shading)
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT1);
 	renderTriangles(mesh);
+	glDisable(GL_LIGHTING);
 
 	if (isEditMode) {
 		// Draw the edges

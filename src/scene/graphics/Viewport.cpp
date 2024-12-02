@@ -40,9 +40,8 @@ Viewport::Viewport(const std::string &title, const int width, const int height, 
 
 	// OpenGL setup
 	glEnable(GL_MULTISAMPLE);		// Enable multi-sampling (antialiasing)
-	// glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);		// Enable depth testing
-	// glEnable(GL_RESCALE_NORMAL);
+	glEnable(GL_RESCALE_NORMAL);
 
 	glfwSwapInterval(0);				// Disable v-sync
 
