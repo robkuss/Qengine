@@ -5,10 +5,9 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
-#include <math/ray/Ray.h>
 
+#include <math/ray/Ray.h>
 #include <math/vector/Vector3.h>
-class SceneManager;
 
 // Options
 #define TEXT	// For on-screen debug text
@@ -16,6 +15,7 @@ class SceneManager;
 	#include "ui/text/Text.cpp"
 #endif
 
+class SceneManager;	// Forward declaration for friend
 
 // Constants
 const auto CAMERA_POSITION_INIT			= Vector3(10.0f, 0, 0);		// Default camera position

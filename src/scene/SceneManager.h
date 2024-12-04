@@ -32,7 +32,7 @@ public:
 	void toggleShadingMode() const;
 
 private:
-	// Grant Viewport access to private members
+	// Grant a few Viewport functions access to private members using the best keyword in C++
 	friend void Viewport::drawOnScreenText() const;
 	friend void Viewport::setCallbacks(GLFWwindow* window);
 	friend void Viewport::onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
