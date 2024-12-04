@@ -6,11 +6,13 @@
 
 #include <math/Util.h>
 #include <math/vector/Vector2.h>
+
+#include <scene/SceneManager.h>
 #include <scene/graphics/color/Colors.h>
 
 
-Viewport::Viewport(const std::string &title, const int width, const int height, const SceneManager& sceneManager)
-		: title(title), width(width), height(height), sceneManager(sceneManager) {
+Viewport::Viewport(const std::string& title, const int width, const int height)
+	: title(title), width(width), height(height) {
 	glfwSetErrorCallback([](int, const char *description) {
 		std::cerr << "GLFW Error: " << description << std::endl;
 	});
@@ -39,13 +41,15 @@ Viewport::Viewport(const std::string &title, const int width, const int height, 
 	setCallbacks(window);
 
 	// OpenGL setup
-	glEnable(GL_MULTISAMPLE);		// Enable multi-sampling (antialiasing)
-	glEnable(GL_DEPTH_TEST);		// Enable depth testing
+	glEnable(GL_MULTISAMPLE); // Enable multi-sampling (antialiasing)
+	glEnable(GL_DEPTH_TEST); // Enable depth testing
 	glEnable(GL_RESCALE_NORMAL);
 
-	glfwSwapInterval(0);				// Disable v-sync
+	glfwSwapInterval(0); // Disable v-sync
 
 	aspect = static_cast<float>(width) / static_cast<float>(height);
+
+	sceneManager = new SceneManager();
 }
 
 Viewport::~Viewport() {
@@ -95,7 +99,7 @@ void Viewport::render() const {
 	// Render scene objects
 	glLightfv(GL_LIGHT1, GL_POSITION, light1Pos);
 	glLightfv(GL_LIGHT2, GL_POSITION, light2Pos);
-	sceneManager.render(camPos);
+	sceneManager->render(camPos);
 
 	#ifdef DRAW_MOUSE_RAY
 		drawMouseRay();
@@ -139,7 +143,7 @@ void Viewport::centerWindow() const {
 }
 
 void Viewport::drawOnScreenText() const {
-	const auto cube = *sceneManager.sceneObjects[0];
+	const auto cube = *sceneManager->sceneObjects[0];
 	const auto mouseWorld = unproject(mouseX[0], mouseY[0], 0.0f);
 	for (int i = 0; i <= 10; i++) {
 		std::ostringstream out;
@@ -150,9 +154,9 @@ void Viewport::drawOnScreenText() const {
 			case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camDist; break;
 			case 4:  out << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
 			case 5:  out << "Mouse World: "  << std::fixed << std::setprecision(3) << mouseWorld.x << " " << mouseWorld.y << " " << mouseWorld.z; break;
-			case 6:	 out << "Mode: " << modeToString(sceneManager.viewportMode.mode);
-				if (sceneManager.transformMode.mode    != Mode::NONE)	out << " " << modeToString(sceneManager.transformMode.mode);
-				if (sceneManager.transformMode.subMode != SubMode::NONE) out << " " << subModeToString(sceneManager.transformMode.subMode); break;
+			case 6:	 out << "Mode: " << modeToString(sceneManager->viewportMode.mode);
+				if (sceneManager->transformMode.mode    != Mode::NONE)	out << " " << modeToString(sceneManager->transformMode.mode);
+				if (sceneManager->transformMode.subMode != SubMode::NONE) out << " " << subModeToString(sceneManager->transformMode.subMode); break;
 			case 7:  out << "Cube:"; break;
 			case 8:  out << "    Pos: "   << std::fixed << std::setprecision(3) << cube.getPosition().x  << " " << cube.getPosition().y  << " " << cube.getPosition().z;  break;
 			case 9:  out << "    Scale: " << std::fixed << std::setprecision(3) << cube.getScale().x     << " " << cube.getScale().y     << " " << cube.getScale().z;     break;
@@ -296,7 +300,7 @@ Vector3 Viewport::unproject(const double mouseX, const double mouseY, const floa
 	return {worldSpace.x, worldSpace.y, worldSpace.z};
 }
 
-Ray Viewport::getMouseRay(const double mouseX, const double mouseY) {
+Ray Viewport::getMouseRay(const double mouseX, const double mouseY) const {
 	return {camPos, unproject(mouseX, mouseY, 1.0f).normalize()};
 }
 

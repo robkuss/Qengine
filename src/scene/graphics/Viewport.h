@@ -5,8 +5,10 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+#include <math/ray/Ray.h>
 
-#include <scene/SceneManager.h>
+#include <math/vector/Vector3.h>
+class SceneManager;
 
 // Options
 #define TEXT	// For on-screen debug text
@@ -16,7 +18,7 @@
 
 
 // Constants
-const auto CAMERA_POSITION_INIT			= Vector3(10, 0, 0);			// Default camera position
+const auto CAMERA_POSITION_INIT			= Vector3(10.0f, 0, 0);		// Default camera position
 const auto LOOK_AT_POINT_INIT			= Vector3(0, 0, 0);			// Default: Looking at origin
 const auto UP_VECTOR_INIT				= Vector3(0, 0, 1);			// Default: Up direction is positive Z
 const float CAMERA_DISTANCE_INIT		= CAMERA_POSITION_INIT.length();	// Camera distance from the origin
@@ -36,7 +38,7 @@ constexpr int ANTIALIASING_SAMPLES		= 10;
 
 class Viewport {
 public:
-	explicit Viewport(const std::string& title, int width, int height, const SceneManager& sceneManager);
+	explicit Viewport(const std::string& title, int width, int height);
 	~Viewport();
 
 	void setCallbacks(GLFWwindow* window);
@@ -54,12 +56,14 @@ public:
 
 	void onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
 
+	void drawOnScreenText() const;
+
 private:
 	GLFWwindow* window;
 	std::string title;
 	int width, height;
 	float aspect;
-	SceneManager sceneManager;
+	SceneManager* sceneManager{};
 
 #ifdef TEXT
 	Text* text{};	// For on-screen debug text
@@ -102,16 +106,15 @@ private:
 
 	// Functions
 	void gluPerspective() const;
-	static void gluLookAt(const Vector3& eye, const Vector3& center, const Vector3& up) ;
+	static void gluLookAt(const Vector3 &eye, const Vector3 &center, const Vector3 &up) ;
 	void updateCameraPosition();
 
 	[[nodiscard]] Vector3 unproject(double mouseX, double mouseY, float depth) const;
-	Ray getMouseRay(double mouseX, double mouseY);
+	Ray getMouseRay(double mouseX, double mouseY) const;
 
 	static void drawAxes();
 	static void drawGrid();
 	void drawMouseRay() const;
-	void drawOnScreenText() const;
 
 	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
 

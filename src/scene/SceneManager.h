@@ -2,15 +2,10 @@
 
 #include <math/ray/Ray.h>
 
+#include "graphics/Viewport.h"
+
 class SceneManager {
 public:
-	std::vector<std::shared_ptr<Object>> sceneObjects;		// Scene Objects as shared pointers to prevent object slicing
-	std::shared_ptr<Object> selectedObject = nullptr;
-
-	// Mode
-	Mode viewportMode  = OBJECT;
-	Mode transformMode = NONE;
-
 	// Constructor & Destructor
 	explicit SceneManager();
 	~SceneManager() = default;
@@ -22,10 +17,10 @@ public:
 
 	void select(const Ray& ray, const Mode& mode);
 	void selectObject(const std::shared_ptr<Object>& obj);
+	void deselectObjeect(const std::shared_ptr<Object> &obj);
 	void selectFace(const Triangle* triangle) const;
 
-	[[nodiscard]] Object* getSelectedObject() const;
-	[[nodiscard]] Mesh* getSelectedMesh() const;
+	[[nodiscard]] std::vector<std::shared_ptr<Mesh>> getSelectedMeshes() const;
 
 	void transform(double mouseX, double mouseY, int width, int height, Vector3 worldPos, Vector3 camPos);
 	void applyTransformation();
@@ -37,6 +32,18 @@ public:
 	void toggleShadingMode() const;
 
 private:
+	// Grant Viewport access to private members
+	friend void Viewport::drawOnScreenText() const;
+	friend void Viewport::setCallbacks(GLFWwindow* window);
+	friend void Viewport::onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
+
+	// Mode
+	Mode viewportMode  = OBJECT;
+	Mode transformMode = NONE;
+
+	std::vector<std::shared_ptr<Object>> sceneObjects;		// Scene Objects as shared pointers to prevent object slicing
+	std::vector<std::shared_ptr<Object>> selectedObjects;
+
 	float scalingSens		= 1000.0f;
 	Vector3 lastTransform   = Vector3::ZERO;
 };
