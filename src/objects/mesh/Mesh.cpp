@@ -18,12 +18,12 @@ void Mesh::setRotation(const Vector3& rotation) {
 	this->rotation = Matrix4::rotateX(rotation.x) * Matrix4::rotateY(rotation.y) * Matrix4::rotateZ(rotation.z);
 }
 
-void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transformation) {
+void Mesh::applyTransformation(const Mode mode, const Matrix4& transformation) {
 	const auto oldPos	= getPosition();
 	const auto oldScale	= getScale();
 
 	// Update Object transformation
-	switch (mode) {
+	switch (mode.mode) {
 		case Mode::GRAB:   position = transformation * position; break;
 		case Mode::SCALE:  scale	= transformation * scale;	 break;
 		case Mode::ROTATE: rotation = transformation * rotation; break;
@@ -32,7 +32,7 @@ void Mesh::applyTransformation(const Mode::ModeEnum mode, const Matrix4& transfo
 
 	// Update vertex data
 	for (Vertex& vertex : vertices) {
-		switch (mode) {
+		switch (mode.mode) {
 			case Mode::GRAB:   vertex += getPosition() - oldPos; break;
 			case Mode::SCALE:  vertex = Vertex(oldPos + (vertex - oldPos) * (getScale() / oldScale)); break;
 			case Mode::ROTATE: vertex = Vertex(oldPos + vector3(transformation * vector4(vertex - oldPos))); break;

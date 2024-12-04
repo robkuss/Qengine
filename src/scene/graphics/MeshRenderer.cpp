@@ -22,7 +22,7 @@ void MeshRenderer::renderEdge(const Mesh& mesh, const std::pair<int, int>& e) {
 	glEnd();
 }
 
-void MeshRenderer::renderTriangle(Mesh& mesh, const Triangle& t) {
+void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t) {
 	// Enable lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT1);
@@ -75,13 +75,13 @@ void MeshRenderer::renderEdges(const Mesh& mesh) {
 	}
 }
 
-void MeshRenderer::renderTriangles(Mesh& mesh) {
+void MeshRenderer::renderTriangles(const Mesh& mesh) {
 	for (const auto& triangle : mesh.getTriangles()) {
 		renderTriangle(mesh, triangle);
 	}
 }
 
-void MeshRenderer::render(Mesh& mesh, const Vector3& camPos, const bool isSelected, const bool isEditMode) {
+void MeshRenderer::render(const Mesh& mesh, const Vector3& camPos, const bool isSelected, const bool isEditMode) {
 	// Draw the faces
 	renderTriangles(mesh);
 

@@ -37,7 +37,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 		const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow));
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 			const Ray ray = vp->getMouseRay(vp->mouseX[0], vp->mouseY[0]);
-			vp->sceneManager.select(ray);
+			vp->sceneManager.select(ray, vp->sceneManager.viewportMode);
 		}
 		else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
 			vp->initRotation(action == GLFW_PRESS);
@@ -50,7 +50,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 			// Update the mouse position in the Viewport
 			glfwGetCursorPos(cbWindow, vp->mouseX, vp->mouseY);
 
-			if (vp->sceneManager.transformMode.mode == Mode::NONE) {
+			if (vp->sceneManager.transformMode == NONE) {
 				// Viewport rotation
 				if (vp->rotating) {
 					vp->rotate(mouseX, mouseY);
@@ -93,15 +93,15 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 		case GLFW_KEY_6: setPerspective(  0.0f,-90.0f); break;					// 6 -> Bottom View (towards positive Z)
 
 		// Set Transform Mode
-		case GLFW_KEY_G: sceneManager.setTransformMode(Mode::GRAB); break;			// G -> Grab
-		case GLFW_KEY_S: sceneManager.setTransformMode(Mode::SCALE); break;			// S -> Scale
-		case GLFW_KEY_R: sceneManager.setTransformMode(Mode::ROTATE); break; 		// R -> Rotate
-		case GLFW_KEY_E: sceneManager.setTransformMode(Mode::EXTRUDE); break;		// E -> Extrude
-		case GLFW_KEY_F: sceneManager.setTransformMode(Mode::FILL); break;			// F -> Fill
-		case GLFW_KEY_M: sceneManager.setTransformMode(Mode::MERGE); break;			// M -> Merge
+		case GLFW_KEY_G: sceneManager.setTransformMode(GRAB); break;				// G -> Grab
+		case GLFW_KEY_S: sceneManager.setTransformMode(SCALE); break;				// S -> Scale
+		case GLFW_KEY_R: sceneManager.setTransformMode(ROTATE); break; 				// R -> Rotate
+		case GLFW_KEY_E: sceneManager.setTransformMode(EXTRUDE); break;				// E -> Extrude
+		case GLFW_KEY_F: sceneManager.setTransformMode(FILL); break;				// F -> Fill
+		case GLFW_KEY_M: sceneManager.setTransformMode(MERGE); break;				// M -> Merge
 
 		// Set Transform SubMode
-		case GLFW_KEY_X || GLFW_KEY_Y || GLFW_KEY_Z: if (sceneManager.transformMode.mode != Mode::NONE) {
+		case GLFW_KEY_X || GLFW_KEY_Y || GLFW_KEY_Z: if (sceneManager.transformMode != NONE) {
 			case GLFW_KEY_X: sceneManager.setTransformSubMode(SubMode::X); break;	// X -> Snap transformation to X direction
 			case GLFW_KEY_Z: sceneManager.setTransformSubMode(SubMode::Y); break;	// Z -> Snap transformation to Y direction TODO: Make this depend on scancode, not key
 			case GLFW_KEY_Y: sceneManager.setTransformSubMode(SubMode::Z); break;	// Y -> Snap transformation to Z direction TODO: Make this depend on scancode, not key

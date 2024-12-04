@@ -19,14 +19,20 @@ public:
 
 	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
-	void selectObject(const std::shared_ptr<Object>& obj) { selectedObject = obj; }
-	void select(const Ray& ray);
+
+	void select(const Ray& ray, const Mode& mode);
+	void selectObject(const std::shared_ptr<Object>& obj);
+	void selectFace(const Triangle* triangle) const;
+
+	[[nodiscard]] Object* getSelectedObject() const;
+	[[nodiscard]] Mesh* getSelectedMesh() const;
 
 	void transform(double mouseX, double mouseY, int width, int height, Vector3 worldPos, Vector3 camPos);
+	void applyTransformation();
 
 	void toggleViewportMode();
-	void setTransformMode(Mode::ModeEnum mode);
-	void setTransformSubMode(SubMode subMode);
+	void setTransformMode(const Mode& mode);
+	void setTransformSubMode(const SubMode& subMode);
 
 	void toggleShadingMode() const;
 

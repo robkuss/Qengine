@@ -35,6 +35,8 @@ public:
     // Constructor
     Mode(const ModeEnum modeEnum, const ModeType modeType, const SubMode subMode = SubMode::NONE)
         : mode(modeEnum), type(modeType), subMode(subMode) {}
+
+    bool operator==(const Mode & mode) const = default;
 };
 
 // Function to convert ModeEnum to string

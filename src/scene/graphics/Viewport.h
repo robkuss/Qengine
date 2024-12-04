@@ -47,7 +47,6 @@ public:
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
 
-	void toggleViewportMode();
 	void initRotation(bool isRotating);
 	void rotate(double mouseX, double mouseY);
 	void zoom(double yoffset);

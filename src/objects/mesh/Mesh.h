@@ -44,7 +44,7 @@ public:
 	void setScale(const Vector3& scale);
 	void setRotation(const Vector3& rotation);
 
-	void applyTransformation(Mode::ModeEnum mode, const Matrix4& transformation);
+	void applyTransformation(Mode mode, const Matrix4 &transformation);
 
 	void setShadingMode(ShadingMode shadingMode);
 
