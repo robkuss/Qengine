@@ -18,7 +18,7 @@ void Mesh::setRotation(const Vector3& rotation) {
 	this->rotation = Matrix4::rotateX(rotation.x) * Matrix4::rotateY(rotation.y) * Matrix4::rotateZ(rotation.z);
 }
 
-void Mesh::applyTransformation(const Mode mode, const Matrix4& transformation) {
+void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) {
 	const auto oldPos	= getPosition();
 	const auto oldScale	= getScale();
 

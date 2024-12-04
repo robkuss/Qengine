@@ -12,7 +12,6 @@
 class Object {
 public:
 	std::string name;
-
 	Matrix4 position, scale, rotation;
 
 	// Constructor & Destructor

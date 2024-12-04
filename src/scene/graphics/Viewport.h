@@ -42,33 +42,21 @@ public:
 	explicit Viewport(const std::string& title, int width, int height);
 	~Viewport();
 
-	void setCallbacks(GLFWwindow* window);
-
 	void start();
-	void render() const;
 
-	void centerWindow() const;
-	void windowResize(int newW, int newH);
-
-	void initRotation(bool isRotating);
-	void rotate(double mouseX, double mouseY);
-	void zoom(double yoffset);
-	void setPerspective(float h, float v);
-
-	void onKeyboardInput(GLFWwindow *cbWindow, int key, int scancode, int action, int mods);
-
+	void setCallbacks(GLFWwindow* window);
+	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
 	void drawOnScreenText() const;
 
 private:
 	GLFWwindow* window;
 	std::string title;
 	int width, height;
-	float aspect;
 	SceneManager* sceneManager{};
 
-#ifdef TEXT
-	Text* text{};	// For on-screen debug text
-#endif
+	#ifdef TEXT
+		Text* text{};	// For on-screen debug text
+	#endif
 
 	// Initial values
 	Vector3 camPos		= CAMERA_POSITION_INIT;
@@ -106,16 +94,26 @@ private:
 	GLfloat light2Pos[4] = {-2, -3, -6, 0};
 
 	// Functions
-	void gluPerspective() const;
-	static void gluLookAt(const Vector3 &eye, const Vector3 &center, const Vector3 &up) ;
+	void render() const;
+
+	void centerWindow() const;
+	void windowResize(int newW, int newH);
+
+	void initRotation(bool isRotating);
+	void rotate(double mouseX, double mouseY);
+	void zoom(double yoffset);
+	void setPerspective(float h, float v);
+
+	static void gluPerspective(float aspect);
+	static void gluLookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
 	void updateCameraPosition();
 
 	[[nodiscard]] Vector3 unproject(double mouseX, double mouseY, float depth) const;
 	[[nodiscard]] Ray getMouseRay(double mouseX, double mouseY) const;
+	void drawMouseRay() const;
 
 	static void drawAxes();
 	static void drawGrid();
-	void drawMouseRay() const;
 
 	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
 

@@ -44,8 +44,6 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 
 	glfwSwapInterval(0); // Disable v-sync
 
-	aspect = static_cast<float>(width) / static_cast<float>(height);
-
 	sceneManager = new SceneManager();
 }
 
@@ -68,7 +66,7 @@ void Viewport::start() {
 	setLight(Colors::LIGHT_SUN, Colors::LIGHT_AMBIENT, Colors::WHITE);
 
 	// Get matrices
-	gluPerspective();						  // projection matrix
+	gluPerspective(static_cast<float>(width) / static_cast<float>(height)); // projection matrix
 	gluLookAt(camPos, lookAt, up);   // view matrix
 
 	// Start rendering the Viewport
@@ -120,11 +118,10 @@ void Viewport::getFPS() {
 void Viewport::windowResize(const int newW, const int newH) {
 	width = newW;
 	height = newH;
-	aspect = static_cast<float>(width) / static_cast<float>(height);
 
 	// Update viewport
 	glViewport(0, 0, width, height);
-	gluPerspective();
+	gluPerspective(static_cast<float>(width) / static_cast<float>(height));
 	render();
 }
 
@@ -169,7 +166,7 @@ void Viewport::drawOnScreenText() const {
  * Function to set up a perspective projection matrix, which is essential for rendering 3D scenes
  * in a way that simulates human vision, where objects further away appear smaller than those closer.
  */
-void Viewport::gluPerspective() const {
+void Viewport::gluPerspective(const float aspect) {
 	glMatrixMode(GL_PROJECTION);	// Subsequent matrix operations will affect the projection matrix
 
 	const double fh = tan(FOV_Y * PI / 360.0) * Z_NEAR;	// Height of the Near Clipping Plane
