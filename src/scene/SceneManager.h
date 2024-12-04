@@ -1,6 +1,8 @@
 #pragma once
 
-#include <math/ray/Ray.h>
+class Ray;
+class Object;
+class Mesh;
 
 #include "graphics/Viewport.h"
 

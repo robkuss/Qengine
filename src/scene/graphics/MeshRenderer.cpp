@@ -1,8 +1,14 @@
 #include "MeshRenderer.h"
 
+// Ensure proper linkage and calling convention for Windows API functions
+#define WINGDIAPI __declspec(dllimport)
+#define APIENTRY __stdcall
+
+#include <GL/gl.h>
+
 #include <ranges>
 
-#include <scene/graphics/color/Colors.h>	// Also includes <GL/gl.h>
+#include <scene/graphics/color/Colors.h>
 
 /** Reinterpret Vertex as GLfloat* */
 void vertex3fv(const Vertex& v) {

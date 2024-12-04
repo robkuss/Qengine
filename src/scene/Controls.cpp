@@ -1,5 +1,6 @@
 #include <scene/graphics/Viewport.h>
 
+#include "Mode.h"
 #include "SceneManager.h"
 
 // Controls

@@ -6,8 +6,9 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-#include <math/ray/Ray.h>
 #include <math/vector/Vector3.h>
+#include <math/ray/Ray.h>
+
 
 // Options
 #define TEXT	// For on-screen debug text
@@ -110,7 +111,7 @@ private:
 	void updateCameraPosition();
 
 	[[nodiscard]] Vector3 unproject(double mouseX, double mouseY, float depth) const;
-	Ray getMouseRay(double mouseX, double mouseY) const;
+	[[nodiscard]] Ray getMouseRay(double mouseX, double mouseY) const;
 
 	static void drawAxes();
 	static void drawGrid();

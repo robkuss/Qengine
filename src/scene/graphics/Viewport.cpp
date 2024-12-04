@@ -4,11 +4,8 @@
 #include <sstream>
 #include <iomanip>
 
-#include <math/Util.h>
-#include <math/vector/Vector2.h>
-
+#include <objects/Object.h>
 #include <scene/SceneManager.h>
-#include <scene/graphics/color/Colors.h>
 
 
 Viewport::Viewport(const std::string& title, const int width, const int height)

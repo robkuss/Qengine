@@ -1,13 +1,18 @@
 #pragma once
 
-#include <math/vector/Vector3.h>
+#include <utility>
+#include <vector>
+
 #include <objects/mesh/Mesh.h>
+
+class Vector3;
+struct Vertex;
+struct Triangle;
+
 
 class MeshRenderer {
 public:
 	static void render(const Mesh &mesh, const Vector3 &camPos, bool isSelected, bool isEditMode);
-
-	static bool isSilhouetteEdge(const std::vector<Triangle> &triangles, Vector3 camPos);
 
 private:
 	static void renderVertex(const Vertex& v);
@@ -17,4 +22,6 @@ private:
 	static void renderVertices(const Mesh& mesh);
 	static void renderEdges(const Mesh& mesh);
 	static void renderTriangles(const Mesh &mesh);
+
+	static bool isSilhouetteEdge(const std::vector<Triangle> &triangles, Vector3 camPos);
 };

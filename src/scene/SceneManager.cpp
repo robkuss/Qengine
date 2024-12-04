@@ -1,11 +1,9 @@
 #include "SceneManager.h"
 
-#include <memory>   // For std::shared_ptr
+#include <memory>
 
-#include <math/matrix/Matrix4.h>
 #include <math/vector/Vector2.h>
 #include <scene/graphics/MeshRenderer.h>
-
 #include <objects/mesh/cube/Cube.cpp>
 
 
