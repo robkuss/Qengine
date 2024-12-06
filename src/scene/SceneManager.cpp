@@ -13,7 +13,6 @@ SceneManager::SceneManager() {
 	cube->setPosition(Vector3(0.5f, 0.5f, 0.5f));
 	cube->setScale(Vector3::ONE);
 	cube->setRotation(Vector3::ZERO);
-	cube->buildEdgeToFaceMap();
 	addObject(cube);
 }
 
@@ -40,7 +39,7 @@ void SceneManager::render(const Vector3& camPos) const {
  *
  * @see getMouseRay for the ray computation logic.
  */
-void SceneManager::select(const Ray& ray, const Mode& mode) {
+void SceneManager::select(const Ray& ray, const Mode& mode, const bool preserve) {
 	#ifdef DRAW_MOUSE_RAY
 		// Update the visual Mouse Ray
 		const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
@@ -53,9 +52,9 @@ void SceneManager::select(const Ray& ray, const Mode& mode) {
 		// Find Objects that intersect with the mouse Ray
 		std::vector<std::shared_ptr<Object>> intersectingObjects;
 		for (const auto& obj : sceneObjects) {
-			// Attempt to cast Object to Mesh using dynamic_cast
+			// Attempt to cast Object to Mesh
 			if (const auto mesh = dynamic_cast<Mesh*>(obj.get())) {
-				if (ray.intersects(mesh->getTriangles())) {
+				if (ray.intersects(*mesh)) {
 					intersectingObjects.push_back(obj);
 				}
 			} else {
@@ -63,8 +62,8 @@ void SceneManager::select(const Ray& ray, const Mode& mode) {
 			}
 		}
 
-		// Select the Object that's closest to the Ray origin (the camera)
 		if (!intersectingObjects.empty()) {
+			// Select the Object that's closest to the Ray origin (the camera)
 			selectObject(
 				*std::ranges::min_element(
 					intersectingObjects,
@@ -73,34 +72,36 @@ void SceneManager::select(const Ray& ray, const Mode& mode) {
 					}
 				)
 			);
-		} else selectObject(nullptr); // No Object selected
+		} else if (!preserve) {
+			// Deselect all previously selected Objects
+			for (const auto& obj : selectedObjects) deselectObject(obj);
+		}
 	}
 
-	// If in Edit Mode, select specific faces TODO Also implement Edge and Vertex selection
-	else {
-		const auto meshes = getSelectedMeshes();
-		if (meshes.empty()) return; // No Mesh selected
-
-		for (const auto& mesh : meshes) {
-			// Find Triangles that intersect with the mouse Ray
-			std::vector<Triangle> intersectingTriangles;
-			for (const auto& triangle : mesh->getTriangles()) {
-				if (ray.intersects(triangle)) {
-					intersectingTriangles.push_back(triangle);
+	// If in Edit Mode, select specific vertices
+	else if (mode == EDIT) {
+		std::vector<Vertex> intersectingVertices;
+		for (const auto& mesh : getSelectedMeshes()) {
+			for (const auto v : mesh->vertices) {
+				if (ray.intersects(v)) {
+					intersectingVertices.push_back(v);
 				}
 			}
 
-			if (!intersectingTriangles.empty()) {
-				// Select the Triangle that's closest to the Ray origin (the camera)
-				selectFace(
-					&*std::ranges::min_element(
-						intersectingTriangles,
-						[&ray](const Triangle& a, const Triangle& b) {
-							return ray.origin.distance(a.center()) < ray.origin.distance(b.center());
+			if (!intersectingVertices.empty()) {
+				// Select the Object that's closest to the Ray origin (the camera)
+				selectVertex(
+					*std::ranges::min_element(
+						intersectingVertices,
+						[&ray](const Vertex& a, const Vertex& b) {
+							return a.distance(ray.origin) < b.distance(ray.origin);
 						}
 					)
 				);
-			} else selectFace(nullptr); // No face selected
+			} else if (!preserve) {
+				// Deselect all previously selected Objects
+				for (const auto& obj : selectedVertices) deselectVertex(obj);
+			}
 		}
 	}
 
@@ -112,12 +113,16 @@ void SceneManager::selectObject(const std::shared_ptr<Object>& obj) {
 	selectedObjects.push_back(obj);
 }
 
-void SceneManager::deselectObjeect(const std::shared_ptr<Object>& obj) {
-	sceneObjects.erase(std::ranges::find(sceneObjects, obj));
+void SceneManager::deselectObject(const std::shared_ptr<Object>& obj) {
+	selectedObjects.erase(std::ranges::find(selectedObjects, obj));
 }
 
-void SceneManager::selectFace(const Triangle* triangle) const {
-	// TODO
+void SceneManager::selectVertex(const Vertex& v) {
+	selectedVertices.push_back(v);
+}
+
+void SceneManager::deselectVertex(const Vertex& v) {
+	selectedVertices.erase(std::ranges::find(selectedVertices, v));
 }
 
 std::vector<std::shared_ptr<Mesh>> SceneManager::getSelectedMeshes() const {

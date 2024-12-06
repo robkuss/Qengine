@@ -40,7 +40,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 		const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow));
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 			const Ray ray = vp->getMouseRay(vp->mouseX[0], vp->mouseY[0]);
-			vp->sceneManager->select(ray, vp->sceneManager->viewportMode);
+			vp->sceneManager->select(ray, vp->sceneManager->viewportMode, false);	// TODO implement selection preservation when Ctrl/Shift pressed
 		}
 		else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
 			vp->initRotation(action == GLFW_PRESS);

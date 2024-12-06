@@ -26,6 +26,8 @@ public:
 
 	void buildEdgeToFaceMap();
 
+	[[nodiscard]] std::vector<Triangle> getTriangles() const;
+
 private:
 	friend class SceneManager;
 	friend class MeshRenderer;
@@ -42,7 +44,6 @@ private:
 	[[nodiscard]] Vector3 vertexNormal(const Vertex& v) const;
 
 	[[nodiscard]] Triangle getTriangle(int index) const;
-	[[nodiscard]] std::vector<Triangle> getTriangles() const;
 
 	void addEdgeToMap(int v0, int v1, const Triangle& t);
 

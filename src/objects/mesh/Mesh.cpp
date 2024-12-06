@@ -114,9 +114,9 @@ Vector3 Mesh::faceNormal(const Triangle& t) {
 Vector3 Mesh::vertexNormal(const Vertex& v) const {
 	Vector3 accNormal(0.0f, 0.0f, 0.0f);
 
-	for (int i = 0; i + 2 < faceIndices.size(); i += 3) {
+	for (Triangle t : getTriangles()) {
 		// Check if the current triangle contains the vertex
-		if (const auto t = getTriangle(i); v == t.v0 || v == t.v1 || v == t.v2) {
+		if (v == t.v0 || v == t.v1 || v == t.v2) {
 			// Accumulate the face normal
 			accNormal = accNormal + faceNormal(t);
 		}
