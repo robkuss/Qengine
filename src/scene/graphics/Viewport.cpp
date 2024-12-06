@@ -3,6 +3,7 @@
 #include <cmath>
 #include <sstream>
 #include <iomanip>
+#include <math/vector/Vector2.h>
 
 #include <objects/Object.h>
 #include <scene/SceneManager.h>
@@ -73,6 +74,7 @@ void Viewport::start() {
 	while (!glfwWindowShouldClose(window)) {
 		glfwGetFramebufferSize(window, &width, &height);
 		glViewport(0, 0, width, height);
+		glGetIntegerv(GL_VIEWPORT, viewport);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear the framebuffer
 
@@ -138,7 +140,7 @@ void Viewport::centerWindow() const {
 
 void Viewport::drawOnScreenText() const {
 	const auto cube = *sceneManager->sceneObjects[0];
-	const auto mouseWorld = unproject(mouseX[0], mouseY[0], 0.0f);
+	const auto mouseWorld = unproject(Vector2(*mouseX, *mouseY), viewport, viewMatrix, projMatrix);
 	for (int i = 0; i <= 10; i++) {
 		std::ostringstream out;
 		switch (i) {
@@ -169,12 +171,20 @@ void Viewport::drawOnScreenText() const {
 void Viewport::gluPerspective(const float aspect) {
 	glMatrixMode(GL_PROJECTION);	// Subsequent matrix operations will affect the projection matrix
 
-	const double fh = tan(FOV_Y * PI / 360.0) * Z_NEAR;	// Height of the Near Clipping Plane
-	const double fw = fh * aspect;							//  Width of the Near Clipping Plane
+	const auto fh = static_cast<float>(tan(FOV_Y * PI / 360.0) * Z_NEAR);	// Height of the Near Clipping Plane
+	const auto fw = fh * aspect;										//  Width of the Near Clipping Plane
+	constexpr float dz = Z_FAR - Z_NEAR;
 
-	// Update the perspective projection matrix based on the calculated dimensions
+	// Update the projection matrix
+	projMatrix = {
+		Z_NEAR / fw, 0.0f,			0.0f,				   0.0f,
+		0.0f,        Z_NEAR / fh,	0.0f,				   0.0f,
+		0.0f,        0.0f,		  -(Z_FAR + Z_NEAR) / dz, -1.0f,
+		0.0f,        0.0f, -(2.0f * Z_FAR * Z_NEAR) / dz,  0.0f
+	};
+
 	glLoadIdentity();
-	glFrustum(-fw, fw, -fh, fh, Z_NEAR, Z_FAR);
+	glMultMatrixf(projMatrix.data());
 }
 
 /**
@@ -193,17 +203,16 @@ void Viewport::gluLookAt(const Vector3& eye, const Vector3& center, const Vector
 	const Vector3 side = forward.cross(up).normalize();	 // Calculate the side vector (perpendicular to both forward and up vectors)
 	const Vector3 zUp = side.cross(forward);			 // Recalculate the actual up vector to ensure orthogonality
 
-	// Construct the view matrix, which is used to transform coordinates from world space to camera space
-	const GLfloat viewMatrix[] = {
+	// Update the view matrix
+	viewMatrix = {
 		 side.x,		 zUp.x,		  -forward.x,		 0.0f,
 		 side.y,		 zUp.y,		  -forward.y,		 0.0f,
 		 side.z,		 zUp.z,		  -forward.z,		 0.0f,
 		-side.dot(eye), -zUp.dot(eye), forward.dot(eye), 1.0f
 	};
 
-	// Update the view matrix, which sets up the camera's orientation and position
 	glLoadIdentity();
-	glMultMatrixf(viewMatrix);
+	glMultMatrixf(viewMatrix.data());
 }
 
 /** Update camera position based on spherical coordinates. */
@@ -265,37 +274,8 @@ void Viewport::setPerspective(const float h, const float v) {
 	gluLookAt(camPos, lookAt, up);
 }
 
-/**
- * This function maps screen space (2D mouse coordinates) to 3D world space.
- *
- * @param mouseX The x-coordinate of the mouse position in screen space.
- * @param mouseY The y-coordinate of the mouse position in screen space.
- * @param depth A Z-value in normalized device coordinates.
- *              Use 1.0f for a ray (far plane),
- *              and 0.0f for the near plane or exact position grabbing.
- *
- * @return the world space coordinates for the given mouse position as a Vector3
- */
-Vector3 Viewport::unproject(const double mouseX, const double mouseY, const float depth) const {
-	// Get viewport, projection, and modelview matrices
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	glGetFloatv(GL_PROJECTION_MATRIX, projMatrix);
-	glGetFloatv(GL_MODELVIEW_MATRIX, viewMatrix);
-
-	// Convert mouse coordinates to normalized device coordinates (NDC)
-	const auto x = static_cast<float>(2.0 * mouseX / viewport[2] - 1.0);
-	const auto y = static_cast<float>(1.0 - 2.0 * mouseY / viewport[3]);
-
-	const auto viewSpace = Vector4(x, y, depth, 1.0f);									// Create a vector in clip space
-	const auto clipSpace = Matrix4(projMatrix).invert() * viewSpace;					// Transform from clip space to view space by applying the inverse of the projection matrix
-	const auto unprojectedClipSpace = Vector4(clipSpace.x, clipSpace.y, -1.0f, 0.0f);	// Set the Z to -1 for proper unprojection and W to 0 for direction vector in the case of a ray
-	const auto worldSpace = Matrix4(viewMatrix).invert() * unprojectedClipSpace;		// Transform from clip space to world space by applying the inverse of the view matrix
-
-	return {worldSpace.x, worldSpace.y, worldSpace.z};
-}
-
-Ray Viewport::getMouseRay(const double mouseX, const double mouseY) const {
-	return {camPos, unproject(mouseX, mouseY, 1.0f).normalize()};
+Ray Viewport::getMouseRay(const Vector2& mousePos) const {
+	return {camPos, unproject(mousePos, viewport, viewMatrix, projMatrix).normalize()};
 }
 
 // Drawing functions

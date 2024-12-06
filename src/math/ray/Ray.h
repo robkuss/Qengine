@@ -8,7 +8,6 @@
 
 class Vector3;
 
-
 class Ray {
 public:
 	Vector3 origin, direction;
@@ -18,7 +17,7 @@ public:
 
 	[[nodiscard]] bool intersects(const Mesh& mesh) const;
 	[[nodiscard]] bool intersects(const Triangle& t) const;
-	[[nodiscard]] bool intersects(const Vertex& v) const;
+	[[nodiscard]] bool intersects(const Vertex &v) const;
 };
 
 
@@ -69,5 +68,6 @@ inline bool Ray::intersects(const Triangle &t) const {
 }
 
 inline bool Ray::intersects(const Vertex& v) const {
-	return false; // TODO
+
+	return origin.distance(v) <= 20.0f;
 }

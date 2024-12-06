@@ -2,6 +2,7 @@
 
 #define GLFW_INCLUDE_GLEXT
 
+#include <array>
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -16,6 +17,7 @@
 	#include "ui/text/Text.cpp"
 #endif
 
+class Vector2;
 class SceneManager;	// Forward declaration for friend
 
 // Constants
@@ -83,9 +85,10 @@ private:
 	int fps				= 0;
 
 	// OpenGL Pointers
-	GLint* viewport		= new int[4];
-	GLfloat* projMatrix = new float[16];
-	GLfloat* viewMatrix = new float[16];
+	GLint* viewport		= new GLint[4];
+	std::array<GLfloat, 16> projMatrix;
+	std::array<GLfloat, 16> viewMatrix;
+
 	GLdouble* mouseX	= new double[1];
 	GLdouble* mouseY	= new double[1];
 
@@ -104,12 +107,11 @@ private:
 	void zoom(double yoffset);
 	void setPerspective(float h, float v);
 
-	static void gluPerspective(float aspect);
-	static void gluLookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
+	void gluPerspective(float aspect);
+	void gluLookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
 	void updateCameraPosition();
 
-	[[nodiscard]] Vector3 unproject(double mouseX, double mouseY, float depth) const;
-	[[nodiscard]] Ray getMouseRay(double mouseX, double mouseY) const;
+	[[nodiscard]] Ray getMouseRay(const Vector2& mousePos) const;
 	void drawMouseRay() const;
 
 	static void drawAxes();

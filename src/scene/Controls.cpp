@@ -1,3 +1,4 @@
+#include <math/vector/Vector2.h>
 #include <scene/graphics/Viewport.h>
 
 #include "Mode.h"
@@ -39,7 +40,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* cbWindow, const int button, const int action, const int) {
 		const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow));
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-			const Ray ray = vp->getMouseRay(vp->mouseX[0], vp->mouseY[0]);
+			const Ray ray = vp->getMouseRay(Vector2(*vp->mouseX, *vp->mouseY));
 			vp->sceneManager->select(ray, vp->sceneManager->viewportMode, false);	// TODO implement selection preservation when Ctrl/Shift pressed
 		}
 		else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
@@ -60,7 +61,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 				}
 			} else {
 				// Object transformation
-				vp->sceneManager->transform(mouseX, mouseY, vp->width, vp->height, vp->unproject(mouseX, mouseY, 0), vp->camPos);
+				vp->sceneManager->transform(mouseX, mouseY, vp->width, vp->height, unproject(Vector2(*vp->mouseX, *vp->mouseY), vp->viewport, vp->viewMatrix, vp->projMatrix), vp->camPos);
 			}
 		}
 	});

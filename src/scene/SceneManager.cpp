@@ -78,18 +78,19 @@ void SceneManager::select(const Ray& ray, const Mode& mode, const bool preserve)
 		}
 	}
 
-	// If in Edit Mode, select specific vertices
+	// If in Edit Mode, select specific Vertices
 	else if (mode == EDIT) {
 		std::vector<Vertex> intersectingVertices;
 		for (const auto& mesh : getSelectedMeshes()) {
 			for (const auto v : mesh->vertices) {
 				if (ray.intersects(v)) {
 					intersectingVertices.push_back(v);
+					std::cout << "found vertex: " << v.x << ", " << v.y << ", " << v.z << std::endl;
 				}
 			}
 
 			if (!intersectingVertices.empty()) {
-				// Select the Object that's closest to the Ray origin (the camera)
+				// Select the Vertex that's closest to the Ray origin (the camera)
 				selectVertex(
 					*std::ranges::min_element(
 						intersectingVertices,
@@ -99,7 +100,7 @@ void SceneManager::select(const Ray& ray, const Mode& mode, const bool preserve)
 					)
 				);
 			} else if (!preserve) {
-				// Deselect all previously selected Objects
+				// Deselect all previously selected Vertices
 				for (const auto& obj : selectedVertices) deselectVertex(obj);
 			}
 		}

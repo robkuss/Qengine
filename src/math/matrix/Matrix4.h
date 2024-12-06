@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cmath>
 
 #include <math/Util.h>
@@ -16,11 +17,19 @@ struct Matrix4 {
 	Matrix4() = default;
 
 	// Constructor with array
-	explicit Matrix4(const float* data) {
-		m11 = data[0];  m21 = data[4];  m31 = data[8];   m41 = data[12];
-		m12 = data[1];  m22 = data[5];  m32 = data[9];   m42 = data[13];
-		m13 = data[2];  m23 = data[6];  m33 = data[10];  m43 = data[14];
-		m14 = data[3];  m24 = data[7];  m34 = data[11];  m44 = data[15];
+	explicit Matrix4(const float* arr) {
+		m11 = arr[0];  m21 = arr[4];  m31 = arr[8];   m41 = arr[12];
+		m12 = arr[1];  m22 = arr[5];  m32 = arr[9];   m42 = arr[13];
+		m13 = arr[2];  m23 = arr[6];  m33 = arr[10];  m43 = arr[14];
+		m14 = arr[3];  m24 = arr[7];  m34 = arr[11];  m44 = arr[15];
+	}
+
+	// Constructor with std::array
+	explicit Matrix4(const std::array<float, 16>& arr) {
+		m11 = arr[0];  m21 = arr[4];  m31 = arr[8];   m41 = arr[12];
+		m12 = arr[1];  m22 = arr[5];  m32 = arr[9];   m42 = arr[13];
+		m13 = arr[2];  m23 = arr[6];  m33 = arr[10];  m43 = arr[14];
+		m14 = arr[3];  m24 = arr[7];  m34 = arr[11];  m44 = arr[15];
 	}
 
 	// Constructor with initializer list

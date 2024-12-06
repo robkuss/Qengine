@@ -1,7 +1,9 @@
 #pragma once
 
-#include <math/vector/Vector3.h>
-#include <math/vector/Vector4.h>
+#include "vector/Vector2.h"
+#include "vector/Vector3.h"
+#include "vector/Vector4.h"
+
 #include <scene/Mode.h>
 
 constexpr float EPSILON		= 1e-9f;					// Infinitesimal
@@ -31,3 +33,23 @@ inline Vector3 clampDirection(const SubMode subMode) {
 		default: return Vector3::ONE;
 	}
 }
+
+/**
+ * This function maps 3D world space to 2D screen space.
+ * @param worldPoint The point in 3D world space to be projected to 2D screen space
+ * @param viewport contains screen dimensions data
+ * @param viewMatrix
+ * @param projMatrix
+ * @return the screen space coordinates for the given world position as a Vector2
+ */
+Vector2 project(const Vector3& worldPoint, const int* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
+
+/**
+ * This function maps 2D screen space to 3D world space.
+ * @param screenPoint The point in 2D screen space to be projected to 3D world space
+ * @param viewport contains screen dimensions data
+ * @param viewMatrix
+ * @param projMatrix
+ * @return the world space coordinates for the given mouse position as a Vector3
+ */
+Vector3 unproject(const Vector2& screenPoint, const int* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
