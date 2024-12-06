@@ -1,3 +1,4 @@
+
 #include "Viewport.h"
 
 #include <cmath>
@@ -10,7 +11,7 @@
 
 
 Viewport::Viewport(const std::string& title, const int width, const int height)
-	: title(title), width(width), height(height) {
+		: title(title), width(width), height(height), aspect(static_cast<float>(width) / static_cast<float>(height)), sceneManager(new SceneManager(this)) {
 	glfwSetErrorCallback([](int, const char *description) {
 		std::cerr << "GLFW Error: " << description << std::endl;
 	});
@@ -44,8 +45,6 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 	glEnable(GL_RESCALE_NORMAL);
 
 	glfwSwapInterval(0); // Disable v-sync
-
-	sceneManager = new SceneManager();
 }
 
 Viewport::~Viewport() {
@@ -67,28 +66,27 @@ void Viewport::start() {
 	setLight(Colors::LIGHT_SUN, Colors::LIGHT_AMBIENT, Colors::WHITE);
 
 	// Get matrices
-	gluPerspective(static_cast<float>(width) / static_cast<float>(height)); // projection matrix
+	gluPerspective(aspect); // projection matrix
 	gluLookAt(camPos, lookAt, up);   // view matrix
 
 	// Start rendering the Viewport
 	while (!glfwWindowShouldClose(window)) {
 		glfwGetFramebufferSize(window, &width, &height);
-		glViewport(0, 0, width, height);
-		glGetIntegerv(GL_VIEWPORT, viewport);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear the framebuffer
 
 		render();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-		getFPS();
 	}
 }
 
 /** Viewport rendering loop called every frame */
-void Viewport::render() const {
+void Viewport::render() {
+	glViewport(0, 0, width, height);
+	glGetIntegerv(GL_VIEWPORT, viewport.data());
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	// Draw the coordinate system
 	drawAxes();
 	drawGrid();
@@ -106,6 +104,8 @@ void Viewport::render() const {
 		drawOnScreenText();
 		text->drawErrorText(width, height);
 	#endif
+
+	getFPS();
 }
 
 void Viewport::getFPS() {
@@ -120,11 +120,11 @@ void Viewport::getFPS() {
 void Viewport::windowResize(const int newW, const int newH) {
 	width = newW;
 	height = newH;
+	aspect = static_cast<float>(width) / static_cast<float>(height);
 
 	// Update viewport
 	glViewport(0, 0, width, height);
-	gluPerspective(static_cast<float>(width) / static_cast<float>(height));
-	render();
+	gluPerspective(aspect);
 }
 
 /** Centers the application's window to the middle of the screen. */
@@ -230,6 +230,8 @@ void Viewport::updateCameraPosition() {
 		camDist * cosV * -sinH,
 		camDist * sinV
 	);
+
+	gluLookAt(camPos, lookAt, up);
 }
 
 void Viewport::initRotation(const bool isRotating) {
@@ -250,7 +252,6 @@ void Viewport::rotate(const double mouseX, const double mouseY) {
 
 	// Apply camera rotation
 	updateCameraPosition();
-	gluLookAt(camPos, lookAt, up);
 }
 
 /** Handle the mouse scroll event to zoom in and out. */
@@ -264,14 +265,14 @@ void Viewport::zoom(const double yoffset) {
 
 	// Apply zoom
 	updateCameraPosition();
-	gluLookAt(camPos, lookAt, up);
 }
 
 void Viewport::setPerspective(const float h, const float v) {
 	rotH = h;
 	rotV = v;
-	updateCameraPosition();	 // Apply camera rotation
-	gluLookAt(camPos, lookAt, up);
+
+	// Apply camera rotation
+	updateCameraPosition();
 }
 
 Ray Viewport::getMouseRay(const Vector2& mousePos) const {

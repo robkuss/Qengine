@@ -32,6 +32,7 @@ constexpr float Z_NEAR					= CAMERA_DISTANCE_MIN / 2.0f;		// Near Clipping Plane
 constexpr float Z_FAR					= CAMERA_DISTANCE_MAX * 2.0f;		//  Far Clipping Plane: The distance from the camera to the far clipping plane. Objects further than this distance are not rendered.
 constexpr float FOV_Y					= 45.0f;							// Field of View in Y dimension
 constexpr float ZOOM_SENSITIVITY		= 2.0f;
+constexpr float SELECT_TOLERANCE		= 20.0f;							// Tolerance in pixel distance for mouse picking
 
 constexpr float AXES_LENGTH				= 100.0f;
 constexpr float MOUSE_RAY_LENGTH		= 1000.0f;
@@ -50,10 +51,17 @@ public:
 	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
 	void drawOnScreenText() const;
 
+	[[nodiscard]] Ray getMouseRay(const Vector2& mousePos) const;
+
+	std::array<int, 4> viewport {};
+	std::array<GLfloat, 16> projMatrix{};
+	std::array<GLfloat, 16> viewMatrix{};
+
 private:
 	GLFWwindow* window;
 	std::string title;
 	int width, height;
+	float aspect;
 	SceneManager* sceneManager{};
 
 	#ifdef TEXT
@@ -84,11 +92,6 @@ private:
 	int frameCount		= 0;
 	int fps				= 0;
 
-	// OpenGL Pointers
-	GLint* viewport		= new GLint[4];
-	std::array<GLfloat, 16> projMatrix;
-	std::array<GLfloat, 16> viewMatrix;
-
 	GLdouble* mouseX	= new double[1];
 	GLdouble* mouseY	= new double[1];
 
@@ -97,7 +100,7 @@ private:
 	GLfloat light2Pos[4] = {-2, -3, -6, 0};
 
 	// Functions
-	void render() const;
+	void render();
 
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
@@ -111,7 +114,6 @@ private:
 	void gluLookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
 	void updateCameraPosition();
 
-	[[nodiscard]] Ray getMouseRay(const Vector2& mousePos) const;
 	void drawMouseRay() const;
 
 	static void drawAxes();

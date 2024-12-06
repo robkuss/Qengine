@@ -42,7 +42,7 @@ inline Vector3 clampDirection(const SubMode subMode) {
  * @param projMatrix
  * @return the screen space coordinates for the given world position as a Vector2
  */
-Vector2 project(const Vector3& worldPoint, const int* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
+Vector2 project(const Vector3& worldPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
 
 /**
  * This function maps 2D screen space to 3D world space.
@@ -52,4 +52,4 @@ Vector2 project(const Vector3& worldPoint, const int* viewport, const std::array
  * @param projMatrix
  * @return the world space coordinates for the given mouse position as a Vector3
  */
-Vector3 unproject(const Vector2& screenPoint, const int* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
+Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);

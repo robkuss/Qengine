@@ -1,7 +1,8 @@
 #include "Util.h"
+
 #include "math/matrix/Matrix4.h"
 
-Vector2 project(const Vector3& worldPoint, const int* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
+Vector2 project(const Vector3& worldPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
 	// Convert world coordinates to view space
 	const Vector4 viewSpace = Matrix4(viewMatrix) * Vector4(worldPoint.x, worldPoint.y, worldPoint.z, 1.0f);
 	const Vector4 clipSpace = Matrix4(projMatrix) * viewSpace;
@@ -16,7 +17,7 @@ Vector2 project(const Vector3& worldPoint, const int* viewport, const std::array
 	return {x, y};
 }
 
-Vector3 unproject(const Vector2& screenPoint, const int* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
+Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
 	// Convert mouse coordinates to normalized device coordinates (NDC)
 	const auto x = static_cast<float>(2.0 * screenPoint.x / viewport[2] - 1.0);
 	const auto y = static_cast<float>(1.0 - 2.0 * screenPoint.y / viewport[3]);

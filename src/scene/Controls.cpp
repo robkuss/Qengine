@@ -32,16 +32,18 @@
 void Viewport::setCallbacks(GLFWwindow* window) {
 	// Window resize callback
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* cbWindow, const int width, const int height) {
-		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow)))
+		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
 			vp->windowResize(width, height);
+			vp->render(); // Force a re-render during resizing
+			glfwSwapBuffers(cbWindow);
+		}
 	});
 
 	// Mouse button callbacks
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* cbWindow, const int button, const int action, const int) {
 		const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow));
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-			const Ray ray = vp->getMouseRay(Vector2(*vp->mouseX, *vp->mouseY));
-			vp->sceneManager->select(ray, vp->sceneManager->viewportMode, false);	// TODO implement selection preservation when Ctrl/Shift pressed
+			vp->sceneManager->select(Vector2(*vp->mouseX, *vp->mouseY), vp->sceneManager->viewportMode, false);	// TODO implement selection preservation when Ctrl/Shift pressed
 		}
 		else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
 			vp->initRotation(action == GLFW_PRESS);

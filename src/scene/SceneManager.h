@@ -9,12 +9,14 @@ class Mesh;
 class SceneManager {
 public:
 	// Constructor & Destructor
-	explicit SceneManager();
+	explicit SceneManager(const Viewport* vp);
 	~SceneManager() = default;
 
 	void render(const Vector3& camPos) const;
 
 private:
+	const Viewport *vp;
+
 	// Grant a few Viewport functions access to private members using the best keyword in C++
 	friend void Viewport::drawOnScreenText() const;
 	friend void Viewport::setCallbacks(GLFWwindow* window);
@@ -34,7 +36,7 @@ private:
 	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
 
-	void select(const Ray& ray, const Mode& mode, bool preserve);
+	void select(const Vector2 &mousePos, const Mode &mode, bool preserve);
 	void selectObject(const std::shared_ptr<Object>& obj);
 	void deselectObject(const std::shared_ptr<Object> &obj);
 	void selectVertex(const Vertex &v);

@@ -7,7 +7,7 @@
 #include <objects/mesh/cube/Cube.cpp>
 
 
-SceneManager::SceneManager() {
+SceneManager::SceneManager(const Viewport* vp): vp(vp) {
 	// Add Default Cube to scene
 	const auto cube = std::make_shared<Cube>("Cube", 1.0f);
 	cube->setPosition(Vector3(0.5f, 0.5f, 0.5f));
@@ -39,7 +39,9 @@ void SceneManager::render(const Vector3& camPos) const {
  *
  * @see getMouseRay for the ray computation logic.
  */
-void SceneManager::select(const Ray& ray, const Mode& mode, const bool preserve) {
+void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool preserve) {
+	const Ray ray = vp->getMouseRay(mousePos);
+
 	#ifdef DRAW_MOUSE_RAY
 		// Update the visual Mouse Ray
 		const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
@@ -83,11 +85,14 @@ void SceneManager::select(const Ray& ray, const Mode& mode, const bool preserve)
 		std::vector<Vertex> intersectingVertices;
 		for (const auto& mesh : getSelectedMeshes()) {
 			for (const auto v : mesh->vertices) {
-				if (ray.intersects(v)) {
+				const auto projV = project(v, vp->viewport, vp->viewMatrix, vp->projMatrix);
+				std::cout << "Vertex " << v.x << ", " << v.y << ", " << v.z << ": " << projV.x << ", " << projV.y << std::endl;
+				if (Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
 					intersectingVertices.push_back(v);
 					std::cout << "found vertex: " << v.x << ", " << v.y << ", " << v.z << std::endl;
 				}
 			}
+			std::cout << std::endl;
 
 			if (!intersectingVertices.empty()) {
 				// Select the Vertex that's closest to the Ray origin (the camera)

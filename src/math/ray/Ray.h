@@ -17,7 +17,7 @@ public:
 
 	[[nodiscard]] bool intersects(const Mesh& mesh) const;
 	[[nodiscard]] bool intersects(const Triangle& t) const;
-	[[nodiscard]] bool intersects(const Vertex &v) const;
+	[[nodiscard]] static bool intersects(const Vector2 &vertexPos, const Vector2 &mousePos, float tolerance) ;
 };
 
 
@@ -67,7 +67,6 @@ inline bool Ray::intersects(const Triangle &t) const {
 	return p > EPSILON;
 }
 
-inline bool Ray::intersects(const Vertex& v) const {
-
-	return origin.distance(v) <= 20.0f;
+inline bool Ray::intersects(const Vector2& vertexPos, const Vector2& mousePos, const float tolerance) {
+	return vertexPos.distance(mousePos) < tolerance;
 }
