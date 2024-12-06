@@ -17,6 +17,9 @@
 	#include "ui/text/Text.cpp"
 #endif
 
+//#define RENDER_PROJECTED_VERTICES
+//#define DRAW_MOUSE_RAY
+
 class Vector2;
 class SceneManager;	// Forward declaration for friend
 
@@ -42,6 +45,10 @@ constexpr int ANTIALIASING_SAMPLES		= 10;
 
 class Viewport {
 public:
+	std::array<int, 4> viewport {};
+	std::array<GLfloat, 16> projMatrix{};
+	std::array<GLfloat, 16> viewMatrix{};
+
 	explicit Viewport(const std::string& title, int width, int height);
 	~Viewport();
 
@@ -51,11 +58,10 @@ public:
 	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
 	void drawOnScreenText() const;
 
+	// Mouse Ray
+	mutable Vector3 rayStart    = Vector3::MINUS_ONE;
+	mutable Vector3 rayEnd      = Vector3::ONE;
 	[[nodiscard]] Ray getMouseRay(const Vector2& mousePos) const;
-
-	std::array<int, 4> viewport {};
-	std::array<GLfloat, 16> projMatrix{};
-	std::array<GLfloat, 16> viewMatrix{};
 
 private:
 	GLFWwindow* window;
@@ -82,10 +88,6 @@ private:
 	double rotV			= 0.0;
 	double lastH		= 0.0;
 	double lastV		= 0.0;
-
-	// Mouse Ray
-	Vector3 rayStart    = Vector3::MINUS_ONE;
-	Vector3 rayEnd      = Vector3::ONE;
 
 	// FPS tracking
 	double previousTime = 0.0;

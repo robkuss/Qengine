@@ -3,18 +3,28 @@
 #include "math/matrix/Matrix4.h"
 
 Vector2 project(const Vector3& worldPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
-	// Convert world coordinates to view space
-	const Vector4 viewSpace = Matrix4(viewMatrix) * Vector4(worldPoint.x, worldPoint.y, worldPoint.z, 1.0f);
-	const Vector4 clipSpace = Matrix4(projMatrix) * viewSpace;
+	// TODO Make this better
+	auto clip = Vector4(
+       viewMatrix[0] * worldPoint.x + viewMatrix[4] * worldPoint.y + viewMatrix[8] * worldPoint.z + viewMatrix[12],
+       viewMatrix[1] * worldPoint.x + viewMatrix[5] * worldPoint.y + viewMatrix[9] * worldPoint.z + viewMatrix[13],
+       -(viewMatrix[2] * worldPoint.x + viewMatrix[6] * worldPoint.y + viewMatrix[10] * worldPoint.z + viewMatrix[14]),
+       viewMatrix[3] * worldPoint.x + viewMatrix[7] * worldPoint.y + viewMatrix[11] * worldPoint.z + viewMatrix[15]
+	);
 
-	// Convert to normalized device coordinates (NDC)
-	const Vector4 ndcSpace = clipSpace / clipSpace.w;
+	// Step 2: Apply the projection matrix (this transforms from camera space to clip space)
+	clip.x = projMatrix[0] * clip.x + projMatrix[4] * clip.y + projMatrix[8] * clip.z + projMatrix[12] * clip.w;
+	clip.y = projMatrix[1] * clip.x + projMatrix[5] * clip.y + projMatrix[9] * clip.z + projMatrix[13] * clip.w;
+	clip.z = projMatrix[2] * clip.x + projMatrix[6] * clip.y + projMatrix[10] * clip.z + projMatrix[14] * clip.w;
+	clip.w = projMatrix[3] * clip.x + projMatrix[7] * clip.y + projMatrix[11] * clip.z + projMatrix[15] * clip.w;
 
-	// Convert from NDC to screen coordinates (mapping NDC [-1, 1] to [0, 1])
-	const float x = (ndcSpace.x + 1.0f) * 0.5f * static_cast<float>(viewport[2]) + static_cast<float>(viewport[0]);
-	const float y = (1.0f - ndcSpace.y) * 0.5f * static_cast<float>(viewport[3]) + static_cast<float>(viewport[1]);
+	if (std::abs(clip.w) < EPSILON) throw std::runtime_error("Cannot project point: w component is zero.");
+	const float ndcX = clip.x / clip.w;
+	const float ndcY = clip.y / clip.w;
 
-	return {x, y};
+	float screenX = (ndcX * 0.5f + 0.5f) * static_cast<float>(viewport[2]);
+	float screenY = (1.0f - (ndcY * 0.5f + 0.5f)) * static_cast<float>(viewport[3]);
+
+	return {screenX, screenY};
 }
 
 Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {

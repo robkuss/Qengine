@@ -69,9 +69,10 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t) {
 	glDisable(GL_LIGHTING);
 }
 
-void MeshRenderer::renderVertices(const Mesh& mesh) {
-	for (const auto& vertex : mesh.vertices) {
-		renderVertex(vertex);
+void MeshRenderer::renderVertices(const Mesh& mesh, const Viewport* vp) {
+	for (const auto& v : mesh.vertices) {
+		glPointSize(4.0f);
+		renderVertex(v);
 	}
 }
 
@@ -87,7 +88,38 @@ void MeshRenderer::renderTriangles(const Mesh& mesh) {
 	}
 }
 
-void MeshRenderer::render(const Mesh& mesh, const Vector3& camPos, const bool isSelected, const bool isEditMode) {
+void MeshRenderer::renderProjectedVertices(const Mesh& mesh, const Viewport* vp) {
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glOrtho(0, vp->viewport[2], vp->viewport[3], 0, -1, 1);
+
+	// Switch to the model view matrix to render the text
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glBegin(GL_POINTS);
+	color3f(Color(255, 0, 0));
+	for (const auto& v : mesh.vertices) {
+		const auto projV = project(v, vp->viewport, vp->viewMatrix, vp->projMatrix);
+		glVertex2f(static_cast<float>(projV.x), static_cast<float>(projV.y));
+	}
+	glEnd();
+
+	// Restore the model view matrix
+	glPopMatrix();
+
+	// Restore the projection matrix (back to 3D perspective)
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	// Switch back to the model view matrix
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void MeshRenderer::render(const Mesh& mesh, const Vector3& camPos, const bool isSelected, const bool isEditMode, const Viewport* vp) {
 	// Draw the faces
 	renderTriangles(mesh);
 
@@ -100,7 +132,11 @@ void MeshRenderer::render(const Mesh& mesh, const Vector3& camPos, const bool is
 		// Draw the vertices
 		color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_VERT_COLOR);
 		glPointSize(4.0f);
-		renderVertices(mesh);
+		renderVertices(mesh, vp);
+
+		#ifdef RENDER_PROJECTED_VERTICES
+			renderProjectedVertices(mesh, vp);
+		#endif
 	} else if (isSelected) {
 		// Highlight only the outline of the Mesh in Object Mode
 		color3f(Colors::MESH_SELECT_COLOR);

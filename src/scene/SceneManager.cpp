@@ -24,7 +24,7 @@ void SceneManager::render(const Vector3& camPos) const {
 
 		// Attempt to cast Object to Mesh using dynamic_cast
 		if (const auto mesh = dynamic_cast<Mesh*>(obj.get())) {
-			MeshRenderer::render(*mesh, camPos, isSelected, viewportMode == EDIT);
+			MeshRenderer::render(*mesh, camPos, isSelected, viewportMode == EDIT, vp);
 		}
 	}
 }
@@ -45,8 +45,8 @@ void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool 
 	#ifdef DRAW_MOUSE_RAY
 		// Update the visual Mouse Ray
 		const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
-		rayStart = ray.origin;
-		rayEnd   = ray.origin + directionScaled;
+		vp->rayStart = ray.origin;
+		vp->rayEnd   = ray.origin + directionScaled;
 	#endif
 
 	// If in Object Mode, select entire Objects
@@ -85,14 +85,11 @@ void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool 
 		std::vector<Vertex> intersectingVertices;
 		for (const auto& mesh : getSelectedMeshes()) {
 			for (const auto v : mesh->vertices) {
-				const auto projV = project(v, vp->viewport, vp->viewMatrix, vp->projMatrix);
-				std::cout << "Vertex " << v.x << ", " << v.y << ", " << v.z << ": " << projV.x << ", " << projV.y << std::endl;
-				if (Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
+				if (const auto projV = project(v, vp->viewport, vp->viewMatrix, vp->projMatrix); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
 					intersectingVertices.push_back(v);
 					std::cout << "found vertex: " << v.x << ", " << v.y << ", " << v.z << std::endl;
 				}
 			}
-			std::cout << std::endl;
 
 			if (!intersectingVertices.empty()) {
 				// Select the Vertex that's closest to the Ray origin (the camera)
@@ -116,19 +113,27 @@ void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool 
 }
 
 void SceneManager::selectObject(const std::shared_ptr<Object>& obj) {
-	selectedObjects.push_back(obj);
+	if (std::ranges::find(selectedObjects, obj) == selectedObjects.end()) {
+		selectedObjects.push_back(obj);
+	}
 }
 
 void SceneManager::deselectObject(const std::shared_ptr<Object>& obj) {
-	selectedObjects.erase(std::ranges::find(selectedObjects, obj));
+	if (const auto it = std::ranges::find(selectedObjects, obj); it != selectedObjects.end()) {
+		selectedObjects.erase(it);
+	}
 }
 
 void SceneManager::selectVertex(const Vertex& v) {
-	selectedVertices.push_back(v);
+	if (std::ranges::find(selectedVertices, v) == selectedVertices.end()) {
+		selectedVertices.push_back(v);
+	}
 }
 
 void SceneManager::deselectVertex(const Vertex& v) {
-	selectedVertices.erase(std::ranges::find(selectedVertices, v));
+	if (const auto it = std::ranges::find(selectedVertices, v); it != selectedVertices.end()) {
+		selectedVertices.erase(it);
+	}
 }
 
 std::vector<std::shared_ptr<Mesh>> SceneManager::getSelectedMeshes() const {
