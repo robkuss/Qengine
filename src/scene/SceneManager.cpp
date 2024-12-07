@@ -6,25 +6,24 @@
 #include <scene/graphics/MeshRenderer.h>
 #include <objects/mesh/cube/Cube.cpp>
 
+#include "RenderContext.h"
 
-SceneManager::SceneManager(const Viewport* vp): vp(vp) {
+
+SceneManager::SceneManager() {
 	// Add Default Cube to scene
 	const auto cube = std::make_shared<Cube>("Cube", 1.0f);
 	cube->setPosition(Vector3(0.5f, 0.5f, 0.5f));
 	cube->setScale(Vector3::ONE);
 	cube->setRotation(Vector3::ZERO);
 	addObject(cube);
+	context = new RenderContext(selectionMode);
 }
 
-void SceneManager::render(const Vector3& camPos) const {
+void SceneManager::render() const {
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& obj : sceneObjects) {
-		// Check if the current Object is selected
-		const bool isSelected = std::ranges::find(selectedObjects, obj) != selectedObjects.end();
-
-		// Attempt to cast Object to Mesh using dynamic_cast
 		if (const auto mesh = dynamic_cast<Mesh*>(obj.get())) {
-			MeshRenderer::render(*mesh, camPos, isSelected, viewportMode == EDIT, vp);
+			MeshRenderer::render(*mesh, *context);
 		}
 	}
 }
@@ -39,8 +38,8 @@ void SceneManager::render(const Vector3& camPos) const {
  *
  * @see getMouseRay for the ray computation logic.
  */
-void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool preserve) {
-	const Ray ray = vp->getMouseRay(mousePos);
+void SceneManager::select(const Vector2& mousePos, const bool preserve) {
+	const auto ray = context->mouseRay;
 
 	#ifdef DRAW_MOUSE_RAY
 		// Update the visual Mouse Ray
@@ -50,13 +49,13 @@ void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool 
 	#endif
 
 	// If in Object Mode, select entire Objects
-	if (mode == OBJECT) {
+	if (selectionMode == OBJECT) {
 		// Find Objects that intersect with the mouse Ray
 		std::vector<std::shared_ptr<Object>> intersectingObjects;
 		for (const auto& obj : sceneObjects) {
 			// Attempt to cast Object to Mesh
 			if (const auto mesh = dynamic_cast<Mesh*>(obj.get())) {
-				if (ray.intersects(*mesh)) {
+				if (ray->intersects(*mesh)) {
 					intersectingObjects.push_back(obj);
 				}
 			} else {
@@ -70,7 +69,7 @@ void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool 
 				*std::ranges::min_element(
 					intersectingObjects,
 					[&ray](const std::shared_ptr<Object>& a, const std::shared_ptr<Object>& b) {
-						return a->getPosition().distance(ray.origin) < b->getPosition().distance(ray.origin);
+						return a->getPosition().distance(ray->origin) < b->getPosition().distance(ray->origin);
 					}
 				)
 			);
@@ -81,11 +80,11 @@ void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool 
 	}
 
 	// If in Edit Mode, select specific Vertices
-	else if (mode == EDIT) {
+	else if (selectionMode == EDIT) {
 		std::vector<Vertex> intersectingVertices;
 		for (const auto& mesh : getSelectedMeshes()) {
 			for (const auto v : mesh->vertices) {
-				if (const auto projV = project(v, vp->viewport, vp->viewMatrix, vp->projMatrix); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
+				if (const auto projV = project(v, context->viewport, context->viewMatrix, context->projMatrix); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
 					intersectingVertices.push_back(v);
 					std::cout << "found vertex: " << v.x << ", " << v.y << ", " << v.z << std::endl;
 				}
@@ -97,13 +96,13 @@ void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool 
 					*std::ranges::min_element(
 						intersectingVertices,
 						[&ray](const Vertex& a, const Vertex& b) {
-							return a.distance(ray.origin) < b.distance(ray.origin);
+							return a.distance(ray->origin) < b.distance(ray->origin);
 						}
 					)
 				);
 			} else if (!preserve) {
 				// Deselect all previously selected Vertices
-				for (const auto& obj : selectedVertices) deselectVertex(obj);
+				for (const auto obj : selectedVertices) deselectVertex(obj);
 			}
 		}
 	}
@@ -115,24 +114,28 @@ void SceneManager::select(const Vector2& mousePos, const Mode& mode, const bool 
 void SceneManager::selectObject(const std::shared_ptr<Object>& obj) {
 	if (std::ranges::find(selectedObjects, obj) == selectedObjects.end()) {
 		selectedObjects.push_back(obj);
+		context->selectedObjects = selectedObjects;
 	}
 }
 
 void SceneManager::deselectObject(const std::shared_ptr<Object>& obj) {
 	if (const auto it = std::ranges::find(selectedObjects, obj); it != selectedObjects.end()) {
 		selectedObjects.erase(it);
+		context->selectedObjects = selectedObjects;
 	}
 }
 
 void SceneManager::selectVertex(const Vertex& v) {
 	if (std::ranges::find(selectedVertices, v) == selectedVertices.end()) {
 		selectedVertices.push_back(v);
+		context->selectedVertices = selectedVertices;
 	}
 }
 
 void SceneManager::deselectVertex(const Vertex& v) {
 	if (const auto it = std::ranges::find(selectedVertices, v); it != selectedVertices.end()) {
 		selectedVertices.erase(it);
+		context->selectedVertices = selectedVertices;
 	}
 }
 
@@ -140,7 +143,7 @@ std::vector<std::shared_ptr<Mesh>> SceneManager::getSelectedMeshes() const {
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	for (const auto& obj : selectedObjects) {
 		// Check if the object is a Mesh by using dynamic_pointer_cast
-		if (auto mesh = std::dynamic_pointer_cast<Mesh>(obj)) {
+		if (const auto mesh = std::dynamic_pointer_cast<Mesh>(obj)) {
 			meshes.push_back(mesh);
 		}
 	}
@@ -207,8 +210,9 @@ void SceneManager::applyTransformation() {
 	}
 }
 
-void SceneManager::toggleViewportMode() {
-	viewportMode = viewportMode == OBJECT ? EDIT : OBJECT;
+void SceneManager::toggleSelectionMode() {
+	selectionMode = selectionMode == OBJECT ? EDIT : OBJECT;
+	context->selectionMode = selectionMode;
 }
 
 void SceneManager::setTransformMode(const Mode& mode) {

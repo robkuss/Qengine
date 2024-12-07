@@ -11,7 +11,7 @@
 
 
 Viewport::Viewport(const std::string& title, const int width, const int height)
-		: title(title), width(width), height(height), aspect(static_cast<float>(width) / static_cast<float>(height)), sceneManager(new SceneManager(this)) {
+		: title(title), width(width), height(height), sceneManager(new SceneManager()) {
 	glfwSetErrorCallback([](int, const char *description) {
 		std::cerr << "GLFW Error: " << description << std::endl;
 	});
@@ -66,7 +66,7 @@ void Viewport::start() {
 	setLight(Colors::LIGHT_SUN, Colors::LIGHT_AMBIENT, Colors::WHITE);
 
 	// Get matrices
-	gluPerspective(aspect); // projection matrix
+	gluPerspective(); // projection matrix
 	gluLookAt(camPos, lookAt, up);   // view matrix
 
 	// Start rendering the Viewport
@@ -84,6 +84,7 @@ void Viewport::start() {
 void Viewport::render() {
 	glViewport(0, 0, width, height);
 	glGetIntegerv(GL_VIEWPORT, viewport.data());
+	sceneManager->context->viewport = viewport;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -94,7 +95,8 @@ void Viewport::render() {
 	// Render scene objects
 	glLightfv(GL_LIGHT1, GL_POSITION, light1Pos);
 	glLightfv(GL_LIGHT2, GL_POSITION, light2Pos);
-	sceneManager->render(camPos);
+	sceneManager->context->camPos = camPos;
+	sceneManager->render();
 
 	#ifdef DRAW_MOUSE_RAY
 		drawMouseRay();
@@ -118,23 +120,16 @@ void Viewport::getFPS() {
 }
 
 void Viewport::windowResize(const int newW, const int newH) {
-	width = newW;
-	height = newH;
-	aspect = static_cast<float>(width) / static_cast<float>(height);
-
-	// Update viewport
-	glViewport(0, 0, width, height);
-	gluPerspective(aspect);
+	glViewport(0, 0, width = newW, height = newH);
+	gluPerspective();
 }
 
 /** Centers the application's window to the middle of the screen. */
 void Viewport::centerWindow() const {
 	const auto monitor = glfwGetPrimaryMonitor();
 	const auto vidMode = glfwGetVideoMode(monitor);
-	const int monitorWidth	 = vidMode->width;
-	const int monitorHeight  = vidMode->height;
-	const int windowPosX	 = (monitorWidth - width) / 2;
-	const int windowPosY	 = (monitorHeight - height) / 2;
+	const int windowPosX	 = (vidMode->width - width) / 2;
+	const int windowPosY	 = (vidMode->height - height) / 2;
 	glfwSetWindowPos(window, windowPosX, windowPosY);
 }
 
@@ -150,7 +145,7 @@ void Viewport::drawOnScreenText() const {
 			case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camDist; break;
 			case 4:  out << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
 			case 5:  out << "Mouse World: "  << std::fixed << std::setprecision(3) << mouseWorld.x << " " << mouseWorld.y << " " << mouseWorld.z; break;
-			case 6:	 out << "Mode: " << modeToString(sceneManager->viewportMode.mode);
+			case 6:	 out << "Mode: " << modeToString(sceneManager->selectionMode.mode);
 				if (sceneManager->transformMode.mode    != Mode::NONE)	out << " " << modeToString(sceneManager->transformMode.mode);
 				if (sceneManager->transformMode.subMode != SubMode::NONE) out << " " << subModeToString(sceneManager->transformMode.subMode); break;
 			case 7:  out << "Cube:"; break;
@@ -168,9 +163,10 @@ void Viewport::drawOnScreenText() const {
  * Function to set up a perspective projection matrix, which is essential for rendering 3D scenes
  * in a way that simulates human vision, where objects further away appear smaller than those closer.
  */
-void Viewport::gluPerspective(const float aspect) {
+void Viewport::gluPerspective() {
 	glMatrixMode(GL_PROJECTION);	// Subsequent matrix operations will affect the projection matrix
 
+	const auto aspect = static_cast<float>(width) / static_cast<float>(height);
 	const auto fh = static_cast<float>(tan(FOV_Y * PI / 360.0) * Z_NEAR);	// Height of the Near Clipping Plane
 	const auto fw = fh * aspect;										//  Width of the Near Clipping Plane
 	constexpr float dz = Z_FAR - Z_NEAR;
@@ -182,6 +178,7 @@ void Viewport::gluPerspective(const float aspect) {
 		0.0f,        0.0f,		  -(Z_FAR + Z_NEAR) / dz, -1.0f,
 		0.0f,        0.0f, -(2.0f * Z_FAR * Z_NEAR) / dz,  0.0f
 	};
+	sceneManager->context->projMatrix = projMatrix;
 
 	glLoadIdentity();
 	glMultMatrixf(projMatrix.data());
@@ -210,6 +207,7 @@ void Viewport::gluLookAt(const Vector3& eye, const Vector3& center, const Vector
 		 side.z,		 zUp.z,		  -forward.z,		 0.0f,
 		-side.dot(eye), -zUp.dot(eye), forward.dot(eye), 1.0f
 	};
+	sceneManager->context->viewMatrix = viewMatrix;
 
 	glLoadIdentity();
 	glMultMatrixf(viewMatrix.data());
@@ -275,8 +273,9 @@ void Viewport::setPerspective(const float h, const float v) {
 	updateCameraPosition();
 }
 
-Ray Viewport::getMouseRay(const Vector2& mousePos) const {
-	return {camPos, unproject(mousePos, viewport, viewMatrix, projMatrix).normalize()};
+void Viewport::setMouseRay(const Vector2& mousePos) {
+	mouseRay.origin = camPos;
+	mouseRay.direction = unproject(mousePos, viewport, viewMatrix, projMatrix).normalize();
 }
 
 // Drawing functions

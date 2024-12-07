@@ -17,7 +17,6 @@
 	#include "ui/text/Text.cpp"
 #endif
 
-//#define RENDER_PROJECTED_VERTICES
 //#define DRAW_MOUSE_RAY
 
 class Vector2;
@@ -46,8 +45,8 @@ constexpr int ANTIALIASING_SAMPLES		= 10;
 class Viewport {
 public:
 	std::array<int, 4> viewport {};
-	std::array<GLfloat, 16> projMatrix{};
 	std::array<GLfloat, 16> viewMatrix{};
+	std::array<GLfloat, 16> projMatrix{};
 
 	explicit Viewport(const std::string& title, int width, int height);
 	~Viewport();
@@ -58,16 +57,10 @@ public:
 	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
 	void drawOnScreenText() const;
 
-	// Mouse Ray
-	mutable Vector3 rayStart    = Vector3::MINUS_ONE;
-	mutable Vector3 rayEnd      = Vector3::ONE;
-	[[nodiscard]] Ray getMouseRay(const Vector2& mousePos) const;
-
 private:
 	GLFWwindow* window;
 	std::string title;
 	int width, height;
-	float aspect;
 	SceneManager* sceneManager{};
 
 	#ifdef TEXT
@@ -94,8 +87,12 @@ private:
 	int frameCount		= 0;
 	int fps				= 0;
 
+	// Mouse
 	GLdouble* mouseX	= new double[1];
 	GLdouble* mouseY	= new double[1];
+	mutable Vector3 rayStart    = Vector3::MINUS_ONE;
+	mutable Vector3 rayEnd      = Vector3::ONE;
+	Ray mouseRay = Ray(rayStart, rayEnd);
 
 	// Lighting
 	GLfloat light1Pos[4] = {2, 3, 6, 0};
@@ -112,10 +109,11 @@ private:
 	void zoom(double yoffset);
 	void setPerspective(float h, float v);
 
-	void gluPerspective(float aspect);
+	void gluPerspective();
 	void gluLookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
 	void updateCameraPosition();
 
+	void setMouseRay(const Vector2 &mousePos);
 	void drawMouseRay() const;
 
 	static void drawAxes();

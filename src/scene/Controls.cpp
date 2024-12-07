@@ -43,7 +43,10 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* cbWindow, const int button, const int action, const int) {
 		const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow));
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-			vp->sceneManager->select(Vector2(*vp->mouseX, *vp->mouseY), vp->sceneManager->viewportMode, false);	// TODO implement selection preservation when Ctrl/Shift pressed
+			const auto mousePos = Vector2(*vp->mouseX, *vp->mouseY);
+			vp->setMouseRay(mousePos);
+			vp->sceneManager->context->mouseRay = &vp->mouseRay;
+			vp->sceneManager->select(mousePos, false);	// TODO implement selection preservation when Ctrl/Shift pressed
 		}
 		else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
 			vp->initRotation(action == GLFW_PRESS);
@@ -88,7 +91,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
 	if (action != GLFW_PRESS) return;
 	switch (key) {
-		case GLFW_KEY_TAB : sceneManager->toggleViewportMode(); break;				// TAB -> Toggle Object/Edit Mode
+		case GLFW_KEY_TAB : sceneManager->toggleSelectionMode(); break;				// TAB -> Toggle Object/Edit Mode
 
 		// Number keys for perspective toggling
 		case GLFW_KEY_1: setPerspective(  0.0f,  0.0f); break;					// 1 -> Front View  (towards negative X)

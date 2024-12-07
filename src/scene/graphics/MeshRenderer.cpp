@@ -8,7 +8,8 @@
 
 #include <ranges>
 
-#include <scene/graphics/color/Colors.h>
+#include "scene/graphics/color/Colors.h"
+#include "scene/RenderContext.h"
 
 /** Reinterpret Vertex as GLfloat* */
 void vertex3fv(const Vertex& v) {
@@ -69,7 +70,7 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t) {
 	glDisable(GL_LIGHTING);
 }
 
-void MeshRenderer::renderVertices(const Mesh& mesh, const Viewport* vp) {
+void MeshRenderer::renderVertices(const Mesh& mesh) {
 	for (const auto& v : mesh.vertices) {
 		glPointSize(4.0f);
 		renderVertex(v);
@@ -88,42 +89,19 @@ void MeshRenderer::renderTriangles(const Mesh& mesh) {
 	}
 }
 
-void MeshRenderer::renderProjectedVertices(const Mesh& mesh, const Viewport* vp) {
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
+void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
+	const bool isSelected = std::ranges::find_if(
+		context.selectedObjects,
+		[&mesh](const std::shared_ptr<Object>& obj) {
+			const auto meshPtr = dynamic_cast<const Mesh*>(obj.get());
+			return meshPtr != nullptr && *meshPtr == mesh;
+		}
+	) != context.selectedObjects.end();
 
-	glOrtho(0, vp->viewport[2], vp->viewport[3], 0, -1, 1);
-
-	// Switch to the model view matrix to render the text
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glBegin(GL_POINTS);
-	color3f(Color(255, 0, 0));
-	for (const auto& v : mesh.vertices) {
-		const auto projV = project(v, vp->viewport, vp->viewMatrix, vp->projMatrix);
-		glVertex2f(static_cast<float>(projV.x), static_cast<float>(projV.y));
-	}
-	glEnd();
-
-	// Restore the model view matrix
-	glPopMatrix();
-
-	// Restore the projection matrix (back to 3D perspective)
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-
-	// Switch back to the model view matrix
-	glMatrixMode(GL_MODELVIEW);
-}
-
-void MeshRenderer::render(const Mesh& mesh, const Vector3& camPos, const bool isSelected, const bool isEditMode, const Viewport* vp) {
 	// Draw the faces
 	renderTriangles(mesh);
 
-	if (isEditMode) {
+	if (context.selectionMode == EDIT) {
 		// Draw the edges
 		color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_EDGE_COLOR);
 		glLineWidth(2.0f);
@@ -132,18 +110,15 @@ void MeshRenderer::render(const Mesh& mesh, const Vector3& camPos, const bool is
 		// Draw the vertices
 		color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_VERT_COLOR);
 		glPointSize(4.0f);
-		renderVertices(mesh, vp);
+		renderVertices(mesh);
 
-		#ifdef RENDER_PROJECTED_VERTICES
-			renderProjectedVertices(mesh, vp);
-		#endif
 	} else if (isSelected) {
 		// Highlight only the outline of the Mesh in Object Mode
 		color3f(Colors::MESH_SELECT_COLOR);
 		glLineWidth(4.0f);
 		glPointSize(3.0f);
 		for (const auto& [edge, triangles] : mesh.edgeToFaceMap) {
-			if (isSilhouetteEdge(triangles, camPos)) {
+			if (isSilhouetteEdge(triangles, context.camPos)) {
 				// Highlight the silhouette edges
 				renderEdge(mesh, edge);
 
