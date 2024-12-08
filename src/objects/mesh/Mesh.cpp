@@ -33,13 +33,21 @@ void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) 
 	}
 
 	// Update vertex data
-	for (auto& vertex : vertices) {
+	for (const auto& vertex : vertices) {
 		switch (mode.mode) {
 			case Mode::GRAB:   vertex->position = vertex->position + getPosition() - oldPos; break;
 			case Mode::SCALE:  vertex->position = oldPos + (vertex->position - oldPos) * (getScale() / oldScale); break;
 			case Mode::ROTATE: vertex->position = oldPos + vector3(transformation * vector4(vertex->position - oldPos)); break;
 			default: ;
 		}
+	}
+
+	updateVertexNormals();
+}
+
+void Mesh::updateVertexNormals() const {
+	for (const auto& v : vertices) {
+		v->normal = (v->position - getPosition()).normalize();
 	}
 }
 

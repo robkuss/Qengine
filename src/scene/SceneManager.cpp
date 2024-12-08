@@ -17,12 +17,14 @@ SceneManager::SceneManager() {
 	cube->setPosition(Vector3(0.5f, 1.0f, 0.5f));
 	cube->setScale(Vector3::ONE);
 	cube->setRotation(Vector3::ZERO);
+	cube->updateVertexNormals();
 	addObject(cube);
 
 	const auto sphere = std::make_shared<Sphere>("Sphere", 0.5f, 64, 32);
 	sphere->setPosition(Vector3(0.5f, -1.0f, 0.5f));
 	sphere->setScale(Vector3::ONE);
 	sphere->setRotation(Vector3::ZERO);
+	sphere->updateVertexNormals();
 	addObject(sphere);
 
 	context = new RenderContext(selectionMode);

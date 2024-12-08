@@ -56,5 +56,7 @@ private:
 
 	void applyTransformation(const Mode& mode, const Matrix4& transformation);
 
+	void updateVertexNormals() const;
+
 	void setShadingMode(ShadingMode shadingMode);
 };

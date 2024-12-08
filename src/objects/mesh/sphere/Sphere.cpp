@@ -12,8 +12,6 @@ public:
 
         buildEdgeToFaceMap();
         buildVertexToEdgeMap();
-
-        initializeNormals();
     }
 
     ~Sphere() override = default;
