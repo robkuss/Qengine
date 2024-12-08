@@ -94,6 +94,13 @@ void Mesh::buildEdgeToFaceMap() {
 	}
 }
 
+void Mesh::initializeNormals() const {
+	for (auto& v : vertices) {
+		v->normal = vertexNormal(*v);
+	}
+}
+
+
 /** Helper function to add an edge to the map */
 void Mesh::addEdgeToMap(const Edge& e, const Triangle& t) {
 	// Ensure that the order of the vertices is consistent

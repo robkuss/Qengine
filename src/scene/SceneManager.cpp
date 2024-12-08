@@ -4,18 +4,27 @@
 
 #include <math/vector/Vector2.h>
 #include <scene/graphics/MeshRenderer.h>
+
 #include <objects/mesh/cube/Cube.cpp>
+#include <objects/mesh/sphere/Sphere.cpp>
 
 #include "RenderContext.h"
 
 
 SceneManager::SceneManager() {
-	// Add Default Cube to scene
+	// Add Default Cube and Sphere to scene
 	const auto cube = std::make_shared<Cube>("Cube", 1.0f);
-	cube->setPosition(Vector3(0.5f, 0.5f, 0.5f));
+	cube->setPosition(Vector3(0.5f, 1.0f, 0.5f));
 	cube->setScale(Vector3::ONE);
 	cube->setRotation(Vector3::ZERO);
 	addObject(cube);
+
+	const auto sphere = std::make_shared<Sphere>("Sphere", 0.5f, 32, 16);
+	sphere->setPosition(Vector3(0.5f, -1.0f, 0.5f));
+	sphere->setScale(Vector3::ONE);
+	sphere->setRotation(Vector3::ZERO);
+	addObject(sphere);
+
 	context = new RenderContext(selectionMode);
 }
 

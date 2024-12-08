@@ -6,8 +6,7 @@
 #include "Vertex.h"
 
 struct Edge {
-	std::shared_ptr<Vertex> v0;
-	std::shared_ptr<Vertex> v1;
+	std::shared_ptr<Vertex> v0, v1;
 
 	Edge(const std::shared_ptr<Vertex>& v0, const std::shared_ptr<Vertex>& v1) : v0(std::min(v0, v1)), v1(std::max(v0, v1)) {}
 

@@ -29,6 +29,7 @@ public:
 
 	void buildEdgeToFaceMap();
 	void buildVertexToEdgeMap();
+	void initializeNormals() const;
 
 	[[nodiscard]] std::vector<Triangle> getTriangles() const;
 

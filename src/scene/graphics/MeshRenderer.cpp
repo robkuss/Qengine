@@ -43,9 +43,9 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
             vertex3fv(*t.v1);
             vertex3fv(*t.v2);
         } else {
-            const Vector3 n0 = mesh.vertexNormal(*t.v0);
-            const Vector3 n1 = mesh.vertexNormal(*t.v1);
-            const Vector3 n2 = mesh.vertexNormal(*t.v2);
+            const Vector3 n0 = t.v0->normal;
+            const Vector3 n1 = t.v1->normal;
+            const Vector3 n2 = t.v2->normal;
 
             glNormal3f(n0.x, n0.y, n0.z);
             vertex3fv(*t.v0);
@@ -61,7 +61,6 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT1);
     glEnable(GL_LIGHT2);
-	glEnable(GL_CULL_FACE);   // Enable face culling to avoid rendering back faces
 
     // Draw the mesh with the base color
     drawWithColor(Colors::MESH_FACE_COLOR);
@@ -84,7 +83,6 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
 
     // Disable lighting after rendering
     glDisable(GL_LIGHTING);
-	glDisable(GL_CULL_FACE);  // Disable face culling when done
 }
 
 void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context) {

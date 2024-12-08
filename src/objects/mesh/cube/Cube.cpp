@@ -4,20 +4,23 @@
 
 class Cube final : public Mesh {
 public:
-    float s;    // side length
-
     /** Construct a Cube Mesh with given side length and position and default scale and rotation */
-    explicit Cube(const std::string& name, const float s) : Mesh{name, position, scale, rotation}, s(s) {
+    explicit Cube(const std::string& name, const float s)
+            : Mesh{name, position, scale, rotation}, s(s) {
         initializeVertices();
         initializeFaceIndices();
 
         buildEdgeToFaceMap();
         buildVertexToEdgeMap();
+
+        initializeNormals();
     }
 
     ~Cube() override = default;
 
 private:
+    float s;    // side length
+
     /** Initialize the Cube's vertices based on side length and position */
     void initializeVertices() override {
         // Front face

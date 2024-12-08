@@ -4,9 +4,11 @@
 #include <cmath>
 
 struct Vertex : Vector3 {
+	Vector3 normal;	  // Vertex normal
+
 	// Constructors
-	explicit Vertex(const Vector3& position) : Vector3(position.x, position.y, position.z) {}
-	explicit Vertex(const float x, const float y, const float z) : Vector3(x, y, z) {}
+	explicit Vertex(const Vector3& position) : Vector3(position.x, position.y, position.z), normal(0.0f, 0.0f, 0.0f) {}
+	explicit Vertex(const float x, const float y, const float z) : Vector3(x, y, z), normal(0.0f, 0.0f, 0.0f) {}
 
 	// Equality operator with floating-point tolerance
 	bool operator==(const Vertex& other) const {
