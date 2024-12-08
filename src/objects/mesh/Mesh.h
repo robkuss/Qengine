@@ -46,9 +46,6 @@ private:
 	virtual void initializeVertices()	 = 0;
 	virtual void initializeFaceIndices() = 0;
 
-	static Vector3 faceNormal(const Triangle& t);
-	[[nodiscard]] Vector3 vertexNormal(const Vertex &v) const;
-
 	[[nodiscard]] Triangle getTriangle(int index) const;
 
 	void addEdgeToMap(const Edge &e, const Triangle &t);

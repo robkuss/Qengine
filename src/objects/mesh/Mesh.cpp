@@ -94,13 +94,6 @@ void Mesh::buildEdgeToFaceMap() {
 	}
 }
 
-void Mesh::initializeNormals() const {
-	for (auto& v : vertices) {
-		v->normal = vertexNormal(*v);
-	}
-}
-
-
 /** Helper function to add an edge to the map */
 void Mesh::addEdgeToMap(const Edge& e, const Triangle& t) {
 	// Ensure that the order of the vertices is consistent
@@ -113,35 +106,26 @@ void Mesh::addEdgeToMap(const Edge& e, const Triangle& t) {
 	}
 }
 
+/** Calculate normals for each vertex */
+void Mesh::initializeNormals() const {
+	for (auto& v : vertices) {
+		v->normal = v->position.normalize();
+	}
+}
+/*void Mesh::initializeNormals() const {
+	for (auto& v : vertices) {
+		Vector3 accNormal = Vector3::ZERO;
+		for (const Triangle& t : getTriangles()) {
+			// Check if the current triangle contains the vertex
+			if (v == t.v0 || v == t.v1 || v == t.v2) {
+				// Accumulate the face normal
+				accNormal = accNormal + faceNormal(t);
+			}
+		}
+		v->normal = accNormal.normalize();
+	}
+}*/
+
 void Mesh::setShadingMode(const ShadingMode shadingMode) {
 	this->shadingMode = shadingMode;
-}
-
-
-// Helpers
-
-/** Calculate the normal for a face in the Mesh */
-Vector3 Mesh::faceNormal(const Triangle& t) {
-	// Compute the two edge vectors
-	const Vector3 e1 = t.v1->position - t.v0->position;
-	const Vector3 e2 = t.v2->position - t.v0->position;
-
-	// Compute the normal using the cross product
-	return e1.cross(e2).normalize();
-}
-
-/** Calculate the normal for a vertex in the Mesh */
-Vector3 Mesh::vertexNormal(const Vertex& v) const {
-	Vector3 accNormal(0.0f, 0.0f, 0.0f);
-
-	for (const Triangle& t : getTriangles()) {
-		// Check if the current triangle contains the vertex
-		if (v == *t.v0 || v == *t.v1 || v == *t.v2) {
-			// Accumulate the face normal
-			accNormal = accNormal + faceNormal(t);
-		}
-	}
-
-	// Normalize the accumulated normal
-	return accNormal.normalize();
 }

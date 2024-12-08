@@ -30,36 +30,27 @@ void MeshRenderer::renderEdge(const Edge& e, const Color& firstColor, const Colo
 void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const bool isSelected) {
     // Function to draw a triangle with a specified color and transparency
     auto drawWithColor = [&mesh, &t](const Color& color) {
+    	const bool isFlatShading = mesh.shadingMode == ShadingMode::FLAT;
+
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color.toGLfloat());
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, color.toGLfloat());
         glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0f);
 
         glBegin(GL_TRIANGLES);
-        // Choose the shading mode
-        if (mesh.shadingMode == ShadingMode::FLAT) {
-            const Vector3 normal = Mesh::faceNormal(t);
-            glNormal3f(normal.x, normal.y, normal.z);
-            vertex3fv(*t.v0);
-            vertex3fv(*t.v1);
-            vertex3fv(*t.v2);
-        } else {
-            const Vector3 n0 = t.v0->normal;
-            const Vector3 n1 = t.v1->normal;
-            const Vector3 n2 = t.v2->normal;
-
-            glNormal3f(n0.x, n0.y, n0.z);
-            vertex3fv(*t.v0);
-            glNormal3f(n1.x, n1.y, n1.z);
-            vertex3fv(*t.v1);
-            glNormal3f(n2.x, n2.y, n2.z);
-            vertex3fv(*t.v2);
-        }
+    	for (const auto& v : {t.v0, t.v1, t.v2}) {
+    		// Choose the shading mode
+    		const auto normal = isFlatShading
+    			? faceNormal(t)		// Flat shading
+    			: v->normal;		// Smooth shading
+    		glNormal3f(normal.x, normal.y, normal.z);
+    		vertex3fv(*v);
+    	}
         glEnd();
     };
 
     // Enable lighting
     glEnable(GL_LIGHTING);
-    //glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHT1);
     //glEnable(GL_LIGHT2);
 
     // Draw the mesh with the base color
@@ -173,8 +164,8 @@ bool MeshRenderer::isSilhouetteEdge(const std::pair<Edge, std::vector<Triangle>>
 	const Triangle& tri2 = edgeEntry.second[1];
 
 	// Compute face normals
-	const Vector3 normal1 = Mesh::faceNormal(tri1);
-	const Vector3 normal2 = Mesh::faceNormal(tri2);
+	const Vector3 normal1 = faceNormal(tri1);
+	const Vector3 normal2 = faceNormal(tri2);
 
 	// Calculate camera view direction for each triangle
 	const Vector3 viewDir1 = (context.camPos - tri1.centroid()).normalize();

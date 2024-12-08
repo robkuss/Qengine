@@ -340,11 +340,8 @@ void Viewport::drawMouseRay() const {
 }
 
 void Viewport::setLight(const Color& diffuse, const Color& ambient, const Color& specular) {
-	constexpr float noLight[4] = {0.0, 0.0, 0.0, 1.0};
+	constexpr float noLight[4] = {0, 0, 0, 1};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
-
-	glEnable(GL_LIGHT1);
-	glEnable(GL_LIGHT2);
 
 	const float diffuseF[3] = {diffuse.red(), diffuse.green(), diffuse.blue()};
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseF);

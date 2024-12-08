@@ -20,13 +20,12 @@ public:
 
 private:
     float radius;   // Sphere radius
-
     int segments;   // Number of vertical slices
     int rings;      // Number of horizontal slices
 
-    /** Initialize the Sphere's vertices based on radius, segments, and rings */
+    /** Initialize the Sphere's Vertices based on radius, segments, and rings */
     void initializeVertices() override {
-        vertices.emplace_back(std::make_shared<Vertex>(0, 0, radius)); // Top pole
+        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, radius)); // Top pole
         for (int ring = 1; ring < rings; ++ring) {
             const auto theta = static_cast<float>(PI * ring / rings); // Latitude angle
             const float sinTheta = sin(theta);
@@ -43,17 +42,17 @@ private:
                 vertices.emplace_back(std::make_shared<Vertex>(x, y, z));
             }
         }
-        vertices.emplace_back(std::make_shared<Vertex>(0, 0, -radius)); // Bottom pole
+        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, -radius)); // Bottom pole
     }
 
-    /** Initialize the Sphere's face indices to form the mesh */
+    /** Initialize the Sphere's face indices to form the Mesh */
     void initializeFaceIndices() override {
         // Top pole faces
         for (int seg = 0; seg < segments; ++seg) {
             const int nextSeg = (seg + 1) % segments;
             faceIndices.push_back(1 + seg);       // First vertex
-            faceIndices.push_back(0);            // Top pole vertex
-            faceIndices.push_back(1 + nextSeg);  // Second vertex
+            faceIndices.push_back(1 + nextSeg);   // Second vertex
+            faceIndices.push_back(0);             // Top pole vertex
         }
 
         // Middle faces
@@ -67,13 +66,13 @@ private:
 
                 // First triangle
                 faceIndices.push_back(current);
-                faceIndices.push_back(next);
                 faceIndices.push_back(below);
+                faceIndices.push_back(next);
 
                 // Second triangle
                 faceIndices.push_back(next);
-                faceIndices.push_back(belowNext);
                 faceIndices.push_back(below);
+                faceIndices.push_back(belowNext);
             }
         }
 
@@ -82,8 +81,8 @@ private:
         for (int seg = 0; seg < segments; ++seg) {
             const int nextSeg = (seg + 1) % segments;
             faceIndices.push_back(bottomPoleIndex - segments + nextSeg); // First vertex
-            faceIndices.push_back(bottomPoleIndex);                         // Bottom pole vertex
             faceIndices.push_back(bottomPoleIndex - segments + seg);     // Second vertex
+            faceIndices.push_back(bottomPoleIndex);                         // Bottom pole vertex
         }
     }
 };
