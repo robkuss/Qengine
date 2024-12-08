@@ -89,7 +89,6 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 			for (const auto& v : mesh->vertices) {
 				if (const auto projV = project(*v, context->viewport, context->viewMatrix, context->projMatrix); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
 					intersectingVertices.push_back(v);
-					std::cout << "found vertex: " << v->x << ", " << v->y << ", " << v->z << std::endl;
 				}
 			}
 
@@ -121,6 +120,8 @@ void SceneManager::selectObject(const std::shared_ptr<Object>& obj) {
 	if (std::ranges::find(selectedObjects, obj) == selectedObjects.end()) {
 		selectedObjects.push_back(obj);
 		context->selectedObjects = selectedObjects;
+	} else {
+		deselectObject(obj);
 	}
 }
 
@@ -135,6 +136,8 @@ void SceneManager::selectVertex(const std::shared_ptr<Vertex>& v) {
 	if (std::ranges::find(selectedVertices, v) == selectedVertices.end()) {
 		selectedVertices.push_back(v);
 		context->selectedVertices = selectedVertices;
+	} else {
+		deselectVertex(v);
 	}
 }
 

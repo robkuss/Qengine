@@ -18,65 +18,85 @@ void MeshRenderer::renderVertex(const std::shared_ptr<Vertex>& v) {
 	glEnd();
 }
 
-void MeshRenderer::renderEdge(const Mesh& mesh, const std::pair<int, int>& e) {
+void MeshRenderer::renderEdge(const Mesh& mesh, const std::pair<int, int>& e, const Color& firstColor, const Color& secondColor) {
 	glBegin(GL_LINES);
+	color3f(firstColor);
 	vertex3fv(mesh.vertices[e.first]);
+	color3f(secondColor);
 	vertex3fv(mesh.vertices[e.second]);
 	glEnd();
 }
 
-void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const Color& baseColor) {
-	// Enable lighting
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT1);
-	glEnable(GL_LIGHT2);
+void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const bool isSelected) {
+    // Function to draw a triangle with a specified color and transparency
+    auto drawWithColor = [&mesh, &t](const Color& color) {
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color.toGLfloat());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, color.toGLfloat());
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0f);
 
-	// Apply material
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, baseColor.toGLfloat());
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, baseColor.toGLfloat());
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0f);
+        glBegin(GL_TRIANGLES);
+        // Choose the shading mode
+        if (mesh.shadingMode == ShadingMode::FLAT) {
+            const Vector3 normal = Mesh::faceNormal(t);
+            glNormal3f(normal.x, normal.y, normal.z);
+            vertex3fv(t.v0);
+            vertex3fv(t.v1);
+            vertex3fv(t.v2);
+        } else {
+            const Vector3 n0 = mesh.vertexNormal(t.v0);
+            const Vector3 n1 = mesh.vertexNormal(t.v1);
+            const Vector3 n2 = mesh.vertexNormal(t.v2);
 
-	glBegin(GL_TRIANGLES);
-	if (mesh.shadingMode == ShadingMode::FLAT) {
-		// Compute face normals
-		const Vector3 normal = Mesh::faceNormal(t);
+            glNormal3f(n0.x, n0.y, n0.z);
+            vertex3fv(t.v0);
+            glNormal3f(n1.x, n1.y, n1.z);
+            vertex3fv(t.v1);
+            glNormal3f(n2.x, n2.y, n2.z);
+            vertex3fv(t.v2);
+        }
+        glEnd();
+    };
 
-		// Draw the Triangle with a single normal
-		glNormal3f(normal.x, normal.y, normal.z);
-		vertex3fv(t.v0);
-		vertex3fv(t.v1);
-		vertex3fv(t.v2);
-	} else {
-		// Compute vertex normals
-		const Vector3 n0 = mesh.vertexNormal(t.v0);
-		const Vector3 n1 = mesh.vertexNormal(t.v1);
-		const Vector3 n2 = mesh.vertexNormal(t.v2);
+    // Enable lighting
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHT2);
+	glEnable(GL_CULL_FACE);   // Enable face culling to avoid rendering back faces
 
-		// Draw the Triangle with per-vertex normals
-		glNormal3f(n0.x, n0.y, n0.z);
-		vertex3fv(t.v0);
-		glNormal3f(n1.x, n1.y, n1.z);
-		vertex3fv(t.v1);
-		glNormal3f(n2.x, n2.y, n2.z);
-		vertex3fv(t.v2);
-	}
-	glEnd();
+    // Draw the mesh with the base color
+    drawWithColor(Colors::MESH_FACE_COLOR);
 
-	// Disable lighting
-	glDisable(GL_LIGHTING);
+    if (isSelected) {
+    	// Disable depth testing to ensure selection color overlays correctly
+    	glDisable(GL_DEPTH_TEST);
+
+        // Enable blending only for the selection color
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        // Draw the selection color
+        drawWithColor(Colors::MESH_SELECT_COLOR.transparent(0.3f));
+
+        // Disable blending after drawing the selection color
+        glDisable(GL_BLEND);
+    	glEnable(GL_DEPTH_TEST);  // Re-enable depth testing
+    }
+
+    // Disable lighting after rendering
+    glDisable(GL_LIGHTING);
+	glDisable(GL_CULL_FACE);  // Disable face culling when done
 }
 
 void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context) {
 	glPointSize(4.0f);
 
 	for (const auto& v : mesh.vertices) {
-		if (std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end()) {
-			color3f(Colors::MESH_SELECT_COLOR);
-			renderVertex(v);
-		} else {
-			color3f(Colors::MESH_VERT_COLOR);
-			renderVertex(v);
-		}
+		// Highlight if the Vertex is currently selected
+		const auto color = std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end()
+			? Colors::MESH_SELECT_COLOR
+			: Colors::MESH_VERT_COLOR;
+		color3f(color);
+		renderVertex(v);
 	}
 }
 
@@ -84,28 +104,26 @@ void MeshRenderer::renderEdges(const Mesh& mesh, const RenderContext& context) {
 	glLineWidth(2.0f);
 
 	for (const auto& edge : mesh.edgeToFaceMap | std::views::keys) {
-		for (const auto& v : mesh.vertices) {
-			if (std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end()) {
-				color3f(Colors::MESH_SELECT_COLOR);
-				for (const auto& e : mesh.vertexToEdgeMap.at(v)) {
-					renderEdge(mesh, e);
-				}
-			}
-		}
-		color3f(Colors::MESH_EDGE_COLOR);
-		renderEdge(mesh, edge);
+		// Highlight if either of the 2 Vertices of the Edge are currently selected
+		const auto firstColor = std::ranges::find(context.selectedVertices, mesh.vertices[edge.first]) != context.selectedVertices.end()
+			? Colors::MESH_SELECT_COLOR
+			: Colors::MESH_EDGE_COLOR;
+		const auto secondColor = std::ranges::find(context.selectedVertices, mesh.vertices[edge.second]) != context.selectedVertices.end()
+			? Colors::MESH_SELECT_COLOR
+			: Colors::MESH_EDGE_COLOR;
+		renderEdge(mesh, edge, firstColor, secondColor);
 	}
 }
 
 void MeshRenderer::renderTriangles(const Mesh& mesh, const RenderContext& context) {
 	for (const auto& triangle : mesh.getTriangles()) {
-		const auto baseColor =
-			   std::ranges::find(context.selectedVertices, triangle.v0) != context.selectedVertices.end()
-			&& std::ranges::find(context.selectedVertices, triangle.v1) != context.selectedVertices.end()
-			&& std::ranges::find(context.selectedVertices, triangle.v2) != context.selectedVertices.end()
-			? Colors::MESH_SELECT_COLOR
-			: Colors::MESH_FACE_COLOR;
-		renderTriangle(mesh, triangle, baseColor);
+		// Highlight if all 3 Vertices of the Triangle are currently selected
+		const auto vertices = {triangle.v0, triangle.v1, triangle.v2};
+		const auto isSelected = std::ranges::all_of(vertices,
+		    [&context](const auto& vertex) {
+			    return std::ranges::find(context.selectedVertices, vertex) != context.selectedVertices.end();
+		    });
+		renderTriangle(mesh, triangle, isSelected);
 	}
 }
 
@@ -130,13 +148,13 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 
 	} else if (isSelected) {
 		// Highlight only the outline of the Mesh in Object Mode
-		color3f(Colors::MESH_SELECT_COLOR);
+		const auto color = Colors::MESH_SELECT_COLOR;
 		glLineWidth(4.0f);
 		glPointSize(3.0f);
 		for (const auto& [edge, triangles] : mesh.edgeToFaceMap) {
 			if (isSilhouetteEdge(triangles, context.camPos)) {
 				// Highlight the silhouette edges
-				renderEdge(mesh, edge);
+				renderEdge(mesh, edge, color, color);
 
 				// Also highlight the vertices of the silhouette edges
 				renderVertex(mesh.vertices[edge.first]);

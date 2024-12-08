@@ -19,8 +19,8 @@ public:
 
 private:
 	static void renderVertex(const std::shared_ptr<Vertex>& v);
-	static void renderEdge(const Mesh &mesh, const std::pair<int, int> &e);
-	static void renderTriangle(const Mesh &mesh, const Triangle &t, const Color &baseColor);
+	static void renderEdge(const Mesh &mesh, const std::pair<int, int> &e, const Color &firstColor, const Color &secondColor);
+	static void renderTriangle(const Mesh &mesh, const Triangle &t, bool isSelected);
 
 	static void renderVertices(const Mesh &mesh, const RenderContext &context);
 	static void renderEdges(const Mesh &mesh, const RenderContext &context);
