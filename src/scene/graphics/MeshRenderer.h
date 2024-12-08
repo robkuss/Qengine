@@ -20,7 +20,7 @@ private:
 	static void renderEdge(const Mesh &mesh, const std::pair<int, int> &e);
 	static void renderTriangle(const Mesh &mesh, const Triangle &t);
 
-	static void renderVertices(const Mesh& mesh);
+	static void renderVertices(const Mesh &mesh, const RenderContext &context);
 	static void renderEdges(const Mesh& mesh);
 	static void renderTriangles(const Mesh &mesh);
 

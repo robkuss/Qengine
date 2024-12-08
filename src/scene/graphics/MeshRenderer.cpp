@@ -70,8 +70,13 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t) {
 	glDisable(GL_LIGHTING);
 }
 
-void MeshRenderer::renderVertices(const Mesh& mesh) {
+void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context) {
 	for (const auto& v : mesh.vertices) {
+		color3f(
+			std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end()
+			? Colors::MESH_SELECT_COLOR
+			: Colors::MESH_VERT_COLOR
+		);
 		glPointSize(4.0f);
 		renderVertex(v);
 	}
@@ -103,14 +108,14 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 
 	if (context.selectionMode == EDIT) {
 		// Draw the edges
-		color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_EDGE_COLOR);
+		color3f(/*isSelected ? Colors::MESH_SELECT_COLOR : */Colors::MESH_EDGE_COLOR);
 		glLineWidth(2.0f);
 		renderEdges(mesh);
 
 		// Draw the vertices
-		color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_VERT_COLOR);
+		//color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_VERT_COLOR);
 		glPointSize(4.0f);
-		renderVertices(mesh);
+		renderVertices(mesh, context);
 
 	} else if (isSelected) {
 		// Highlight only the outline of the Mesh in Object Mode

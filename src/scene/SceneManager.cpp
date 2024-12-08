@@ -73,9 +73,12 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 					}
 				)
 			);
-		} else if (!preserve) {
+		}
+
+		if (!preserve && intersectingObjects.empty()) {
 			// Deselect all previously selected Objects
-			for (const auto& obj : selectedObjects) deselectObject(obj);
+			selectedObjects.clear();
+			context->selectedObjects = selectedObjects;
 		}
 	}
 
@@ -100,10 +103,13 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 						}
 					)
 				);
-			} else if (!preserve) {
-				// Deselect all previously selected Vertices
-				for (const auto obj : selectedVertices) deselectVertex(obj);
 			}
+		}
+
+		if (!preserve && intersectingVertices.empty()) {
+			// Deselect all previously selected Vertices
+			selectedVertices.clear();
+			context->selectedVertices = selectedVertices;
 		}
 	}
 
