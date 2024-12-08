@@ -63,8 +63,8 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 			}
 		}
 
+		// Select the Object that's closest to the Ray origin (the camera)
 		if (!intersectingObjects.empty()) {
-			// Select the Object that's closest to the Ray origin (the camera)
 			selectObject(
 				*std::ranges::min_element(
 					intersectingObjects,
@@ -73,15 +73,14 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 					}
 				)
 			);
-		}
-
-		if (!preserve && intersectingObjects.empty()) {
+		} else if (!preserve) {
 			deselectAllObjects();
 		}
 	}
 
 	// If in Edit Mode, select specific Vertices
 	else if (selectionMode == EDIT) {
+		// Find Vertices that intersect with the mouse Ray
 		std::vector<Vertex> intersectingVertices;
 		for (const auto& mesh : getSelectedMeshes()) {
 			for (const auto& v : mesh->vertices) {
@@ -90,8 +89,8 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 				}
 			}
 
+			// Select the Vertex that's closest to the Ray origin (the camera)
 			if (!intersectingVertices.empty()) {
-				// Select the Vertex that's closest to the Ray origin (the camera)
 				selectVertex(
 					*std::ranges::min_element(
 						intersectingVertices,
@@ -100,9 +99,7 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 						}
 					)
 				);
-			}
-
-			if (!preserve && intersectingVertices.empty()) {
+			} else if (!preserve) {
 				deselectAllVertices();
 			}
 		}
@@ -203,7 +200,6 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 				break;
 			}
 			case Mode::SCALE: {
-				// Compute scaling matrix based on mouse position and object distance
 				const auto screenCenter = Vector2(width / 2.0, height / 2.0);
 				const auto mousePos		= Vector2(mouseX, mouseY);
 				const Matrix4 transform	= Matrix4::scale(
@@ -241,25 +237,31 @@ void SceneManager::applyTransformation() {
 
 void SceneManager::toggleSelectionMode() {
 	if (selectionMode == OBJECT) {
+		// Don't change mode if no Object is selected
 		if (!selectedObjects.empty()) {
 			selectionMode = EDIT;
 		}
 	} else if (selectionMode == EDIT) {
 		selectionMode = OBJECT;
 	}
+	context->selectionMode = selectionMode;
+
 	// Reset vertex selection data
 	deselectAllVertices();
-	context->selectionMode = selectionMode;
 }
 
 void SceneManager::setTransformMode(const Mode& mode) {
-	if (selectedObjects.empty()) return;	// Don't change mode if no Object is selected
+	// Don't change mode if no Object is selected
+	if (selectedObjects.empty()) return;
 	transformMode = mode;
-	transformMode.subMode = SubMode::NONE;		// Reset direction
+
+	// Reset direction
+	transformMode.subMode = SubMode::NONE;
 }
 
 void SceneManager::setTransformSubMode(const SubMode& subMode) {
-	if (selectedObjects.empty()) return;	// Don't change mode if no Object is selected
+	// Don't change mode if no Object is selected
+	if (selectedObjects.empty()) return;
 	if (transformMode.type != ModeType::TRANSFORM) {
 		transformMode.subMode = subMode;
 	}
