@@ -4,10 +4,13 @@
 #include <map>
 #include <vector>
 
-#include <objects/Object.h>
-#include <scene/Mode.h>
-#include <math/geometry/Vertex.h>
-#include <math/geometry/Triangle.h>
+#include "objects/Object.h"
+#include "scene/Mode.h"
+
+#include "math/geometry/Vertex.h"
+#include "math/geometry/Edge.h"
+#include "math/geometry/Triangle.h"
+
 
 enum class ShadingMode {
 	FLAT,
@@ -33,9 +36,9 @@ private:
 	friend class SceneManager;
 	friend class MeshRenderer;
 
-	// Edge-to-face adjacency information
-	std::map<std::pair<int, int>, std::vector<Triangle>> edgeToFaceMap;
-	std::map<std::shared_ptr<Vertex>, std::vector<std::pair<int, int>>> vertexToEdgeMap;
+	// adjacency information
+	std::map<Edge, std::vector<Triangle>> edgeToFaceMap;
+	std::map<std::shared_ptr<Vertex>, std::vector<Edge>> vertexToEdgeMap;
 
 	ShadingMode shadingMode = ShadingMode::FLAT;
 
@@ -47,7 +50,7 @@ private:
 
 	[[nodiscard]] Triangle getTriangle(int index) const;
 
-	void addEdgeToMap(int v0, int v1, const Triangle& t);
+	void addEdgeToMap(const Edge &e, const Triangle &t);
 
 	void setPosition(const Vector3& translation);
 	void setScale(const Vector3& scale);

@@ -68,7 +68,7 @@ void Mesh::buildVertexToEdgeMap() {
 	// Use shared_ptr to store the vertices in the map
 	for (const auto& v : vertices) {
 		for (const auto& e: edgeToFaceMap | std::views::keys) {
-			if (vertices[e.first] == v || vertices[e.second] == v) {
+			if (e.v0 == v || e.v1 == v) {
 				// Store the shared pointer to the vertex in the map
 				if (!vertexToEdgeMap.contains(v)) {
 					vertexToEdgeMap[v] = std::vector {e};
@@ -85,32 +85,24 @@ void Mesh::buildEdgeToFaceMap() {
 	edgeToFaceMap.clear();
 
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
-		// Get the 3 vertices that form a Triangle
-		const int v0 = faceIndices[i];
-		const int v1 = faceIndices[i + 1];
-		const int v2 = faceIndices[i + 2];
-
 		const Triangle t = getTriangle(i);
 
 		// Add edges to the adjacency map
-		addEdgeToMap(v0, v1, t);
-		addEdgeToMap(v1, v2, t);
-		addEdgeToMap(v2, v0, t);
+		addEdgeToMap(Edge(t.v0, t.v1), t);
+		addEdgeToMap(Edge(t.v1, t.v2), t);
+		addEdgeToMap(Edge(t.v2, t.v0), t);
 	}
 }
 
 /** Helper function to add an edge to the map */
-void Mesh::addEdgeToMap(int v0, int v1, const Triangle& t) {
+void Mesh::addEdgeToMap(const Edge& e, const Triangle& t) {
 	// Ensure that the order of the vertices is consistent
-	if (const std::pair<int, int> edge = v0 < v1
-				? std::make_pair(v0, v1)
-				: std::make_pair(v1, v0);
-			!edgeToFaceMap.contains(edge)) {
+	if (!edgeToFaceMap.contains(e)) {
 		// If the edge is not in the map, initialize it with a new vector containing faceIndex
-		edgeToFaceMap[edge] = std::vector {t};
+		edgeToFaceMap[e] = std::vector {t};
 	} else {
 		// If the edge already exists, add faceIndex to the existing vector
-		edgeToFaceMap[edge].push_back(t);
+		edgeToFaceMap[e].push_back(t);
 	}
 }
 

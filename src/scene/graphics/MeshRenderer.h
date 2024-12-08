@@ -1,6 +1,5 @@
 #pragma once
 
-#include <utility>
 #include <vector>
 
 #include <objects/mesh/Mesh.h>
@@ -19,12 +18,12 @@ public:
 
 private:
 	static void renderVertex(const std::shared_ptr<Vertex>& v);
-	static void renderEdge(const Mesh &mesh, const std::pair<int, int> &e, const Color &firstColor, const Color &secondColor);
+	static void renderEdge(const Edge &e, const Color &firstColor, const Color &secondColor);
 	static void renderTriangle(const Mesh &mesh, const Triangle &t, bool isSelected);
 
 	static void renderVertices(const Mesh &mesh, const RenderContext &context);
 	static void renderEdges(const Mesh &mesh, const RenderContext &context);
 	static void renderTriangles(const Mesh &mesh, const RenderContext &context);
 
-	static bool isSilhouetteEdge(const std::vector<Triangle>& triangles, Vector3 camPos);
+	static bool isSilhouetteEdge(const std::pair<Edge, std::vector<Triangle>> &edgeEntry, const RenderContext &context);
 };

@@ -98,7 +98,7 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 					*std::ranges::min_element(
 						intersectingVertices,
 						[&ray](const std::shared_ptr<Vertex>& a, const std::shared_ptr<Vertex>& b) {
-							return a->distance(ray->origin) < b->distance(ray->origin);
+							return static_cast<Vector3>(*a).distance(ray->origin) < static_cast<Vector3>(*b).distance(ray->origin);
 						}
 					)
 				);
