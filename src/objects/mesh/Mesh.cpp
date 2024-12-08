@@ -1,16 +1,18 @@
 #include "Mesh.h"
 
+#include <ranges>
+
 void Mesh::setPosition(const Vector3& translation) {
 	this->position = Matrix4::translate(translation);
-	for (Vector3& vertex : vertices) {
-		vertex = vertex + translation;
+	for (auto& vertex : vertices) {
+		*vertex += translation;
 	}
 }
 
 void Mesh::setScale(const Vector3& scale) {
 	this->scale	= Matrix4::scale(scale);
-	for (Vector3& vertex : vertices) {
-		vertex = vertex * scale;
+	for (auto& vertex : vertices) {
+		*vertex *= scale;
 	}
 }
 
@@ -31,22 +33,22 @@ void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) 
 	}
 
 	// Update vertex data
-	for (Vertex& vertex : vertices) {
+	for (auto& vertex : vertices) {
 		switch (mode.mode) {
-			case Mode::GRAB:   vertex += getPosition() - oldPos; break;
-			case Mode::SCALE:  vertex = Vertex(oldPos + (vertex - oldPos) * (getScale() / oldScale)); break;
-			case Mode::ROTATE: vertex = Vertex(oldPos + vector3(transformation * vector4(vertex - oldPos))); break;
+			case Mode::GRAB:   *vertex = *vertex + getPosition() - oldPos; break;
+			case Mode::SCALE:  *vertex = oldPos + (*vertex - oldPos) * (getScale() / oldScale); break;
+			case Mode::ROTATE: *vertex = oldPos + vector3(transformation * vector4(*vertex - oldPos)); break;
 			default: ;
 		}
 	}
 }
 
 Triangle Mesh::getTriangle(const int index) const {
-	const Vertex& v0 = vertices[faceIndices[index]];
-	const Vertex& v1 = vertices[faceIndices[index + 1]];
-	const Vertex& v2 = vertices[faceIndices[index + 2]];
+	const auto v0 = vertices[faceIndices[index]];
+	const auto v1 = vertices[faceIndices[index + 1]];
+	const auto v2 = vertices[faceIndices[index + 2]];
 
-	return {v0, v1, v2};
+	return {*v0, *v1, *v2};
 }
 
 std::vector<Triangle> Mesh::getTriangles() const {
@@ -57,6 +59,25 @@ std::vector<Triangle> Mesh::getTriangles() const {
 	}
 
 	return triangles;
+}
+
+/** Build the vertex-to-edge adjacency map for the mesh */
+void Mesh::buildVertexToEdgeMap() {
+	vertexToEdgeMap.clear();
+
+	// Use shared_ptr to store the vertices in the map
+	for (const auto& v : vertices) {
+		for (const auto& e: edgeToFaceMap | std::views::keys) {
+			if (vertices[e.first] == v || vertices[e.second] == v) {
+				// Store the shared pointer to the vertex in the map
+				if (!vertexToEdgeMap.contains(v)) {
+					vertexToEdgeMap[v] = std::vector {e};
+				} else {
+					vertexToEdgeMap[v].push_back(e);
+				}
+			}
+		}
+	}
 }
 
 /** Build the edge-to-face adjacency map for the mesh */

@@ -24,8 +24,8 @@ void MeshRenderer::renderVertex(const Vertex& v) {
 
 void MeshRenderer::renderEdge(const Mesh& mesh, const std::pair<int, int>& e) {
 	glBegin(GL_LINES);
-	vertex3fv(mesh.vertices[e.first]);
-	vertex3fv(mesh.vertices[e.second]);
+	vertex3fv(*mesh.vertices[e.first]);
+	vertex3fv(*mesh.vertices[e.second]);
 	glEnd();
 }
 
@@ -72,13 +72,17 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t) {
 
 void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context) {
 	for (const auto& v : mesh.vertices) {
+		const bool isSelected = std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end();
 		color3f(
-			std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end()
+			isSelected
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_VERT_COLOR
 		);
-		glPointSize(4.0f);
-		renderVertex(v);
+		renderVertex(*v);
+		for (const auto& edge : mesh.vertexToEdgeMap.at(v)) {
+			color3f(Colors::MESH_SELECT_COLOR);
+			renderEdge(mesh, edge);
+		}
 	}
 }
 
@@ -108,7 +112,7 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 
 	if (context.selectionMode == EDIT) {
 		// Draw the edges
-		color3f(/*isSelected ? Colors::MESH_SELECT_COLOR : */Colors::MESH_EDGE_COLOR);
+		color3f(/*isSelected ? Colors::MESH_SELECT_COLOR : */Colors::MESH_EDGE_COLOR);	// TODO
 		glLineWidth(2.0f);
 		renderEdges(mesh);
 
@@ -128,8 +132,8 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 				renderEdge(mesh, edge);
 
 				// Also highlight the vertices of the silhouette edges
-				renderVertex(mesh.vertices[edge.first]);
-				renderVertex(mesh.vertices[edge.second]);
+				renderVertex(*mesh.vertices[edge.first]);
+				renderVertex(*mesh.vertices[edge.second]);
 			}
 		}
 	}

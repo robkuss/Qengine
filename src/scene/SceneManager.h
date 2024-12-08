@@ -29,7 +29,7 @@ private:
 
 	std::vector<std::shared_ptr<Object>> sceneObjects;		// Scene Objects as shared pointers to prevent object slicing
 	std::vector<std::shared_ptr<Object>> selectedObjects;
-	std::vector<Vertex> selectedVertices;
+	std::vector<std::shared_ptr<Vertex>> selectedVertices;
 
 	float scalingSens		= 1000.0f;
 	Vector3 lastTransform   = Vector3::ZERO;
@@ -40,8 +40,8 @@ private:
 	void select(const Vector2 &mousePos, bool preserve);
 	void selectObject(const std::shared_ptr<Object>& obj);
 	void deselectObject(const std::shared_ptr<Object> &obj);
-	void selectVertex(const Vertex &v);
-	void deselectVertex(const Vertex &v);
+	void selectVertex(const std::shared_ptr<Vertex> &v);
+	void deselectVertex(const std::shared_ptr<Vertex> &v);
 
 	[[nodiscard]] std::vector<std::shared_ptr<Mesh>> getSelectedMeshes() const;
 

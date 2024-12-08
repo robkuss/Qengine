@@ -16,11 +16,26 @@ struct Vertex : Vector3 {
 		return z < other.z;
 	}
 
+	Vertex& operator=(const Vector3& other) {
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		return *this;
+	}
+
 	// In-place addition operator
 	Vertex& operator+=(const Vector3& other) {
 		x += other.x;
 		y += other.y;
 		z += other.z;
+		return *this;
+	}
+
+	// In-place multiplication operator
+	Vertex& operator*=(const Vector3& other) {
+		x *= other.x;
+		y *= other.y;
+		z *= other.z;
 		return *this;
 	}
 };

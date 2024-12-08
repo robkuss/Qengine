@@ -16,7 +16,7 @@ enum class ShadingMode {
 
 class Mesh : public Object {
 public:
-	std::vector<Vertex> vertices = {};
+	std::vector<std::shared_ptr<Vertex>> vertices = {};
 	std::vector<int> faceIndices = {};
 
 	// Constructor & Destructor
@@ -25,6 +25,7 @@ public:
 	~Mesh() override = default;
 
 	void buildEdgeToFaceMap();
+	void buildVertexToEdgeMap();
 
 	[[nodiscard]] std::vector<Triangle> getTriangles() const;
 
@@ -34,6 +35,7 @@ private:
 
 	// Edge-to-face adjacency information
 	std::map<std::pair<int, int>, std::vector<Triangle>> edgeToFaceMap;
+	std::map<std::shared_ptr<Vertex>, std::vector<std::pair<int, int>>> vertexToEdgeMap;
 
 	ShadingMode shadingMode = ShadingMode::FLAT;
 
