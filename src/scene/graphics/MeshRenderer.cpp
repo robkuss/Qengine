@@ -1,9 +1,5 @@
 #include "MeshRenderer.h"
 
-// Ensure proper linkage and calling convention for Windows API functions
-#define WINGDIAPI __declspec(dllimport)
-#define APIENTRY __stdcall
-
 #include <GL/gl.h>
 
 #include <ranges>
@@ -29,15 +25,15 @@ void MeshRenderer::renderEdge(const Mesh& mesh, const std::pair<int, int>& e) {
 	glEnd();
 }
 
-void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t) {
+void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const Color& baseColor) {
 	// Enable lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT1);
 	glEnable(GL_LIGHT2);
 
 	// Apply material
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Colors::MESH_FACE_COLOR.toGLfloat());
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Colors::MESH_FACE_COLOR.toGLfloat());
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, baseColor.toGLfloat());
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, baseColor.toGLfloat());
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0f);
 
 	glBegin(GL_TRIANGLES);
@@ -71,30 +67,45 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t) {
 }
 
 void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context) {
+	glPointSize(4.0f);
+
 	for (const auto& v : mesh.vertices) {
-		const bool isSelected = std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end();
-		color3f(
-			isSelected
-			? Colors::MESH_SELECT_COLOR
-			: Colors::MESH_VERT_COLOR
-		);
-		renderVertex(v);
-		for (const auto& edge : mesh.vertexToEdgeMap.at(v)) {
+		if (std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end()) {
 			color3f(Colors::MESH_SELECT_COLOR);
-			renderEdge(mesh, edge);
+			renderVertex(v);
+		} else {
+			color3f(Colors::MESH_VERT_COLOR);
+			renderVertex(v);
 		}
 	}
 }
 
-void MeshRenderer::renderEdges(const Mesh& mesh) {
-	for (const auto& edge: mesh.edgeToFaceMap | std::views::keys) {
+void MeshRenderer::renderEdges(const Mesh& mesh, const RenderContext& context) {
+	glLineWidth(2.0f);
+
+	for (const auto& edge : mesh.edgeToFaceMap | std::views::keys) {
+		for (const auto& v : mesh.vertices) {
+			if (std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end()) {
+				color3f(Colors::MESH_SELECT_COLOR);
+				for (const auto& e : mesh.vertexToEdgeMap.at(v)) {
+					renderEdge(mesh, e);
+				}
+			}
+		}
+		color3f(Colors::MESH_EDGE_COLOR);
 		renderEdge(mesh, edge);
 	}
 }
 
-void MeshRenderer::renderTriangles(const Mesh& mesh) {
+void MeshRenderer::renderTriangles(const Mesh& mesh, const RenderContext& context) {
 	for (const auto& triangle : mesh.getTriangles()) {
-		renderTriangle(mesh, triangle);
+		const auto baseColor =
+			   std::ranges::find(context.selectedVertices, triangle.v0) != context.selectedVertices.end()
+			&& std::ranges::find(context.selectedVertices, triangle.v1) != context.selectedVertices.end()
+			&& std::ranges::find(context.selectedVertices, triangle.v2) != context.selectedVertices.end()
+			? Colors::MESH_SELECT_COLOR
+			: Colors::MESH_FACE_COLOR;
+		renderTriangle(mesh, triangle, baseColor);
 	}
 }
 
@@ -108,17 +119,13 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 	) != context.selectedObjects.end();
 
 	// Draw the faces
-	renderTriangles(mesh);
+	renderTriangles(mesh, context);
 
 	if (context.selectionMode == EDIT) {
 		// Draw the edges
-		color3f(/*isSelected ? Colors::MESH_SELECT_COLOR : */Colors::MESH_EDGE_COLOR);	// TODO
-		glLineWidth(2.0f);
-		renderEdges(mesh);
+		renderEdges(mesh, context);
 
 		// Draw the vertices
-		//color3f(isSelected ? Colors::MESH_SELECT_COLOR : Colors::MESH_VERT_COLOR);
-		glPointSize(4.0f);
 		renderVertices(mesh, context);
 
 	} else if (isSelected) {

@@ -5,6 +5,8 @@
 
 #include <objects/mesh/Mesh.h>
 
+#include "color/Color.h"
+
 struct RenderContext;
 class Vector3;
 struct Vertex;
@@ -16,13 +18,13 @@ public:
 	static void render(const Mesh &mesh, const RenderContext& context);
 
 private:
-	static void renderVertex(const std::shared_ptr<Vertex> &v);
+	static void renderVertex(const std::shared_ptr<Vertex>& v);
 	static void renderEdge(const Mesh &mesh, const std::pair<int, int> &e);
-	static void renderTriangle(const Mesh &mesh, const Triangle &t);
+	static void renderTriangle(const Mesh &mesh, const Triangle &t, const Color &baseColor);
 
 	static void renderVertices(const Mesh &mesh, const RenderContext &context);
-	static void renderEdges(const Mesh& mesh);
-	static void renderTriangles(const Mesh &mesh);
+	static void renderEdges(const Mesh &mesh, const RenderContext &context);
+	static void renderTriangles(const Mesh &mesh, const RenderContext &context);
 
-	static bool isSilhouetteEdge(const std::vector<Triangle> &triangles, Vector3 camPos);
+	static bool isSilhouetteEdge(const std::vector<Triangle>& triangles, Vector3 camPos);
 };
