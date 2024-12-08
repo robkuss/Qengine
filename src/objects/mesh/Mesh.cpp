@@ -2,8 +2,6 @@
 
 #include <ranges>
 
-void Mesh::setColor(const Color& color) { this->color = color; }
-
 void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) {
 	const auto oldPos	= getPosition();
 	const auto oldScale	= getScale();

@@ -12,14 +12,23 @@
 
 
 SceneManager::SceneManager() {
-	// Add Default Cube and Sphere to scene
-	const auto cube = std::make_shared<Cube>("Cube", Vector3(0.0f, 1.0f, 0.0f), 1.0f);
-	cube->setColor(Colors::RED);
-	addObject(cube);
+	// Add Default Cube to Scene
+	addObject(std::make_shared<Cube>(
+		"Cube",
+		Colors::RED,
+		Vector3(0.0f, 1.0f, 0.0f),
+		1.0f
+	));
 
-	const auto sphere = std::make_shared<Sphere>("Sphere", Vector3(0.0f, -1.0f, 0.0f), 0.5f, 64, 32);
-	sphere->setColor(Colors::BLUE);
-	addObject(sphere);
+	// Add Default Sphere to Scene
+	addObject(std::make_shared<Sphere>(
+		"Sphere",
+		Colors::BLUE,
+		Vector3(0.0f, -1.0f, 0.0f),
+		0.5f,
+		64,
+		32
+	));
 
 	context = new RenderContext(selectionMode);
 }

@@ -26,7 +26,7 @@ public:
 	Color color = Colors::MESH_FACE_COLOR;
 
 	// Constructor & Destructor
-	explicit Mesh(const std::string& name) : Object{name} {}
+	explicit Mesh(const std::string& name, const Color& color) : Object{name}, color(color) {}
 	~Mesh() override = default;
 
 	void buildEdgeToFaceMap();
