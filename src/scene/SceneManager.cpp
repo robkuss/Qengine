@@ -76,9 +76,7 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 		}
 
 		if (!preserve && intersectingObjects.empty()) {
-			// Deselect all previously selected Objects
-			selectedObjects.clear();
-			context->selectedObjects = selectedObjects;
+			deselectAllObjects();
 		}
 	}
 
@@ -103,17 +101,39 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 					)
 				);
 			}
-		}
 
-		if (!preserve && intersectingVertices.empty()) {
-			// Deselect all previously selected Vertices
-			selectedVertices.clear();
-			context->selectedVertices = selectedVertices;
+			if (!preserve && intersectingVertices.empty()) {
+				deselectAllVertices();
+			}
 		}
 	}
 
 	// When transforming a Mesh, clicking applies the transformation
 	applyTransformation();
+}
+
+void SceneManager::selectAllObjects() {
+	for (const auto& obj : sceneObjects) {
+		selectedObjects.push_back(obj);
+	}
+	context->selectedObjects = selectedObjects;
+}
+
+void SceneManager::deselectAllObjects() {
+	selectedObjects.clear();
+	context->selectedObjects.clear();
+}
+
+void SceneManager::selectAllVertices(const std::shared_ptr<Mesh>& mesh) {
+	for (const auto& v : mesh->vertices) {
+		selectedVertices.push_back(*v);
+	}
+	context->selectedVertices = selectedVertices;
+}
+
+void SceneManager::deselectAllVertices() {
+	selectedVertices.clear();
+	context->selectedVertices.clear();
 }
 
 void SceneManager::selectObject(const std::shared_ptr<Object>& obj) {
@@ -220,7 +240,15 @@ void SceneManager::applyTransformation() {
 }
 
 void SceneManager::toggleSelectionMode() {
-	selectionMode = selectionMode == OBJECT ? EDIT : OBJECT;
+	if (selectionMode == OBJECT) {
+		if (!selectedObjects.empty()) {
+			selectionMode = EDIT;
+		}
+	} else if (selectionMode == EDIT) {
+		selectionMode = OBJECT;
+	}
+	// Reset vertex selection data
+	deselectAllVertices();
 	context->selectionMode = selectionMode;
 }
 

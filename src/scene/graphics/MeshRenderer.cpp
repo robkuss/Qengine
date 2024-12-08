@@ -139,26 +139,28 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 	// Draw the faces
 	renderTriangles(mesh, context);
 
-	if (context.selectionMode == EDIT) {
-		// Draw the edges
-		renderEdges(mesh, context);
+	if (isSelected) {
+		if (context.selectionMode == EDIT) {
+			// Draw the edges
+			renderEdges(mesh, context);
 
-		// Draw the vertices
-		renderVertices(mesh, context);
+			// Draw the vertices
+			renderVertices(mesh, context);
 
-	} else if (isSelected) {
-		// Highlight only the outline of the Mesh in Object Mode
-		const auto color = Colors::MESH_SELECT_COLOR;
-		glLineWidth(4.0f);
-		glPointSize(3.0f);
-		for (const auto& edgeEntry : mesh.edgeToFaceMap) {
-			if (isSilhouetteEdge(edgeEntry, context)) {
-				// Highlight the silhouette edges
-				renderEdge(edgeEntry.first, color, color);
+		} else {
+			// Highlight only the outline of the Mesh in Object Mode
+			const auto color = Colors::MESH_SELECT_COLOR;
+			glLineWidth(4.0f);
+			glPointSize(3.0f);
+			for (const auto& edgeEntry : mesh.edgeToFaceMap) {
+				if (isSilhouetteEdge(edgeEntry, context)) {
+					// Highlight the silhouette edges
+					renderEdge(edgeEntry.first, color, color);
 
-				// Also highlight the vertices of the silhouette edges
-				renderVertex(*edgeEntry.first.v0);
-				renderVertex(*edgeEntry.first.v1);
+					// Also highlight the vertices of the silhouette edges
+					renderVertex(*edgeEntry.first.v0);
+					renderVertex(*edgeEntry.first.v1);
+				}
 			}
 		}
 	}

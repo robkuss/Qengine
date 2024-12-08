@@ -38,6 +38,12 @@ private:
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
 
 	void select(const Vector2 &mousePos, bool preserve);
+
+	void selectAllObjects();
+	void deselectAllObjects();
+	void selectAllVertices(const std::shared_ptr<Mesh> &mesh);
+	void deselectAllVertices();
+
 	void selectObject(const std::shared_ptr<Object>& obj);
 	void deselectObject(const std::shared_ptr<Object> &obj);
 	void selectVertex(const Vertex &v);
