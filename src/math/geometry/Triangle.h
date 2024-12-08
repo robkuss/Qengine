@@ -11,6 +11,6 @@ struct Triangle {
 
 	/** Calculates the centroid of this Triangle */
 	[[nodiscard]] Vector3 centroid() const {
-		return (*v0 + *v1 + *v2) / 3.0f;
+		return (v0->position + v1->position + v2->position) / 3.0f;
 	}
 };

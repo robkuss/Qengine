@@ -93,7 +93,7 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 		std::vector<Vertex> intersectingVertices;
 		for (const auto& mesh : getSelectedMeshes()) {
 			for (const auto& v : mesh->vertices) {
-				if (const auto projV = project(*v, context->viewport, context->viewMatrix, context->projMatrix); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
+				if (const auto projV = project(v->position, context->viewport, context->viewMatrix, context->projMatrix); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
 					intersectingVertices.push_back(*v);
 				}
 			}
@@ -104,7 +104,7 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 					*std::ranges::min_element(
 						intersectingVertices,
 						[&ray](const Vertex& a, const Vertex& b) {
-							return static_cast<Vector3>(a).distance(ray->origin) < static_cast<Vector3>(b).distance(ray->origin);
+							return a.position.distance(ray->origin) < b.position.distance(ray->origin);
 						}
 					)
 				);

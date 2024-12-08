@@ -35,9 +35,9 @@ void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) 
 	// Update vertex data
 	for (auto& vertex : vertices) {
 		switch (mode.mode) {
-			case Mode::GRAB:   *vertex = *vertex + getPosition() - oldPos; break;
-			case Mode::SCALE:  *vertex = oldPos + (*vertex - oldPos) * (getScale() / oldScale); break;
-			case Mode::ROTATE: *vertex = oldPos + vector3(transformation * vector4(*vertex - oldPos)); break;
+			case Mode::GRAB:   vertex->position = vertex->position + getPosition() - oldPos; break;
+			case Mode::SCALE:  vertex->position = oldPos + (vertex->position - oldPos) * (getScale() / oldScale); break;
+			case Mode::ROTATE: vertex->position = oldPos + vector3(transformation * vector4(vertex->position - oldPos)); break;
 			default: ;
 		}
 	}
@@ -123,8 +123,8 @@ void Mesh::setShadingMode(const ShadingMode shadingMode) {
 /** Calculate the normal for a face in the Mesh */
 Vector3 Mesh::faceNormal(const Triangle& t) {
 	// Compute the two edge vectors
-	const Vector3 e1 = *t.v1 - *t.v0;
-	const Vector3 e2 = *t.v2 - *t.v0;
+	const Vector3 e1 = t.v1->position - t.v0->position;
+	const Vector3 e2 = t.v2->position - t.v0->position;
 
 	// Compute the normal using the cross product
 	return e1.cross(e2).normalize();
