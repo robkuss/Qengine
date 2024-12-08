@@ -54,7 +54,7 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
     //glEnable(GL_LIGHT2);
 
     // Draw the mesh with the base color
-    drawWithColor(Colors::MESH_FACE_COLOR);
+    drawWithColor(mesh.color);
 
     if (isSelected) {
     	// Disable depth testing to ensure selection color overlays correctly
@@ -94,10 +94,12 @@ void MeshRenderer::renderEdges(const Mesh& mesh, const RenderContext& context) {
 
 	for (const auto& edge : mesh.edgeToFaceMap | std::views::keys) {
 		// Highlight if either of the 2 Vertices of the Edge are currently selected
-		const auto firstColor = std::ranges::find(context.selectedVertices, *edge.v0) != context.selectedVertices.end()
+		const auto firstColor = std::ranges::find(context.selectedVertices, *edge.v0)
+				!= context.selectedVertices.end()
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_EDGE_COLOR;
-		const auto secondColor = std::ranges::find(context.selectedVertices, *edge.v1) != context.selectedVertices.end()
+		const auto secondColor = std::ranges::find(context.selectedVertices, *edge.v1)
+				!= context.selectedVertices.end()
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_EDGE_COLOR;
 		renderEdge(edge, firstColor, secondColor);
@@ -110,7 +112,8 @@ void MeshRenderer::renderTriangles(const Mesh& mesh, const RenderContext& contex
 		const auto vertices = {*triangle.v0, *triangle.v1, *triangle.v2};
 		const auto isSelected = std::ranges::all_of(vertices,
 		    [&context](const auto& vertex) {
-			    return std::ranges::find(context.selectedVertices, vertex) != context.selectedVertices.end();
+			    return std::ranges::find(context.selectedVertices, vertex)
+		    		!= context.selectedVertices.end();
 		    });
 		renderTriangle(mesh, triangle, isSelected);
 	}
@@ -158,7 +161,10 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 	glLineWidth(1.0f);
 }
 
-bool MeshRenderer::isSilhouetteEdge(const std::pair<Edge, std::vector<Triangle>>& edgeEntry, const RenderContext& context) {
+bool MeshRenderer::isSilhouetteEdge(
+	const std::pair<Edge, std::vector<Triangle>>& edgeEntry,
+	const RenderContext& context
+) {
 	// Retrieve the triangles adjacent to the edge
 	const Triangle& tri1 = edgeEntry.second[0];
 	const Triangle& tri2 = edgeEntry.second[1];

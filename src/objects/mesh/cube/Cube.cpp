@@ -5,8 +5,8 @@
 class Cube final : public Mesh {
 public:
     /** Construct a Cube Mesh with given side length and position and default scale and rotation */
-    explicit Cube(const std::string& name, const float s)
-            : Mesh{name, position, scale, rotation}, s(s) {
+    explicit Cube(const std::string& name, const Vector3& position, const float s)
+            : Mesh{name}, s(s) {
         initializeVertices();
         initializeFaceIndices();
 
@@ -14,6 +14,8 @@ public:
         buildVertexToEdgeMap();
 
         initializeNormals();
+
+        Mesh::applyTransformation(GRAB, Matrix4::translate(position));
     }
 
     ~Cube() override = default;

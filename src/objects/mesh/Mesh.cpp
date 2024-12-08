@@ -2,23 +2,7 @@
 
 #include <ranges>
 
-void Mesh::setPosition(const Vector3& translation) {
-	this->position = Matrix4::translate(translation);
-	for (auto& vertex : vertices) {
-		*vertex += translation;
-	}
-}
-
-void Mesh::setScale(const Vector3& scale) {
-	this->scale	= Matrix4::scale(scale);
-	for (auto& vertex : vertices) {
-		*vertex *= scale;
-	}
-}
-
-void Mesh::setRotation(const Vector3& rotation) {
-	this->rotation = Matrix4::rotateX(rotation.x) * Matrix4::rotateY(rotation.y) * Matrix4::rotateZ(rotation.z);
-}
+void Mesh::setColor(const Color& color) { this->color = color; }
 
 void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) {
 	const auto oldPos	= getPosition();

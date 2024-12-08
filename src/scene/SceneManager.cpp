@@ -13,18 +13,12 @@
 
 SceneManager::SceneManager() {
 	// Add Default Cube and Sphere to scene
-	const auto cube = std::make_shared<Cube>("Cube", 1.0f);
-	cube->setPosition(Vector3(0.5f, 1.0f, 0.5f));
-	cube->setScale(Vector3::ONE);
-	cube->setRotation(Vector3::ZERO);
-	cube->updateVertexNormals();
+	const auto cube = std::make_shared<Cube>("Cube", Vector3(0.0f, 1.0f, 0.0f), 1.0f);
+	cube->setColor(Colors::RED);
 	addObject(cube);
 
-	const auto sphere = std::make_shared<Sphere>("Sphere", 0.5f, 64, 32);
-	sphere->setPosition(Vector3(0.5f, -1.0f, 0.5f));
-	sphere->setScale(Vector3::ONE);
-	sphere->setRotation(Vector3::ZERO);
-	sphere->updateVertexNormals();
+	const auto sphere = std::make_shared<Sphere>("Sphere", Vector3(0.0f, -1.0f, 0.0f), 0.5f, 64, 32);
+	sphere->setColor(Colors::BLUE);
 	addObject(sphere);
 
 	context = new RenderContext(selectionMode);
@@ -95,7 +89,12 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 		std::vector<Vertex> intersectingVertices;
 		for (const auto& mesh : getSelectedMeshes()) {
 			for (const auto& v : mesh->vertices) {
-				if (const auto projV = project(v->position, context->viewport, context->viewMatrix, context->projMatrix); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
+				if (const auto projV = project(
+					v->position,
+					context->viewport,
+					context->viewMatrix,
+					context->projMatrix
+				); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
 					intersectingVertices.push_back(*v);
 				}
 			}
@@ -154,7 +153,8 @@ void SceneManager::selectObject(const std::shared_ptr<Object>& obj) {
 }
 
 void SceneManager::deselectObject(const std::shared_ptr<Object>& obj) {
-	if (const auto it = std::ranges::find(selectedObjects, obj); it != selectedObjects.end()) {
+	if (const auto it = std::ranges::find(selectedObjects, obj);
+			it != selectedObjects.end()) {
 		selectedObjects.erase(it);
 		context->selectedObjects = selectedObjects;
 	}
@@ -170,7 +170,8 @@ void SceneManager::selectVertex(const Vertex& v) {
 }
 
 void SceneManager::deselectVertex(const Vertex& v) {
-	if (const auto it = std::ranges::find(selectedVertices, v); it != selectedVertices.end()) {
+	if (const auto it = std::ranges::find(selectedVertices, v);
+			it != selectedVertices.end()) {
 		selectedVertices.erase(it);
 		context->selectedVertices = selectedVertices;
 	}
@@ -187,7 +188,14 @@ std::vector<std::shared_ptr<Mesh>> SceneManager::getSelectedMeshes() const {
 	return meshes;
 }
 
-void SceneManager::transform(const double mouseX, const double mouseY, const int width, const int height, const Vector3 worldPos, const Vector3 camPos) {
+void SceneManager::transform(
+	const double mouseX,
+	const double mouseY,
+	const int width,
+	const int height,
+	const Vector3 worldPos,
+	const Vector3 camPos
+) {
     // Get the selected Mesh
     const auto meshes= getSelectedMeshes();
     if (meshes.empty()) return;	// Selected Object is not a Mesh
@@ -226,7 +234,10 @@ void SceneManager::transform(const double mouseX, const double mouseY, const int
 				// Example for rotation: Calculate a basic rotation matrix for illustration
 				constexpr float angle = 0.01f; // TODO (Replace with calculated rotation angle based on mouse input)
 
-				const Matrix4 transformMatrix = Matrix4::rotateX(angle) * Matrix4::rotateY(angle) * Matrix4::rotateZ(angle);
+				const Matrix4 transformMatrix =
+					  Matrix4::rotateX(angle)
+					* Matrix4::rotateY(angle)
+					* Matrix4::rotateZ(angle);
 				mesh->applyTransformation(transformMode, transformMatrix);
 				break;
 			}
@@ -281,7 +292,9 @@ void SceneManager::setTransformSubMode(const SubMode& subMode) {
 void SceneManager::toggleShadingMode() const {
 	if (const auto meshes = getSelectedMeshes(); !meshes.empty()) {
 		for (const auto& mesh : meshes) {
-			mesh->setShadingMode(mesh->shadingMode == ShadingMode::SMOOTH ? ShadingMode::FLAT : ShadingMode::SMOOTH);
+			mesh->setShadingMode(mesh->shadingMode == ShadingMode::SMOOTH
+				? ShadingMode::FLAT
+				: ShadingMode::SMOOTH);
 		}
 	}
 }

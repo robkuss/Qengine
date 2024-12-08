@@ -11,6 +11,8 @@
 #include "math/geometry/Edge.h"
 #include "math/geometry/Triangle.h"
 
+#include <scene/graphics/color/Colors.h>
+
 
 enum class ShadingMode {
 	FLAT,
@@ -21,10 +23,10 @@ class Mesh : public Object {
 public:
 	std::vector<std::shared_ptr<Vertex>> vertices = {};
 	std::vector<int> faceIndices = {};
+	Color color = Colors::MESH_FACE_COLOR;
 
 	// Constructor & Destructor
-	Mesh(const std::string& name, const Matrix4& position, const Matrix4& scale, const Matrix4& rotation)
-		: Object{name, position, scale, rotation} {}
+	explicit Mesh(const std::string& name) : Object{name} {}
 	~Mesh() override = default;
 
 	void buildEdgeToFaceMap();
@@ -32,6 +34,8 @@ public:
 	void initializeNormals() const;
 
 	[[nodiscard]] std::vector<Triangle> getTriangles() const;
+
+	void applyTransformation(const Mode &mode, const Matrix4 &transformation) override;
 
 private:
 	friend class SceneManager;
@@ -43,18 +47,18 @@ private:
 
 	ShadingMode shadingMode = ShadingMode::FLAT;
 
-	virtual void initializeVertices()	 = 0;
+	virtual void initializeVertices()    = 0;
 	virtual void initializeFaceIndices() = 0;
 
 	[[nodiscard]] Triangle getTriangle(int index) const;
 
 	void addEdgeToMap(const Edge &e, const Triangle &t);
 
+	void setColor(const Color &color);
+
 	void setPosition(const Vector3& translation);
 	void setScale(const Vector3& scale);
 	void setRotation(const Vector3& rotation);
-
-	void applyTransformation(const Mode& mode, const Matrix4& transformation);
 
 	void updateVertexNormals() const;
 

@@ -5,13 +5,17 @@
 class Sphere final : public Mesh {
 public:
     /** Construct a Sphere Mesh with given radius, position, and segment count */
-    explicit Sphere(const std::string& name, const float radius, const int segments, const int rings)
-            : Mesh{name, position, scale, rotation}, radius(radius), segments(segments), rings(rings) {
+    explicit Sphere(const std::string& name, const Vector3& position, const float radius, const int segments, const int rings)
+            : Mesh{name}, radius(radius), segments(segments), rings(rings) {
         initializeVertices();
         initializeFaceIndices();
 
         buildEdgeToFaceMap();
         buildVertexToEdgeMap();
+
+        initializeNormals();
+
+        Mesh::applyTransformation(GRAB, Matrix4::translate(position));
     }
 
     ~Sphere() override = default;
