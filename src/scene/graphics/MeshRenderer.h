@@ -16,7 +16,7 @@ public:
 	static void render(const Mesh &mesh, const RenderContext& context);
 
 private:
-	static void renderVertex(const Vertex& v);
+	static void renderVertex(const std::shared_ptr<Vertex> &v);
 	static void renderEdge(const Mesh &mesh, const std::pair<int, int> &e);
 	static void renderTriangle(const Mesh &mesh, const Triangle &t);
 

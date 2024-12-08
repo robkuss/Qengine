@@ -28,9 +28,9 @@ inline bool Ray::intersects(const Mesh& mesh) const {
 }
 
 inline bool Ray::intersects(const Triangle &t) const {
-	const auto v0 = t.v0;
-	const auto v1 = t.v1;
-	const auto v2 = t.v2;
+	const auto v0 = *t.v0;
+	const auto v1 = *t.v1;
+	const auto v2 = *t.v2;
 
 	const auto e0 = v1 - v0;
 	const auto e1 = v2 - v0;

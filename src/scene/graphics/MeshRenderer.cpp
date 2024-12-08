@@ -12,11 +12,11 @@
 #include "scene/RenderContext.h"
 
 /** Reinterpret Vertex as GLfloat* */
-void vertex3fv(const Vertex& v) {
-	glVertex3fv(reinterpret_cast<const float *>(&v));
+void vertex3fv(const std::shared_ptr<Vertex>& v) {
+	glVertex3fv(reinterpret_cast<const float *>(&*v));
 }
 
-void MeshRenderer::renderVertex(const Vertex& v) {
+void MeshRenderer::renderVertex(const std::shared_ptr<Vertex>& v) {
 	glBegin(GL_POINTS);
 	vertex3fv(v);
 	glEnd();
@@ -24,8 +24,8 @@ void MeshRenderer::renderVertex(const Vertex& v) {
 
 void MeshRenderer::renderEdge(const Mesh& mesh, const std::pair<int, int>& e) {
 	glBegin(GL_LINES);
-	vertex3fv(*mesh.vertices[e.first]);
-	vertex3fv(*mesh.vertices[e.second]);
+	vertex3fv(mesh.vertices[e.first]);
+	vertex3fv(mesh.vertices[e.second]);
 	glEnd();
 }
 
@@ -78,7 +78,7 @@ void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_VERT_COLOR
 		);
-		renderVertex(*v);
+		renderVertex(v);
 		for (const auto& edge : mesh.vertexToEdgeMap.at(v)) {
 			color3f(Colors::MESH_SELECT_COLOR);
 			renderEdge(mesh, edge);
@@ -132,8 +132,8 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 				renderEdge(mesh, edge);
 
 				// Also highlight the vertices of the silhouette edges
-				renderVertex(*mesh.vertices[edge.first]);
-				renderVertex(*mesh.vertices[edge.second]);
+				renderVertex(mesh.vertices[edge.first]);
+				renderVertex(mesh.vertices[edge.second]);
 			}
 		}
 	}
@@ -150,7 +150,7 @@ bool MeshRenderer::isSilhouetteEdge(const std::vector<Triangle>& triangles, cons
 	const Vector3 normal2 = Mesh::faceNormal(triangles[1]);
 
 	// Use any point from the first face to compute the direction to the camera
-	const Vertex pointOnFace = triangles[0].v0; // Arbitrary point on the first face
+	const Vertex pointOnFace = *triangles[0].v0; // Arbitrary point on the first face
 	const Vector3 camDir = (pointOnFace - camPos).normalize();
 
 	// Compute the dot products of the camera direction with the face normals

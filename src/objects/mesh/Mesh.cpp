@@ -48,7 +48,7 @@ Triangle Mesh::getTriangle(const int index) const {
 	const auto v1 = vertices[faceIndices[index + 1]];
 	const auto v2 = vertices[faceIndices[index + 2]];
 
-	return {*v0, *v1, *v2};
+	return {v0, v1, v2};
 }
 
 std::vector<Triangle> Mesh::getTriangles() const {
@@ -124,18 +124,18 @@ void Mesh::setShadingMode(const ShadingMode shadingMode) {
 /** Calculate the normal for a face in the Mesh */
 Vector3 Mesh::faceNormal(const Triangle& t) {
 	// Compute the two edge vectors
-	const Vector3 e1 = t.v1 - t.v0;
-	const Vector3 e2 = t.v2 - t.v0;
+	const Vector3 e1 = *t.v1 - *t.v0;
+	const Vector3 e2 = *t.v2 - *t.v0;
 
 	// Compute the normal using the cross product
 	return e1.cross(e2).normalize();
 }
 
 /** Calculate the normal for a vertex in the Mesh */
-Vector3 Mesh::vertexNormal(const Vertex& v) const {
+Vector3 Mesh::vertexNormal(const std::shared_ptr<Vertex>& v) const {
 	Vector3 accNormal(0.0f, 0.0f, 0.0f);
 
-	for (Triangle t : getTriangles()) {
+	for (const Triangle& t : getTriangles()) {
 		// Check if the current triangle contains the vertex
 		if (v == t.v0 || v == t.v1 || v == t.v2) {
 			// Accumulate the face normal

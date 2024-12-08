@@ -43,7 +43,7 @@ private:
 	virtual void initializeFaceIndices() = 0;
 
 	static Vector3 faceNormal(const Triangle& t);
-	[[nodiscard]] Vector3 vertexNormal(const Vertex& v) const;
+	[[nodiscard]] Vector3 vertexNormal(const std::shared_ptr<Vertex> &v) const;
 
 	[[nodiscard]] Triangle getTriangle(int index) const;
 
