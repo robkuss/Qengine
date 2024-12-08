@@ -84,11 +84,11 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 
 	// If in Edit Mode, select specific Vertices
 	else if (selectionMode == EDIT) {
-		std::vector<std::shared_ptr<Vertex>> intersectingVertices;
+		std::vector<Vertex> intersectingVertices;
 		for (const auto& mesh : getSelectedMeshes()) {
 			for (const auto& v : mesh->vertices) {
 				if (const auto projV = project(*v, context->viewport, context->viewMatrix, context->projMatrix); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
-					intersectingVertices.push_back(v);
+					intersectingVertices.push_back(*v);
 				}
 			}
 
@@ -97,8 +97,8 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 				selectVertex(
 					*std::ranges::min_element(
 						intersectingVertices,
-						[&ray](const std::shared_ptr<Vertex>& a, const std::shared_ptr<Vertex>& b) {
-							return static_cast<Vector3>(*a).distance(ray->origin) < static_cast<Vector3>(*b).distance(ray->origin);
+						[&ray](const Vertex& a, const Vertex& b) {
+							return static_cast<Vector3>(a).distance(ray->origin) < static_cast<Vector3>(b).distance(ray->origin);
 						}
 					)
 				);
@@ -132,7 +132,7 @@ void SceneManager::deselectObject(const std::shared_ptr<Object>& obj) {
 	}
 }
 
-void SceneManager::selectVertex(const std::shared_ptr<Vertex>& v) {
+void SceneManager::selectVertex(const Vertex& v) {
 	if (std::ranges::find(selectedVertices, v) == selectedVertices.end()) {
 		selectedVertices.push_back(v);
 		context->selectedVertices = selectedVertices;
@@ -141,7 +141,7 @@ void SceneManager::selectVertex(const std::shared_ptr<Vertex>& v) {
 	}
 }
 
-void SceneManager::deselectVertex(const std::shared_ptr<Vertex>& v) {
+void SceneManager::deselectVertex(const Vertex& v) {
 	if (const auto it = std::ranges::find(selectedVertices, v); it != selectedVertices.end()) {
 		selectedVertices.erase(it);
 		context->selectedVertices = selectedVertices;

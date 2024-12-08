@@ -124,12 +124,12 @@ Vector3 Mesh::faceNormal(const Triangle& t) {
 }
 
 /** Calculate the normal for a vertex in the Mesh */
-Vector3 Mesh::vertexNormal(const std::shared_ptr<Vertex>& v) const {
+Vector3 Mesh::vertexNormal(const Vertex& v) const {
 	Vector3 accNormal(0.0f, 0.0f, 0.0f);
 
 	for (const Triangle& t : getTriangles()) {
 		// Check if the current triangle contains the vertex
-		if (v == t.v0 || v == t.v1 || v == t.v2) {
+		if (v == *t.v0 || v == *t.v1 || v == *t.v2) {
 			// Accumulate the face normal
 			accNormal = accNormal + faceNormal(t);
 		}

@@ -18,7 +18,7 @@ struct RenderContext {
 	std::array<float, 16> projMatrix{};
 	Mode selectionMode;
 	std::vector<std::shared_ptr<Object>> selectedObjects{};
-	std::vector<std::shared_ptr<Vertex>> selectedVertices{};
+	std::vector<Vertex> selectedVertices{};
 	Ray* mouseRay = nullptr; // Use pointer to avoid issues with non-copyable reference
 
 	explicit RenderContext(const Mode selectionMode) : selectionMode(selectionMode) {}

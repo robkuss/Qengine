@@ -8,11 +8,11 @@
 #include "scene/RenderContext.h"
 
 /** Reinterpret Vertex as GLfloat* */
-void vertex3fv(const std::shared_ptr<Vertex>& v) {
-	glVertex3fv(reinterpret_cast<const float *>(&*v));
+void vertex3fv(const Vertex& v) {
+	glVertex3fv(reinterpret_cast<const float *>(&v));
 }
 
-void MeshRenderer::renderVertex(const std::shared_ptr<Vertex>& v) {
+void MeshRenderer::renderVertex(const Vertex& v) {
 	glBegin(GL_POINTS);
 	vertex3fv(v);
 	glEnd();
@@ -21,9 +21,9 @@ void MeshRenderer::renderVertex(const std::shared_ptr<Vertex>& v) {
 void MeshRenderer::renderEdge(const Edge& e, const Color& firstColor, const Color& secondColor) {
 	glBegin(GL_LINES);
 	color3f(firstColor);
-	vertex3fv(e.v0);
+	vertex3fv(*e.v0);
 	color3f(secondColor);
-	vertex3fv(e.v1);
+	vertex3fv(*e.v1);
 	glEnd();
 }
 
@@ -39,20 +39,20 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
         if (mesh.shadingMode == ShadingMode::FLAT) {
             const Vector3 normal = Mesh::faceNormal(t);
             glNormal3f(normal.x, normal.y, normal.z);
-            vertex3fv(t.v0);
-            vertex3fv(t.v1);
-            vertex3fv(t.v2);
+            vertex3fv(*t.v0);
+            vertex3fv(*t.v1);
+            vertex3fv(*t.v2);
         } else {
-            const Vector3 n0 = mesh.vertexNormal(t.v0);
-            const Vector3 n1 = mesh.vertexNormal(t.v1);
-            const Vector3 n2 = mesh.vertexNormal(t.v2);
+            const Vector3 n0 = mesh.vertexNormal(*t.v0);
+            const Vector3 n1 = mesh.vertexNormal(*t.v1);
+            const Vector3 n2 = mesh.vertexNormal(*t.v2);
 
             glNormal3f(n0.x, n0.y, n0.z);
-            vertex3fv(t.v0);
+            vertex3fv(*t.v0);
             glNormal3f(n1.x, n1.y, n1.z);
-            vertex3fv(t.v1);
+            vertex3fv(*t.v1);
             glNormal3f(n2.x, n2.y, n2.z);
-            vertex3fv(t.v2);
+            vertex3fv(*t.v2);
         }
         glEnd();
     };
@@ -92,11 +92,11 @@ void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context
 
 	for (const auto& v : mesh.vertices) {
 		// Highlight if the Vertex is currently selected
-		const auto color = std::ranges::find(context.selectedVertices, v) != context.selectedVertices.end()
+		const auto color = std::ranges::find(context.selectedVertices, *v) != context.selectedVertices.end()
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_VERT_COLOR;
 		color3f(color);
-		renderVertex(v);
+		renderVertex(*v);
 	}
 }
 
@@ -105,10 +105,10 @@ void MeshRenderer::renderEdges(const Mesh& mesh, const RenderContext& context) {
 
 	for (const auto& edge : mesh.edgeToFaceMap | std::views::keys) {
 		// Highlight if either of the 2 Vertices of the Edge are currently selected
-		const auto firstColor = std::ranges::find(context.selectedVertices, edge.v0) != context.selectedVertices.end()
+		const auto firstColor = std::ranges::find(context.selectedVertices, *edge.v0) != context.selectedVertices.end()
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_EDGE_COLOR;
-		const auto secondColor = std::ranges::find(context.selectedVertices, edge.v1) != context.selectedVertices.end()
+		const auto secondColor = std::ranges::find(context.selectedVertices, *edge.v1) != context.selectedVertices.end()
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_EDGE_COLOR;
 		renderEdge(edge, firstColor, secondColor);
@@ -118,7 +118,7 @@ void MeshRenderer::renderEdges(const Mesh& mesh, const RenderContext& context) {
 void MeshRenderer::renderTriangles(const Mesh& mesh, const RenderContext& context) {
 	for (const auto& triangle : mesh.getTriangles()) {
 		// Highlight if all 3 Vertices of the Triangle are currently selected
-		const auto vertices = {triangle.v0, triangle.v1, triangle.v2};
+		const auto vertices = {*triangle.v0, *triangle.v1, *triangle.v2};
 		const auto isSelected = std::ranges::all_of(vertices,
 		    [&context](const auto& vertex) {
 			    return std::ranges::find(context.selectedVertices, vertex) != context.selectedVertices.end();
@@ -157,8 +157,8 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 				renderEdge(edgeEntry.first, color, color);
 
 				// Also highlight the vertices of the silhouette edges
-				renderVertex(edgeEntry.first.v0);
-				renderVertex(edgeEntry.first.v1);
+				renderVertex(*edgeEntry.first.v0);
+				renderVertex(*edgeEntry.first.v1);
 			}
 		}
 	}
