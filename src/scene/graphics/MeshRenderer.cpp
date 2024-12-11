@@ -128,6 +128,9 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 		}
 	) != context.selectedObjects.end();
 
+	// Enable backface culling
+	glEnable(GL_CULL_FACE);
+
 	// Draw the faces
 	renderTriangles(mesh, context);
 
@@ -156,6 +159,8 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 			}
 		}
 	}
+
+	glDisable(GL_CULL_FACE);
 
 	// Reset line width back to default
 	glLineWidth(1.0f);

@@ -18,8 +18,7 @@ void transformBatch(const std::vector<std::shared_ptr<Vertex>>& verticesBatch, c
 			case Mode::ROTATE:
 				v->position = oldPos + vector3(transformation * vector4(v->position - oldPos));
 			break;
-			default:
-				break;
+			default: break;
 		}
 	}
 }

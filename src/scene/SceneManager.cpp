@@ -205,9 +205,7 @@ void SceneManager::transform(
 	const Vector3 worldPos,
 	const Vector3 camPos
 ) {
-    // Get the selected Mesh
-    const auto meshes= getSelectedMeshes();
-    if (meshes.empty()) return;	// Selected Object is not a Mesh
+    if (getSelectedMeshes().empty()) return;	// TODO Implement transformation for Objects that aren't Meshes
 
 	// Determine transformation direction
 	const Vector3 direction = clampDirection(transformMode.subMode);
@@ -216,7 +214,7 @@ void SceneManager::transform(
 	// Initialize lastTransform if zero
 	if (lastTransform == Vector3::ZERO) lastTransform = worldPos;
 
-	for (const auto& mesh : meshes) {
+	for (const auto& mesh : getSelectedMeshes()) {
 		switch (transformMode.mode) {
 			case Mode::GRAB: {
 				const Matrix4 transform = Matrix4::translate(
