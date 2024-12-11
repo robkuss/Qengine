@@ -1,6 +1,28 @@
 #include "Mesh.h"
 
+#include <vector>
 #include <ranges>
+#include <future>
+#include <algorithm>
+
+// Function that will process a batch of vertices
+void transformBatch(const std::vector<std::shared_ptr<Vertex>>& verticesBatch, const Mode& mode, const Vector3& oldPos, const Vector3& dPos, const Vector3& dScale, const Matrix4& transformation) {
+	for (auto& v : verticesBatch) {
+		switch (mode.mode) {
+			case Mode::GRAB:
+				v->position = v->position + dPos;
+			break;
+			case Mode::SCALE:
+				v->position = oldPos + (v->position - oldPos) * dScale;
+			break;
+			case Mode::ROTATE:
+				v->position = oldPos + vector3(transformation * vector4(v->position - oldPos));
+			break;
+			default:
+				break;
+		}
+	}
+}
 
 void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) {
 	const auto oldPos	= getPosition();
@@ -17,14 +39,28 @@ void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) 
 	const auto dPos = getPosition() - oldPos;
 	const auto dScale = getScale() / oldScale;
 
-	// Update vertex data
-	for (const auto& v : vertices) {
-		switch (mode.mode) {
-			case Mode::GRAB:   v->position = v->position + dPos; break;
-			case Mode::SCALE:  v->position = oldPos + (v->position - oldPos) * dScale; break;
-			case Mode::ROTATE: v->position = oldPos + vector3(transformation * vector4(v->position - oldPos)); break;
-			default: ;
-		}
+	// Define the batch size
+	constexpr size_t batchSize = 1000;
+	const size_t numBatches = (vertices.size() + batchSize - 1) / batchSize;
+
+	// Vector to store futures for parallel processing
+	std::vector<std::future<void>> futures;
+
+	// Process vertices in batches
+	for (size_t batch = 0; batch < numBatches; ++batch) {
+		const size_t startIdx = batch * batchSize;
+		const size_t endIdx = std::min(startIdx + batchSize, vertices.size());
+
+		// Create a sub-vector (batch) of vertices to process
+		std::vector batchVertices(vertices.begin() + startIdx, vertices.begin() + endIdx); // NOLINT(*-narrowing-conversions)
+
+		// Launch the batch processing in a separate thread or async task
+		futures.push_back(std::async(std::launch::async, transformBatch, batchVertices, std::cref(mode), std::cref(oldPos), std::cref(dPos), std::cref(dScale), std::cref(transformation)));
+	}
+
+	// Wait for all batch processing tasks to complete
+	for (auto& future : futures) {
+		future.get();
 	}
 
 	updateNormals();

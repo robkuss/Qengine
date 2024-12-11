@@ -136,7 +136,11 @@ void Viewport::centerWindow() const {
 void Viewport::drawOnScreenText() const {
 	const auto cube = *sceneManager->sceneObjects[0];
 	const auto mouseWorld = unproject(Vector2(*mouseX, *mouseY), viewport, viewMatrix, projMatrix);
-	for (int i = 0; i <= 10; i++) {
+	size_t vertexCount = 0;
+	for (const auto& obj : sceneManager->sceneObjects) {
+		vertexCount += dynamic_cast<Mesh*>(obj.get())->vertices.size();
+	}
+	for (int i = 0; i <= 11; i++) {
 		std::ostringstream out;
 		switch (i) {
 			case 0:  out << "FPS: " << fps; break;
@@ -151,7 +155,8 @@ void Viewport::drawOnScreenText() const {
 			case 7:  out << "Cube:"; break;
 			case 8:  out << "    Pos: "   << std::fixed << std::setprecision(3) << cube.getPosition().x  << " " << cube.getPosition().y  << " " << cube.getPosition().z;  break;
 			case 9:  out << "    Scale: " << std::fixed << std::setprecision(3) << cube.getScale().x     << " " << cube.getScale().y     << " " << cube.getScale().z;     break;
-			default: out << "    Rot: "   << std::fixed << std::setprecision(3) << cube.getRotation().x  << " " << cube.getRotation().y  << " " << cube.getRotation().z;  break;
+			case 10: out << "    Rot: "   << std::fixed << std::setprecision(3) << cube.getRotation().x  << " " << cube.getRotation().y  << " " << cube.getRotation().z;  break;
+			default: out << "Vertex Count: " << vertexCount; break;
 		}
 		#ifdef TEXT
 			text->renderText(out.str().c_str(), Text::firstLineX, Text::line(i), width, height, Colors::TEXT_COLOR);
