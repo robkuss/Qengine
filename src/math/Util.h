@@ -11,18 +11,22 @@
 constexpr float EPSILON		= 1e-9f;					// Infinitesimal
 constexpr double PI			= 3.14159265358979323846;	// Because for some reason there is no Pi in cmath
 
+/** Degrees to radians */
 inline double radians(const double deg) {
 	return deg * PI / 180.0;
 }
 
+/** Radians to degrees */
 inline double degrees(const double rad) {
 	return rad * 180.0 / PI;
 }
 
+/** Vector3 to Vector4 */
 inline Vector4 vector4(Vector3 v) {
 	return {v.x, v.y, v.z, 1.0f};
 }
 
+/** Vector4 to Vector3 */
 inline Vector3 vector3(Vector4 v) {
 	return {v.x, v.y, v.z};
 }
@@ -36,6 +40,7 @@ inline Vector3 clampDirection(const SubMode subMode) {
 	}
 }
 
+/** Calculate the normal of a Triangle */
 inline Vector3 faceNormal(const Triangle& t) {
 	// Compute the two edge vectors
 	const Vector3 e1 = t.v1->position - t.v0->position;
@@ -45,22 +50,13 @@ inline Vector3 faceNormal(const Triangle& t) {
 	return e1.cross(e2).normalize();
 }
 
-/**
- * This function maps 3D world space to 2D screen space.
- * @param worldPoint The point in 3D world space to be projected to 2D screen space
- * @param viewport contains screen dimensions data
- * @param viewMatrix
- * @param projMatrix
- * @return the screen space coordinates for the given world position as a Vector2
- */
+/** Calculate the centroid of a Triangle */
+inline Vector3 centroid(const Triangle& t) {
+	return (t.v0->position + t.v1->position + t.v2->position) / 3.0f;
+}
+
+/** Map 3D world space to 2D screen space */
 Vector2 project(const Vector3& worldPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
 
-/**
- * This function maps 2D screen space to 3D world space.
- * @param screenPoint The point in 2D screen space to be projected to 3D world space
- * @param viewport contains screen dimensions data
- * @param viewMatrix
- * @param projMatrix
- * @return the world space coordinates for the given mouse position as a Vector3
- */
+/** Map 2D screen space to 3D world space */
 Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);

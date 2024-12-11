@@ -10,10 +10,10 @@ public:
         initializeVertices();
         initializeFaceIndices();
 
-        buildEdgeToFaceMap();
+        initializeTriangles();
         buildVertexToEdgeMap();
-
-        initializeNormals();
+        buildEdgeToFaceMap();
+        updateNormals();
 
         Mesh::applyTransformation(GRAB, Matrix4::translate(position));
     }

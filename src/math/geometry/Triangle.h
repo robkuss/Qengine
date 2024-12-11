@@ -6,11 +6,9 @@
 
 struct Triangle {
 	std::shared_ptr<Vertex> v0, v1, v2;
+	mutable Vector3 normal;	   // Face normal
+	mutable Vector3 centroid;  // Center point
 
-	Triangle(const std::shared_ptr<Vertex>& v0, const std::shared_ptr<Vertex>& v1, const std::shared_ptr<Vertex>& v2) : v0(v0), v1(v1), v2(v2) {}
-
-	/** Calculates the centroid of this Triangle */
-	[[nodiscard]] Vector3 centroid() const {
-		return (v0->position + v1->position + v2->position) / 3.0f;
-	}
+	Triangle(const std::shared_ptr<Vertex>& v0, const std::shared_ptr<Vertex>& v1, const std::shared_ptr<Vertex>& v2)
+		: v0(v0), v1(v1), v2(v2), normal(Vector3::ZERO), centroid(Vector3::ZERO) {}
 };

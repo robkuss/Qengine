@@ -91,3 +91,16 @@ public:
 inline const Vector3& Vector3::ZERO		 = Vector3(0.0f, 0.0f, 0.0f);
 inline const Vector3& Vector3::ONE		 = Vector3(1.0f, 1.0f, 1.0f);
 inline const Vector3& Vector3::MINUS_ONE = Vector3(-1.0f, -1.0f, -1.0f);
+
+template <>
+struct std::hash<Vector3> {
+	size_t operator()(const Vector3& v) const noexcept {
+		// Combine the hashes of the three components (x, y, z)
+		const size_t h1 = hash<float>()(v.x);
+		const size_t h2 = hash<float>()(v.y);
+		const size_t h3 = hash<float>()(v.z);
+
+		// Combine the three hash values using XOR and bit shifting
+		return h1 ^ h2 << 1 ^ h3 << 2;
+	}
+};

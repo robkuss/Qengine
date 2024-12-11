@@ -56,3 +56,16 @@ struct Vertex {
 			(position.z - other.position.z) * (position.z - other.position.z));
 	}
 };
+
+// Specialize std::hash for Vertex
+template <>
+struct std::hash<Vertex> {
+	size_t operator()(const Vertex& v) const noexcept {
+		// Combine the hashes of position and normal vectors
+		const size_t h1 = hash<Vector3>()(v.position);
+		const size_t h2 = hash<Vector3>()(v.normal);
+
+		// Combine the two hash values using XOR and bit shifting
+		return h1 ^ h2 << 1;
+	}
+};

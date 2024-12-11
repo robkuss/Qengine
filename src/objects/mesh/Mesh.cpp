@@ -24,36 +24,25 @@ void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) 
 		}
 	}
 
-	updateVertexNormals();
+	updateNormals();
 }
 
-void Mesh::updateVertexNormals() const {
-	for (const auto& v : vertices) {
-		v->normal = (v->position - getPosition()).normalize();
-	}
-}
-
-Triangle Mesh::getTriangle(const int index) const {
-	const auto v0 = vertices[faceIndices[index]];
-	const auto v1 = vertices[faceIndices[index + 1]];
-	const auto v2 = vertices[faceIndices[index + 2]];
-
-	return {v0, v1, v2};
-}
-
-std::vector<Triangle> Mesh::getTriangles() const {
-	std::vector<Triangle> triangles;
+void Mesh::initializeTriangles() {
+	triangles.clear();
 
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) {
-		triangles.emplace_back(getTriangle(i));
-	}
+		const auto v0 = vertices[faceIndices[i]];
+		const auto v1 = vertices[faceIndices[i + 1]];
+		const auto v2 = vertices[faceIndices[i + 2]];
 
-	return triangles;
+		triangles.emplace_back(std::make_shared<Triangle>(v0, v1, v2));
+	}
 }
 
 /** Build the vertex-to-edge adjacency map for the mesh */
 void Mesh::buildVertexToEdgeMap() {
 	vertexToEdgeMap.clear();
+	vertexToEdgeMap.reserve(vertices.size());	// Reserve space (this helps avoid reallocations)
 
 	// Use shared_ptr to store the vertices in the map
 	for (const auto& v : vertices) {
@@ -73,48 +62,39 @@ void Mesh::buildVertexToEdgeMap() {
 /** Build the edge-to-face adjacency map for the mesh */
 void Mesh::buildEdgeToFaceMap() {
 	edgeToFaceMap.clear();
+	edgeToFaceMap.reserve(triangles.size() * 3);  // Reserve space (this helps avoid reallocations)
 
-	for (int i = 0; i + 2 < faceIndices.size(); i += 3) { // Iterate in steps of 3
-		const Triangle t = getTriangle(i);
-
+	for (const auto& t : triangles) {
 		// Add edges to the adjacency map
-		addEdgeToMap(Edge(t.v0, t.v1), t);
-		addEdgeToMap(Edge(t.v1, t.v2), t);
-		addEdgeToMap(Edge(t.v2, t.v0), t);
+		addEdgeToMap(Edge(t->v0, t->v1), t);
+		addEdgeToMap(Edge(t->v1, t->v2), t);
+		addEdgeToMap(Edge(t->v2, t->v0), t);
 	}
 }
 
 /** Helper function to add an edge to the map */
-void Mesh::addEdgeToMap(const Edge& e, const Triangle& t) {
-	// Ensure that the order of the vertices is consistent
-	if (!edgeToFaceMap.contains(e)) {
-		// If the edge is not in the map, initialize it with a new vector containing faceIndex
-		edgeToFaceMap[e] = std::vector {t};
+void Mesh::addEdgeToMap(const Edge& e, const std::shared_ptr<Triangle>& t) {
+	if (const auto it = edgeToFaceMap.find(e); it == edgeToFaceMap.end()) {
+		// If edge is not found, initialize the vector with the triangle
+		edgeToFaceMap[e] = {t};
 	} else {
-		// If the edge already exists, add faceIndex to the existing vector
-		edgeToFaceMap[e].push_back(t);
+		// If edge is found, add the triangle to the vector
+		it->second.push_back(t);
 	}
 }
 
-/** Calculate normals for each vertex */
-void Mesh::initializeNormals() const {
-	for (auto& v : vertices) {
-		v->normal = v->position.normalize();
+void Mesh::updateNormals() const {
+	// Update vertex normals
+	for (const auto& v : vertices) {
+		v->normal = (v->position - getPosition()).normalize();
+	}
+
+	// Update face normals
+	for (const auto& t : triangles) {
+		t->normal = faceNormal(*t);
+		t->centroid = centroid(*t);
 	}
 }
-/*void Mesh::initializeNormals() const {
-	for (auto& v : vertices) {
-		Vector3 accNormal = Vector3::ZERO;
-		for (const Triangle& t : getTriangles()) {
-			// Check if the current triangle contains the vertex
-			if (v == t.v0 || v == t.v1 || v == t.v2) {
-				// Accumulate the face normal
-				accNormal = accNormal + faceNormal(t);
-			}
-		}
-		v->normal = accNormal.normalize();
-	}
-}*/
 
 void Mesh::setShadingMode(const ShadingMode shadingMode) {
 	this->shadingMode = shadingMode;

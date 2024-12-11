@@ -25,5 +25,5 @@ private:
 	static void renderEdges(const Mesh& mesh, const RenderContext& context);
 	static void renderTriangles(const Mesh& mesh, const RenderContext& context);
 
-	static bool isSilhouetteEdge(const std::pair<Edge, std::vector<Triangle>>& edgeEntry, const RenderContext& context);
+	static bool isSilhouetteEdge(const std::vector<std::shared_ptr<Triangle>> &edgeAdjFaces, const Vector3 &camPos);
 };

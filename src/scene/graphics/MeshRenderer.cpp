@@ -107,15 +107,15 @@ void MeshRenderer::renderEdges(const Mesh& mesh, const RenderContext& context) {
 }
 
 void MeshRenderer::renderTriangles(const Mesh& mesh, const RenderContext& context) {
-	for (const auto& triangle : mesh.getTriangles()) {
+	for (const auto& triangle : mesh.triangles) {
 		// Highlight if all 3 Vertices of the Triangle are currently selected
-		const auto vertices = {*triangle.v0, *triangle.v1, *triangle.v2};
+		const auto vertices = {*triangle->v0, *triangle->v1, *triangle->v2};
 		const auto isSelected = std::ranges::all_of(vertices,
 		    [&context](const auto& vertex) {
 			    return std::ranges::find(context.selectedVertices, vertex)
 		    		!= context.selectedVertices.end();
 		    });
-		renderTriangle(mesh, triangle, isSelected);
+		renderTriangle(mesh, *triangle, isSelected);
 	}
 }
 
@@ -144,14 +144,14 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 			const auto color = Colors::MESH_SELECT_COLOR;
 			glLineWidth(4.0f);
 			glPointSize(3.0f);
-			for (const auto& edgeEntry : mesh.edgeToFaceMap) {
-				if (isSilhouetteEdge(edgeEntry, context)) {
-					// Highlight the silhouette edges
-					renderEdge(edgeEntry.first, color, color);
 
-					// Also highlight the vertices of the silhouette edges
-					renderVertex(*edgeEntry.first.v0);
-					renderVertex(*edgeEntry.first.v1);
+			for (const auto&[first, second]: mesh.edgeToFaceMap) {
+				if (isSilhouetteEdge(second, context.camPos)) {
+					renderEdge(first, color, color);
+
+					// Highlight the vertices of the silhouette edges
+					renderVertex(*first.v0);
+					renderVertex(*first.v1);
 				}
 			}
 		}
@@ -162,25 +162,17 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 }
 
 bool MeshRenderer::isSilhouetteEdge(
-	const std::pair<Edge, std::vector<Triangle>>& edgeEntry,
-	const RenderContext& context
+	const std::vector<std::shared_ptr<Triangle>>& edgeAdjFaces,
+	const Vector3& camPos
 ) {
 	// Retrieve the triangles adjacent to the edge
-	const Triangle& tri1 = edgeEntry.second[0];
-	const Triangle& tri2 = edgeEntry.second[1];
-
-	// Compute face normals
-	const Vector3 normal1 = faceNormal(tri1);
-	const Vector3 normal2 = faceNormal(tri2);
-
-	// Calculate camera view direction for each triangle
-	const Vector3 viewDir1 = (context.camPos - tri1.centroid()).normalize();
-	const Vector3 viewDir2 = (context.camPos - tri2.centroid()).normalize();
+	const auto& t1 = *edgeAdjFaces[0];
+	const auto& t2 = *edgeAdjFaces[1];
 
 	// Check if triangles are front-facing or back-facing
-	const bool tri1FrontFacing = normal1.dot(viewDir1) > 0;
-	const bool tri2FrontFacing = normal2.dot(viewDir2) > 0;
+	const bool t1ff = t1.normal.dot(camPos - t1.centroid) > 0;
+	const bool t2ff = t2.normal.dot(camPos - t2.centroid) > 0;
 
 	// Edge is a silhouette edge if one triangle is front-facing and the other is back-facing
-	return tri1FrontFacing != tri2FrontFacing;
+	return t1ff != t2ff;
 }
