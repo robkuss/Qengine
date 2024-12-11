@@ -25,7 +25,7 @@ public:
 	std::vector<std::shared_ptr<Vertex>> vertices = {};
 	std::vector<std::shared_ptr<Triangle>> triangles = {};
 	std::vector<int> faceIndices = {};
-	Color color = Colors::MESH_FACE_COLOR;
+	Color color;
 
 	// Constructor & Destructor
 	Mesh(const std::string& name, const Color& color) : Object{name}, color(color) {}

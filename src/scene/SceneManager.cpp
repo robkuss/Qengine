@@ -15,19 +15,19 @@ SceneManager::SceneManager() {
 	// Add Default Cube to Scene
 	addObject(std::make_shared<Cube>(
 		"Cube",
-		Colors::RED,
 		Vector3(0.0f, 1.0f, 0.0f),
-		1.0f
+		1.0f,
+		Colors::RED
 	));
 
 	// Add Default Sphere to Scene
 	addObject(std::make_shared<Sphere>(
 		"Sphere",
-		Colors::BLUE,
 		Vector3(0.0f, -1.0f, 0.0f),
 		0.5f,
 		64,
-		32
+		32,
+		Colors::BLUE
 	));
 
 	context = new RenderContext(selectionMode);

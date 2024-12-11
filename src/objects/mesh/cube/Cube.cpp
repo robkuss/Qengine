@@ -5,7 +5,8 @@
 class Cube final : public Mesh {
 public:
     /** Construct a Cube Mesh with given side length and position and default scale and rotation */
-    explicit Cube(const std::string& name, const Color& color, const Vector3& position, const float s)
+    explicit Cube(const std::string& name, const Vector3& position, const float s,
+        const Color& color = Colors::MESH_FACE_COLOR)
             : Mesh{name, color}, s(s) {
         initializeVertices();
         initializeFaceIndices();
