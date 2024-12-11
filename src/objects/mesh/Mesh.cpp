@@ -14,12 +14,15 @@ void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) 
 		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
 	}
 
+	const auto dPos = getPosition() - oldPos;
+	const auto dScale = getScale() / oldScale;
+
 	// Update vertex data
-	for (const auto& vertex : vertices) {
+	for (const auto& v : vertices) {
 		switch (mode.mode) {
-			case Mode::GRAB:   vertex->position = vertex->position + getPosition() - oldPos; break;
-			case Mode::SCALE:  vertex->position = oldPos + (vertex->position - oldPos) * (getScale() / oldScale); break;
-			case Mode::ROTATE: vertex->position = oldPos + vector3(transformation * vector4(vertex->position - oldPos)); break;
+			case Mode::GRAB:   v->position = v->position + dPos; break;
+			case Mode::SCALE:  v->position = oldPos + (v->position - oldPos) * dScale; break;
+			case Mode::ROTATE: v->position = oldPos + vector3(transformation * vector4(v->position - oldPos)); break;
 			default: ;
 		}
 	}

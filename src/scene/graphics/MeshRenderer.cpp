@@ -40,8 +40,8 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
     	for (const auto& v : {t.v0, t.v1, t.v2}) {
     		// Choose the shading mode
     		const auto normal = isFlatShading
-    			? faceNormal(t)		// Flat shading
-    			: v->normal;		// Smooth shading
+    			? t.normal		// Flat shading
+    			: v->normal;	// Smooth shading
     		glNormal3f(normal.x, normal.y, normal.z);
     		vertex3fv(*v);
     	}
