@@ -65,7 +65,7 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Draw the selection color
-        drawWithColor(Colors::MESH_SELECT_COLOR.transparent(0.3f));
+        drawWithColor(Colors::MESH_SELECT_COLOR.transparent(0.4f));
 
         // Disable blending after drawing the selection color
         glDisable(GL_BLEND);

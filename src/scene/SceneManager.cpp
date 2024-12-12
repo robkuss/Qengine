@@ -226,11 +226,12 @@ void SceneManager::transform(
 				break;
 			}
 			case Mode::SCALE: {
-				const auto screenCenter = Vector2(width / 2.0, height / 2.0);
 				const auto mousePos		= Vector2(mouseX, mouseY);
 				const Matrix4 transform	= Matrix4::scale(
 					direction													// Clamp direction
-					* (static_cast<float>(screenCenter.distance(mousePos))		// Distance from mouse position to center of screen
+					* (static_cast<float>(project(mesh->getPosition(),
+						context->viewport, context->viewMatrix, context->projMatrix)
+						.distance(mousePos))									// Distance from mouse position to center of screen
 					* (mesh->getPosition().distance(camPos) / scalingSens))		// Distance from Object to camera
 					/ mesh->getScale()											// Difference from last transform
 				);

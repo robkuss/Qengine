@@ -31,8 +31,9 @@ private:
 	std::vector<std::shared_ptr<Object>> selectedObjects;
 	std::vector<Vertex> selectedVertices;
 
-	float scalingSens		= 1000.0f;
 	Vector3 lastTransform   = Vector3::ZERO;
+
+	float scalingSens		= 1000.0f;	// Scaling sensitivity
 
 	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }

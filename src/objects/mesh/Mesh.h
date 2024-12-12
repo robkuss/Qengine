@@ -33,10 +33,11 @@ public:
 
 	void buildEdgeToFaceMap();
 	void buildVertexToEdgeMap();
-	void initializeTriangles();
-	void updateNormals() const;
 
 	void applyTransformation(const Mode &mode, const Matrix4 &transformation) override;
+
+	void initializeTriangles();
+	void updateNormals() const;
 
 private:
 	friend class SceneManager;
