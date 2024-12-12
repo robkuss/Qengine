@@ -34,7 +34,7 @@ public:
 	void buildEdgeToFaceMap();
 	void buildVertexToEdgeMap();
 
-	void applyTransformation(const Mode &mode, const Matrix4 &transformation) override;
+	void applyTransformation(const Mode& selectionMode, const Mode& transformMode, const Matrix4 &transformation) override;
 
 	void initializeTriangles();
 	void updateNormals() const;

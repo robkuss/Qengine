@@ -144,18 +144,18 @@ void Viewport::drawOnScreenText() const {
 		std::ostringstream out;
 		switch (i) {
 			case 0:  out << "FPS: " << fps; break;
-			case 1:  out << "Camera Pos: " << std::fixed << std::setprecision(3) << camPos.x << " " << camPos.y << " " << camPos.z; break;
+			case 1:  out << "Camera Pos: " << camPos.toString(); break;
 			case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << rotH << " / " << rotV; break;
 			case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camDist; break;
 			case 4:  out << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
-			case 5:  out << "Mouse World: "  << std::fixed << std::setprecision(3) << mouseWorld.x << " " << mouseWorld.y << " " << mouseWorld.z; break;
+			case 5:  out << "Mouse World: "  << mouseWorld.toString(); break;
 			case 6:	 out << "Mode: " << modeToString(sceneManager->selectionMode.mode);
 				if (sceneManager->transformMode.mode    != Mode::NONE)	out << " " << modeToString(sceneManager->transformMode.mode);
 				if (sceneManager->transformMode.subMode != SubMode::NONE) out << " " << subModeToString(sceneManager->transformMode.subMode); break;
 			case 7:  out << "Cube:"; break;
-			case 8:  out << "    Pos: "   << std::fixed << std::setprecision(3) << cube.getPosition().x  << " " << cube.getPosition().y  << " " << cube.getPosition().z;  break;
-			case 9:  out << "    Scale: " << std::fixed << std::setprecision(3) << cube.getScale().x     << " " << cube.getScale().y     << " " << cube.getScale().z;     break;
-			case 10: out << "    Rot: "   << std::fixed << std::setprecision(3) << cube.getRotation().x  << " " << cube.getRotation().y  << " " << cube.getRotation().z;  break;
+			case 8:  out << "    Pos: "   << cube.position.toString();  break;
+			case 9:  out << "    Scale: " << cube.scale.toString();     break;
+			case 10: out << "    Rot: "   << cube.rotation.toString();  break;
 			default: out << "Vertex Count: " << vertexCount; break;
 		}
 		#ifdef TEXT

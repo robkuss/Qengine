@@ -16,7 +16,7 @@ public:
         buildEdgeToFaceMap();
         updateNormals();
 
-        Mesh::applyTransformation(GRAB, Matrix4::translate(position));
+        Mesh::applyTransformation(OBJECT, GRAB, Matrix4::translate(position));
     }
 
     ~Cube() override = default;

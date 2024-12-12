@@ -66,7 +66,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 				}
 			} else {
 				// Object transformation
-				vp->sceneManager->transform(mouseX, mouseY, vp->width, vp->height, unproject(Vector2(*vp->mouseX, *vp->mouseY), vp->viewport, vp->viewMatrix, vp->projMatrix), vp->camPos);
+				vp->sceneManager->transform(mouseX, mouseY, unproject(Vector2(*vp->mouseX, *vp->mouseY), vp->viewport, vp->viewMatrix, vp->projMatrix), vp->camPos);
 			}
 		}
 	});

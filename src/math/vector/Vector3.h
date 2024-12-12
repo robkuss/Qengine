@@ -3,6 +3,8 @@
 #include <string>
 #include <stdexcept>
 #include <cmath>
+#include <iomanip>
+#include <sstream>
 
 
 class Vector3 {
@@ -84,7 +86,9 @@ public:
 	}
 
 	[[nodiscard]] std::string toString() const {
-		return std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z);
+		std::ostringstream out;
+		out << std::fixed << std::setprecision(3) << x << ", " << y << ", " << z;
+		return out.str();
 	}
 };
 

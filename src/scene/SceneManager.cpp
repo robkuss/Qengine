@@ -83,7 +83,7 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 				*std::ranges::min_element(
 					intersectingObjects,
 					[&ray](const std::shared_ptr<Object>& a, const std::shared_ptr<Object>& b) {
-						return a->getPosition().distance(ray->origin) < b->getPosition().distance(ray->origin);
+						return a->position.distance(ray->origin) < b->position.distance(ray->origin);
 					}
 				)
 			);
@@ -200,8 +200,6 @@ std::vector<std::shared_ptr<Mesh>> SceneManager::getSelectedMeshes() const {
 void SceneManager::transform(
 	const double mouseX,
 	const double mouseY,
-	const int width,
-	const int height,
 	const Vector3 worldPos,
 	const Vector3 camPos
 ) {
@@ -215,38 +213,47 @@ void SceneManager::transform(
 	if (lastTransform == Vector3::ZERO) lastTransform = worldPos;
 
 	for (const auto& mesh : getSelectedMeshes()) {
+		const auto position = mesh->position;
+		const auto scale    = mesh->scale;
+
+		const auto camDist = position.distance(camPos);
+
+		const auto mouseDist = static_cast<float>(
+			 project(position, context->viewport, context->viewMatrix, context->projMatrix)
+			.distance(Vector2(mouseX, mouseY))
+		);
+
+		const auto dPos = worldPos - lastTransform;
+
 		switch (transformMode.mode) {
 			case Mode::GRAB: {
 				const Matrix4 transform = Matrix4::translate(
-					direction													// Clamp direction
-					* mesh->getPosition().distance(camPos)						// Distance from Object to camera
-					* (worldPos - lastTransform)								// Difference from last transform
+					direction						// Clamp direction
+					* camDist						// Distance from Object to camera
+					* dPos							// Difference from last transform
 				);
-				mesh->applyTransformation(transformMode, transform);
+				mesh->applyTransformation(selectionMode, transformMode, transform);
 				break;
 			}
 			case Mode::SCALE: {
-				const auto mousePos		= Vector2(mouseX, mouseY);
 				const Matrix4 transform	= Matrix4::scale(
-					direction													// Clamp direction
-					* (static_cast<float>(project(mesh->getPosition(),
-						context->viewport, context->viewMatrix, context->projMatrix)
-						.distance(mousePos))									// Distance from mouse position to center of screen
-					* (mesh->getPosition().distance(camPos) / scalingSens))		// Distance from Object to camera
-					/ mesh->getScale()											// Difference from last transform
+					direction						// Clamp direction
+					* (camDist / scalingSens		// Distance from Object to camera
+					* mouseDist)					// Distance from Object to mouse position
+					/ scale							// Difference from last transform
 				);
-				mesh->applyTransformation(transformMode, transform);
+				mesh->applyTransformation(selectionMode, transformMode, transform);
 				break;
 			}
 			case Mode::ROTATE: {
 				// Example for rotation: Calculate a basic rotation matrix for illustration
-				constexpr float angle = 0.01f; // TODO (Replace with calculated rotation angle based on mouse input)
+				constexpr float angle = 0.01f;		// Rotation angle TODO (Replace with calculated rotation angle based on mouse input)
 
 				const Matrix4 transformMatrix =
 					  Matrix4::rotateX(angle)
 					* Matrix4::rotateY(angle)
 					* Matrix4::rotateZ(angle);
-				mesh->applyTransformation(transformMode, transformMatrix);
+				mesh->applyTransformation(selectionMode, transformMode, transformMatrix);
 				break;
 			}
 			default: break;

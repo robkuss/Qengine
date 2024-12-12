@@ -52,7 +52,9 @@ private:
 
 	[[nodiscard]] std::vector<std::shared_ptr<Mesh>> getSelectedMeshes() const;
 
-	void transform(double mouseX, double mouseY, int width, int height, Vector3 worldPos, Vector3 camPos);
+	void transform(double mouseX, double mouseY, Vector3 worldPos, Vector3 camPos);
+	void doSingleTransformation(const std::shared_ptr<Mesh> &mesh, const Vector3 &position, const Vector3 &direction, const Vector3 &camPos, const
+	                            Vector3 &worldPos, const Vector2 &mousePos) const;
 	void applyTransformation();
 
 	void toggleSelectionMode();

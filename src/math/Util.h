@@ -22,8 +22,8 @@ inline double degrees(const double rad) {
 }
 
 /** Vector3 to Vector4 */
-inline Vector4 vector4(Vector3 v) {
-	return {v.x, v.y, v.z, 1.0f};
+inline Vector4 vector4(Vector3 v, const float w) {
+	return {v.x, v.y, v.z, w};
 }
 
 /** Vector4 to Vector3 */

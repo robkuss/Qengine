@@ -5,23 +5,23 @@
 #include <future>
 #include <algorithm>
 
-void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) {
-	const auto oldPos	= getPosition();
-	const auto oldScale	= getScale();
+void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformMode, const Matrix4& transformation) {
+	const auto oldPos	= position;
+	const auto oldScale	= scale;
 
 	// Update Object transformation
-	switch (mode.mode) {
-		case Mode::GRAB:   position = transformation * position; break;
-		case Mode::SCALE:  scale	= transformation * scale;	 break;
-		case Mode::ROTATE: rotation = transformation * rotation; break;
+	switch (transformMode.mode) {
+		case Mode::GRAB:   position = vector3(transformation * vector4(position, 1.0f)); break;
+		case Mode::SCALE:  scale	= vector3(transformation * vector4(scale, 1.0f));	 break;
+		case Mode::ROTATE: rotation = vector3(transformation * vector4(rotation, 0.0f)); break;
 		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
 	}
 
-	const auto dPos = getPosition() - oldPos;
-	const auto dScale = getScale() / oldScale;
+	const auto dPos   = position - oldPos;
+	const auto dScale = scale / oldScale;
 
 	for (const auto& v : vertices) {
-		switch (mode.mode) {
+		switch (transformMode.mode) {
 			case Mode::GRAB:
 				v->position = v->position + dPos;
 			break;
@@ -29,7 +29,7 @@ void Mesh::applyTransformation(const Mode& mode, const Matrix4& transformation) 
 				v->position = oldPos + (v->position - oldPos) * dScale;
 			break;
 			case Mode::ROTATE:
-				v->position = oldPos + vector3(transformation * vector4(v->position - oldPos));
+				v->position = oldPos + vector3(transformation * vector4(v->position - oldPos, 1.0f));
 			break;
 			default: break;
 		}
@@ -97,7 +97,7 @@ void Mesh::addEdgeToMap(const Edge& e, const std::shared_ptr<Triangle>& t) {
 void Mesh::updateNormals() const {
 	// Update vertex normals
 	for (const auto& v : vertices) {
-		v->normal = (v->position - getPosition()).normalize();
+		v->normal = (v->position - position).normalize();
 	}
 
 	// Update face normals
