@@ -36,7 +36,7 @@ private:
             const auto theta = static_cast<float>(PI * ring / rings); // Latitude angle
             const float sinTheta = sin(theta);
             const float cosTheta = cos(theta);
-            for (int seg = 0; seg < segments; ++seg) {
+            for (int seg = 0; seg < segments + 1; ++seg) {
                 const auto phi = static_cast<float>(2 * PI * seg / segments); // Longitude angle
                 const float sinPhi = sin(phi);
                 const float cosPhi = cos(phi);
@@ -60,8 +60,8 @@ private:
     /** Initialize the Sphere's face indices to form the Mesh */
     void initializeFaceIndices() override {
         // Top pole faces
-        for (int seg = 0; seg < segments; ++seg) {
-            const int nextSeg = (seg + 1) % segments;
+        for (int seg = 0; seg < segments + 1; ++seg) {
+            const int nextSeg = (seg + 1) % (segments + 1);
             faceIndices.push_back(1 + seg);       // First vertex
             faceIndices.push_back(1 + nextSeg);   // Second vertex
             faceIndices.push_back(0);             // Top pole vertex
@@ -69,12 +69,12 @@ private:
 
         // Middle faces
         for (int ring = 0; ring < rings - 2; ++ring) {
-            for (int seg = 0; seg < segments; ++seg) {
-                const int nextSeg = (seg + 1) % segments;
-                int current       = 1 + ring * segments + seg;
-                int next          = 1 + ring * segments + nextSeg;
-                int below         = 1 + (ring + 1) * segments + seg;
-                int belowNext     = 1 + (ring + 1) * segments + nextSeg;
+            for (int seg = 0; seg < segments + 1; ++seg) {
+                const int nextSeg = (seg + 1) % (segments + 1);
+                int current       = 1 + ring * (segments + 1) + seg;
+                int next          = 1 + ring * (segments + 1) + nextSeg;
+                int below         = 1 + (ring + 1) * (segments + 1) + seg;
+                int belowNext     = 1 + (ring + 1) * (segments + 1) + nextSeg;
 
                 // First triangle
                 faceIndices.push_back(current);
@@ -90,10 +90,10 @@ private:
 
         // Bottom pole faces
         const int bottomPoleIndex = static_cast<int>(vertices.size()) - 1;
-        for (int seg = 0; seg < segments; ++seg) {
-            const int nextSeg = (seg + 1) % segments;
-            faceIndices.push_back(bottomPoleIndex - segments + nextSeg); // First vertex
-            faceIndices.push_back(bottomPoleIndex - segments + seg);     // Second vertex
+        for (int seg = 0; seg < segments + 1; ++seg) {
+            const int nextSeg = (seg + 1) % (segments + 1);
+            faceIndices.push_back(bottomPoleIndex - (segments + 1) + nextSeg); // First vertex
+            faceIndices.push_back(bottomPoleIndex - (segments + 1) + seg);     // Second vertex
             faceIndices.push_back(bottomPoleIndex);                         // Bottom pole vertex
         }
     }
