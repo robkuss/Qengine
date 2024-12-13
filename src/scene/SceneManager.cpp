@@ -4,32 +4,10 @@
 
 #include <math/vector/Vector2.h>
 #include <scene/graphics/MeshRenderer.h>
-
-#include <objects/mesh/cube/Cube.cpp>
-#include <objects/mesh/sphere/Sphere.cpp>
-
 #include "RenderContext.h"
 
 
 SceneManager::SceneManager() {
-	// Add Default Cube to Scene
-	addObject(std::make_shared<Cube>(
-		"Cube",
-		Vector3(0.0f, 1.0f, 0.0f),
-		1.0f,
-		Colors::RED
-	));
-
-	// Add Default Sphere to Scene
-	addObject(std::make_shared<Sphere>(
-		"Sphere",
-		Vector3(0.0f, -1.0f, 0.0f),
-		0.5f,
-		64,
-		32,
-		Colors::BLUE
-	));
-
 	context = new RenderContext(selectionMode);
 }
 
@@ -68,7 +46,7 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 		std::vector<std::shared_ptr<Object>> intersectingObjects;
 		for (const auto& obj : sceneObjects) {
 			// Attempt to cast Object to Mesh
-			if (const auto mesh = dynamic_cast<Mesh*>(obj.get())) {
+			if (const auto mesh = dynamic_cast<const Mesh*>(obj.get())) {
 				if (ray->intersects(*mesh)) {
 					intersectingObjects.push_back(obj);
 				}
@@ -268,7 +246,7 @@ void SceneManager::applyTransformation() {
 	if (transformMode != NONE) {
 		lastTransform		  = Vector3::ZERO;	// Reset transformation data
 		transformMode		  = NONE;			// Go back to View Mode
-		transformMode.subMode = SubMode::NONE;
+		transformMode.subMode = SubMode::NONE;	// Reset transformation direction
 	}
 }
 
@@ -292,16 +270,16 @@ void SceneManager::setTransformMode(const Mode& mode) {
 	if (selectedObjects.empty()) return;
 	transformMode = mode;
 
-	// Reset direction
+	// Reset transformation direction
 	transformMode.subMode = SubMode::NONE;
 }
 
 void SceneManager::setTransformSubMode(const SubMode& subMode) {
 	// Don't change mode if no Object is selected
-	if (selectedObjects.empty()) return;
-	if (transformMode.type != ModeType::TRANSFORM) {
-		transformMode.subMode = subMode;
-	}
+	if (selectedObjects.empty() || transformMode.type != ModeType::TRANSFORM) return;
+
+	// Set transformation direction
+	transformMode.subMode = subMode;
 }
 
 void SceneManager::toggleShadingMode() const {

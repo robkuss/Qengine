@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "objects/Object.h"
-#include "scene/Mode.h"
 
 #include "math/geometry/Vertex.h"
 #include "math/geometry/Edge.h"
@@ -14,6 +13,8 @@
 
 #include <scene/graphics/color/Colors.h>
 
+
+class Texture;
 
 enum class ShadingMode {
 	FLAT,
@@ -26,15 +27,16 @@ public:
 	std::vector<std::shared_ptr<Triangle>> triangles = {};
 	std::vector<int> faceIndices = {};
 	Color color;
+	std::shared_ptr<Texture> texture = nullptr;
 
 	// Constructor & Destructor
-	Mesh(const std::string& name, const Color& color) : Object{name}, color(color) {}
+	Mesh(const std::string& name, const Color& color, const std::shared_ptr<Texture>& texture) : Object{name}, color(color), texture(texture) {}
 	~Mesh() override = default;
 
 	void buildEdgeToFaceMap();
 	void buildVertexToEdgeMap();
 
-	void applyTransformation(const Mode& selectionMode, const Mode& transformMode, const Matrix4 &transformation) override;
+	void applyTransformation(const Mode &selectionMode, const Mode &transformMode, const Matrix4 &transformation) override;
 
 	void initializeTriangles();
 	void updateNormals() const;

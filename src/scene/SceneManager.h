@@ -17,6 +17,9 @@ public:
 
 	void render() const;
 
+	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
+	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
+
 private:
 	// Grant a few Viewport functions access to private members using the best keyword in C++
 	friend void Viewport::drawOnScreenText() const;
@@ -34,9 +37,6 @@ private:
 	Vector3 lastTransform   = Vector3::ZERO;
 
 	float scalingSens		= 1000.0f;	// Scaling sensitivity
-
-	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
-	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
 
 	void select(const Vector2 &mousePos, bool preserve);
 

@@ -31,7 +31,7 @@ inline Vector3 vector3(Vector4 v) {
 	return {v.x, v.y, v.z};
 }
 
-inline Vector3 clampDirection(const SubMode subMode) {
+inline Vector3 clampDirection(const SubMode& subMode) {
 	switch (subMode) {
 		case SubMode::X: return {1, 0, 0};
 		case SubMode::Y: return {0, 1, 0};

@@ -6,8 +6,8 @@ class Sphere final : public Mesh {
 public:
     /** Construct a Sphere Mesh with given radius, position, and segment count */
     explicit Sphere(const std::string& name, const Vector3& position, const float radius, const int segments, const int rings,
-        const Color& color = Colors::MESH_FACE_COLOR)
-            : Mesh{name, color}, radius(radius), segments(segments), rings(rings) {
+        const Color& color, const std::shared_ptr<Texture>& texture)
+            : Mesh{name, color, texture}, radius(radius), segments(segments), rings(rings) {
         initializeVertices();
         initializeFaceIndices();
 
@@ -28,7 +28,7 @@ private:
 
     /** Initialize the Sphere's Vertices based on radius, segments, and rings */
     void initializeVertices() override {
-        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, radius)); // Top pole
+        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, radius, Vector2{0.5f, 1.0f})); // Top pole
         for (int ring = 1; ring < rings; ++ring) {
             const auto theta = static_cast<float>(PI * ring / rings); // Latitude angle
             const float sinTheta = sin(theta);
@@ -42,10 +42,13 @@ private:
                 float y = radius * sinTheta * sinPhi;
                 float z = radius * cosTheta;
 
-                vertices.emplace_back(std::make_shared<Vertex>(x, y, z));
+                float u = static_cast<float>(seg) / static_cast<float>(segments); // Map longitude to [0, 1]
+                float v = static_cast<float>(ring) / static_cast<float>(rings);   // Map latitude to [0, 1]
+
+                vertices.emplace_back(std::make_shared<Vertex>(x, y, z, Vector2{u, v}));
             }
         }
-        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, -radius)); // Bottom pole
+        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, -radius, Vector2{0.5f, 0.0f})); // Bottom pole
     }
 
     /** Initialize the Sphere's face indices to form the Mesh */

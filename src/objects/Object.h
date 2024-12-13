@@ -1,10 +1,8 @@
 #pragma once
 
-#include <iostream>
 #include <ostream>
 #include <utility>
 #include <string>
-#include <cmath>
 
 #include <math/vector/Vector3.h>
 #include <math/matrix/Matrix4.h>
@@ -21,7 +19,7 @@ public:
 	explicit Object(std::string name) : name(std::move(name)), id(nextID++) {}
 	virtual ~Object() = default;	// Virtual destructor to enable dynamic_cast
 
-	virtual void applyTransformation(const Mode& selectionMode, const Mode& transformMode, const Matrix4 &transformation);
+	virtual void applyTransformation(const Mode &selectionMode, const Mode &transformMode, const Matrix4 &transformation);
 
 	bool operator==(const Object& other) const { return id == other.id; }	// Object == Object
 
@@ -33,12 +31,12 @@ private:
 // Initialize Object ID
 inline int Object::nextID = 0;
 
-inline void Object::applyTransformation(const Mode& selectionMode, const Mode& transformMode, const Matrix4 &transformation) {
-	// Update Object transformation
-	switch (transformMode.mode) {
+inline void Object::applyTransformation(const Mode &selectionMode, const Mode &transformMode, const Matrix4 &transformation) {
+	// Update Object transformation TODO
+	/*switch (transformMode.mode) {
 		case Mode::GRAB:   position = vector3(transformation * vector4(position, 1.0f)); break;
 		case Mode::SCALE:  scale	= vector3(transformation * vector4(scale, 1.0f));	 break;
 		case Mode::ROTATE: rotation = vector3(transformation * vector4(rotation, 0.0f)); break;
 		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
-	}
+	}*/
 }

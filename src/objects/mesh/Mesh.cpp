@@ -3,7 +3,6 @@
 #include <vector>
 #include <ranges>
 #include <future>
-#include <algorithm>
 
 void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformMode, const Matrix4& transformation) {
 	const auto oldPos	= position;

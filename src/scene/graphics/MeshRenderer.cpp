@@ -1,9 +1,11 @@
 #include "MeshRenderer.h"
 
+#include <iostream>
 #include <GL/gl.h>
 
 #include <ranges>
 
+#include "material/texture/Texture.h"
 #include "scene/graphics/color/Colors.h"
 #include "scene/RenderContext.h"
 
@@ -43,6 +45,7 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
     			? t.normal		// Flat shading
     			: v->normal;	// Smooth shading
     		glNormal3f(normal.x, normal.y, normal.z);
+    		glTexCoord2f(static_cast<float>(v->texCoords.x), static_cast<float>(v->texCoords.y));
     		vertex3fv(*v);
     	}
         glEnd();
@@ -120,6 +123,9 @@ void MeshRenderer::renderTriangles(const Mesh& mesh, const RenderContext& contex
 }
 
 void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
+	glEnable(GL_TEXTURE_2D);
+	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, mesh.texture->id);
+
 	const bool isSelected = std::ranges::find_if(
 		context.selectedObjects,
 		[&mesh](const std::shared_ptr<Object>& obj) {
@@ -164,6 +170,8 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 
 	// Reset line width back to default
 	glLineWidth(1.0f);
+
+	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 bool MeshRenderer::isSilhouetteEdge(

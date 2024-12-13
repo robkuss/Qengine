@@ -37,32 +37,46 @@ public:
         : mode(modeEnum), type(modeType), subMode(subMode) {}
 
     bool operator==(const Mode & mode) const = default;
+
+    [[nodiscard]] std::string modeToString() const;
+    [[nodiscard]] std::string subModeToString() const;
+    [[nodiscard]] std::string modeTypeToString() const;
 };
 
 // Function to convert ModeEnum to string
-inline std::string modeToString(const Mode::ModeEnum modeEnum) {
-    switch (modeEnum) {
-        case Mode::NONE:    return "NONE";
-        case Mode::OBJECT:  return "OBJECT";
-        case Mode::EDIT:    return "EDIT";
-        case Mode::GRAB:    return "GRAB";
-        case Mode::SCALE:   return "SCALE";
-        case Mode::ROTATE:  return "ROTATE";
-        case Mode::EXTRUDE: return "EXTRUDE";
-        case Mode::FILL:    return "FILL";
-        case Mode::MERGE:   return "MERGE";
-        default:            return "UNKNOWN";
+inline std::string Mode::modeToString() const {
+    switch (this->mode) {
+        case NONE:    return "NONE";
+        case OBJECT:  return "OBJECT";
+        case EDIT:    return "EDIT";
+        case GRAB:    return "GRAB";
+        case SCALE:   return "SCALE";
+        case ROTATE:  return "ROTATE";
+        case EXTRUDE: return "EXTRUDE";
+        case FILL:    return "FILL";
+        case MERGE:   return "MERGE";
+        default:      return "UNKNOWN";
     }
 }
 
 // Function to convert SubMode to string
-inline std::string subModeToString(const SubMode subMode) {
-    switch (subMode) {
+inline std::string Mode::subModeToString() const {
+    switch (this->subMode) {
         case SubMode::NONE: return "NONE";
-        case SubMode::X: return "X";
-        case SubMode::Y: return "Y";
-        case SubMode::Z: return "Z";
-        default: return "UNKNOWN";
+        case SubMode::X:    return "X";
+        case SubMode::Y:    return "Y";
+        case SubMode::Z:    return "Z";
+        default:            return "UNKNOWN";
+    }
+}
+
+inline std::string Mode::modeTypeToString() const {
+    switch (this->type) {
+        case ModeType::NONE:      return "NONE";
+        case ModeType::VIEW:      return "VIEW";
+        case ModeType::TRANSFORM: return "TRANSFORM";
+        case ModeType::MESHDATA:  return "MESHDATA";
+        default:                  return "UNKNOWN";
     }
 }
 

@@ -1,13 +1,17 @@
-
 #include "Viewport.h"
 
 #include <cmath>
 #include <sstream>
 #include <iomanip>
+
+#include <scene/SceneManager.h>
 #include <math/vector/Vector2.h>
 
 #include <objects/Object.h>
-#include <scene/SceneManager.h>
+#include <objects/mesh/cube/Cube.cpp>
+#include <objects/mesh/sphere/Sphere.cpp>
+
+#include "material/texture/Texture.h"
 
 
 Viewport::Viewport(const std::string& title, const int width, const int height)
@@ -29,10 +33,9 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 		glfwTerminate();
 		throw std::runtime_error("Failed to open window");
 	}
-
 	centerWindow();
-
 	glfwMakeContextCurrent(window);
+
 	glfwSetWindowUserPointer(window, this);
 	glfwShowWindow(window);
 
@@ -45,6 +48,10 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 	glEnable(GL_RESCALE_NORMAL);
 
 	glfwSwapInterval(0); // Disable v-sync
+
+	glEnable(GL_NORMALIZE);
+	float noLight[4] = {0.0, 0.0, 0.0, 1.0};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
 }
 
 Viewport::~Viewport() {
@@ -58,6 +65,29 @@ Viewport::~Viewport() {
 }
 
 void Viewport::start() {
+	auto thmTexture   = std::make_shared<Texture>("../resources/textures/thm2k.png");
+	auto earthTexture = std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
+
+	// Add Default Cube to Scene
+	sceneManager->addObject(std::make_shared<Cube>(
+		"Cube",
+		Vector3(0.0f, 1.0f, 0.0f),
+		1.0f,
+		Colors::WHITE,
+		thmTexture
+	));
+
+	// Add Default Sphere to Scene
+	sceneManager->addObject(std::make_shared<Sphere>(
+		"Sphere",
+		Vector3(0.0f, -1.0f, 0.0f),
+		0.5f,
+		64,
+		32,
+		Colors::WHITE,
+		earthTexture
+	));
+
 	#ifdef TEXT
 		text = new Text();	// Initialize FreeType for on-screen debug text
 	#endif
@@ -149,9 +179,9 @@ void Viewport::drawOnScreenText() const {
 			case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camDist; break;
 			case 4:  out << "Mouse Screen: " << mouseX[0]  << " / " << mouseY[0]; break;
 			case 5:  out << "Mouse World: "  << mouseWorld.toString(); break;
-			case 6:	 out << "Mode: " << modeToString(sceneManager->selectionMode.mode);
-				if (sceneManager->transformMode.mode    != Mode::NONE)	out << " " << modeToString(sceneManager->transformMode.mode);
-				if (sceneManager->transformMode.subMode != SubMode::NONE) out << " " << subModeToString(sceneManager->transformMode.subMode); break;
+			case 6:	 out << "Mode: " << sceneManager->selectionMode.modeToString();
+				if (sceneManager->transformMode.mode    != Mode::NONE)	out << " " << sceneManager->transformMode.modeToString();
+				if (sceneManager->transformMode.subMode != SubMode::NONE) out << " " << sceneManager->transformMode.subModeToString(); break;
 			case 7:  out << "Cube:"; break;
 			case 8:  out << "    Pos: "   << cube.position.toString();  break;
 			case 9:  out << "    Scale: " << cube.scale.toString();     break;

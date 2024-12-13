@@ -6,8 +6,8 @@ class Cube final : public Mesh {
 public:
     /** Construct a Cube Mesh with given side length and position and default scale and rotation */
     explicit Cube(const std::string& name, const Vector3& position, const float s,
-        const Color& color = Colors::MESH_FACE_COLOR)
-            : Mesh{name, color}, s(s) {
+        const Color& color, const std::shared_ptr<Texture>& texture)
+            : Mesh{name, color, texture}, s(s) {
         initializeVertices();
         initializeFaceIndices();
 
@@ -27,16 +27,16 @@ private:
     /** Initialize the Cube's vertices based on side length and position */
     void initializeVertices() override {
         // Front face
-        vertices.emplace_back(std::make_shared<Vertex>(-s/2, -s/2,  s/2));  // Bottom-left
-        vertices.emplace_back(std::make_shared<Vertex>( s/2, -s/2,  s/2));  // Bottom-right
-        vertices.emplace_back(std::make_shared<Vertex>( s/2,  s/2,  s/2));  // Top-right
-        vertices.emplace_back(std::make_shared<Vertex>(-s/2,  s/2,  s/2));  // Top-left
+        vertices.emplace_back(std::make_shared<Vertex>(-s/2, -s/2,  s/2, Vector2(0, 0)));  // Bottom-left
+        vertices.emplace_back(std::make_shared<Vertex>( s/2, -s/2,  s/2, Vector2(1, 0)));  // Bottom-right
+        vertices.emplace_back(std::make_shared<Vertex>( s/2,  s/2,  s/2, Vector2(1, 1)));  // Top-right
+        vertices.emplace_back(std::make_shared<Vertex>(-s/2,  s/2,  s/2, Vector2(0, 1)));  // Top-left
 
         // Back face
-        vertices.emplace_back(std::make_shared<Vertex>(-s/2, -s/2, -s/2));  // Bottom-left
-        vertices.emplace_back(std::make_shared<Vertex>( s/2, -s/2, -s/2));  // Bottom-right
-        vertices.emplace_back(std::make_shared<Vertex>( s/2,  s/2, -s/2));  // Top-right
-        vertices.emplace_back(std::make_shared<Vertex>(-s/2,  s/2, -s/2));  // Top-left
+        vertices.emplace_back(std::make_shared<Vertex>(-s/2, -s/2, -s/2, Vector2(0, 0)));  // Bottom-left
+        vertices.emplace_back(std::make_shared<Vertex>( s/2, -s/2, -s/2, Vector2(1, 0)));  // Bottom-right
+        vertices.emplace_back(std::make_shared<Vertex>( s/2,  s/2, -s/2, Vector2(1, 1)));  // Top-right
+        vertices.emplace_back(std::make_shared<Vertex>(-s/2,  s/2, -s/2, Vector2(0, 1)));  // Top-left
     }
 
     void initializeFaceIndices() override {
