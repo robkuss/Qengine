@@ -28,7 +28,10 @@ private:
 
     /** Initialize the Sphere's Vertices based on radius, segments, and rings */
     void initializeVertices() override {
-        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, radius, Vector2{0.5f, 1.0f})); // Top pole
+        // Top pole (north pole)
+        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, radius, Vector2{0.5f, 1.0f}));
+
+        // Latitude rings
         for (int ring = 1; ring < rings; ++ring) {
             const auto theta = static_cast<float>(PI * ring / rings); // Latitude angle
             const float sinTheta = sin(theta);
@@ -42,13 +45,16 @@ private:
                 float y = radius * sinTheta * sinPhi;
                 float z = radius * cosTheta;
 
-                float u = static_cast<float>(seg) / static_cast<float>(segments); // Map longitude to [0, 1]
-                float v = static_cast<float>(ring) / static_cast<float>(rings);   // Map latitude to [0, 1]
+                // Calculate texture coordinates
+                const float u = static_cast<float>(seg) / static_cast<float>(segments);
+                const float v = 1.0f - static_cast<float>(ring) / static_cast<float>(rings); // Invert v to fix upside-down texture
 
                 vertices.emplace_back(std::make_shared<Vertex>(x, y, z, Vector2{u, v}));
             }
         }
-        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, -radius, Vector2{0.5f, 0.0f})); // Bottom pole
+
+        // Bottom pole (south pole)
+        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, -radius, Vector2{0.5f, 0.0f}));
     }
 
     /** Initialize the Sphere's face indices to form the Mesh */

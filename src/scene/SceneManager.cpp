@@ -151,6 +151,7 @@ void SceneManager::selectVertex(const Vertex& v) {
 	if (std::ranges::find(selectedVertices, v) == selectedVertices.end()) {
 		selectedVertices.push_back(v);
 		context->selectedVertices = selectedVertices;
+		std::cout << "Selected " << v.texCoords.x << ", " << v.texCoords.y << std::endl;
 	} else {
 		deselectVertex(v);
 	}

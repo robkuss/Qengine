@@ -44,14 +44,10 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 
 	// OpenGL setup
 	glEnable(GL_MULTISAMPLE); // Enable multi-sampling (antialiasing)
-	glEnable(GL_DEPTH_TEST); // Enable depth testing
+	glEnable(GL_DEPTH_TEST);  // Enable depth testing
 	glEnable(GL_RESCALE_NORMAL);
 
 	glfwSwapInterval(0); // Disable v-sync
-
-	glEnable(GL_NORMALIZE);
-	float noLight[4] = {0.0, 0.0, 0.0, 1.0};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
 }
 
 Viewport::~Viewport() {

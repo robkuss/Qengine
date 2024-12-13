@@ -38,7 +38,7 @@ public:
 	static float line(int lineNumber);
 
 private:
-	static constexpr auto fontPath = "C:/Users/rober/OneDrive/Qengine/Qengine/resources/fonts/cour.ttf";
+	static constexpr auto fontPath = "../resources/fonts/cour.ttf";
 	static constexpr int fontSize = 48;
 
 	FT_Library library{};

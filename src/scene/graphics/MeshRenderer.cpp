@@ -54,7 +54,7 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
     // Enable lighting
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT1);
-    //glEnable(GL_LIGHT2);
+    glEnable(GL_LIGHT2);
 
     // Draw the mesh with the base color
     drawWithColor(mesh.color);
