@@ -188,6 +188,11 @@ void SceneManager::transform(
 	for (const auto& mesh : getSelectedMeshes()) {
 		const auto camDist = mesh->position.distance(camPos);
 
+		const auto mouseDist = static_cast<float>(
+			 project(mesh->position, context->viewport, context->viewMatrix, context->projMatrix)
+			.distance(Vector2(mouseX, mouseY))
+		);
+
 		switch (transformMode.mode) {
 			case Mode::GRAB: {
 				const Matrix4 transform = Matrix4::translate(
@@ -199,14 +204,14 @@ void SceneManager::transform(
 				break;
 			}
 			case Mode::SCALE: {
-				const auto mouseDist = static_cast<float>(
-					 project(mesh->position, context->viewport, context->viewMatrix, context->projMatrix)
-					.distance(Vector2(mouseX, mouseY))
+				const float scaleFactor = camDist * mouseDist * scalingSens;
+				const auto scaleVector = Vector3(	// Clamp direction
+					direction.x != 0 ? scaleFactor : mesh->scale.x,
+					direction.y != 0 ? scaleFactor : mesh->scale.y,
+					direction.z != 0 ? scaleFactor : mesh->scale.z
 				);
 				const Matrix4 transform	= Matrix4::scale(
-					  direction						// Clamp direction
-					* (camDist * scalingSens		// Distance from Object to camera
-					* mouseDist)					// Distance from Object to mouse position
+					  scaleVector
 					/ mesh->scale					// Difference from last transform
 				);
 				mesh->applyTransformation(selectionMode, transformMode, transform);
