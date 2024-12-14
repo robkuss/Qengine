@@ -114,7 +114,7 @@ private:
 	void updateCameraPosition();
 
 	void setMouseRay(const Vector2 &mousePos);
-	void drawMouseRay() const;
+	static void drawRay(const Vector3 &rayStart, const Vector3 &rayEnd);
 
 	static void drawAxes();
 	static void drawGrid();

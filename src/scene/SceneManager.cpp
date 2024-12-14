@@ -33,13 +33,6 @@ void SceneManager::render() const {
 void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 	const auto ray = context->mouseRay;
 
-	#ifdef DRAW_MOUSE_RAY
-		// Update the visual Mouse Ray
-		const auto directionScaled = ray.direction * MOUSE_RAY_LENGTH;
-		vp->rayStart = ray.origin;
-		vp->rayEnd   = ray.origin + directionScaled;
-	#endif
-
 	// If in Object Mode, select entire Objects
 	if (selectionMode == OBJECT) {
 		// Find Objects that intersect with the mouse Ray
@@ -190,19 +183,10 @@ void SceneManager::transform(
 
 	// Initialize lastTransform if zero
 	if (lastTransform == Vector3::ZERO) lastTransform = worldPos;
+	const auto dPos = worldPos - lastTransform;
 
 	for (const auto& mesh : getSelectedMeshes()) {
-		const auto position = mesh->position;
-		const auto scale    = mesh->scale;
-
-		const auto camDist = position.distance(camPos);
-
-		const auto mouseDist = static_cast<float>(
-			 project(position, context->viewport, context->viewMatrix, context->projMatrix)
-			.distance(Vector2(mouseX, mouseY))
-		);
-
-		const auto dPos = worldPos - lastTransform;
+		const auto camDist = mesh->position.distance(camPos);
 
 		switch (transformMode.mode) {
 			case Mode::GRAB: {
@@ -215,24 +199,31 @@ void SceneManager::transform(
 				break;
 			}
 			case Mode::SCALE: {
+				const auto mouseDist = static_cast<float>(
+					 project(mesh->position, context->viewport, context->viewMatrix, context->projMatrix)
+					.distance(Vector2(mouseX, mouseY))
+				);
 				const Matrix4 transform	= Matrix4::scale(
-					direction						// Clamp direction
-					* (camDist / scalingSens		// Distance from Object to camera
+					  direction						// Clamp direction
+					* (camDist * scalingSens		// Distance from Object to camera
 					* mouseDist)					// Distance from Object to mouse position
-					/ scale							// Difference from last transform
+					/ mesh->scale					// Difference from last transform
 				);
 				mesh->applyTransformation(selectionMode, transformMode, transform);
 				break;
 			}
 			case Mode::ROTATE: {
-				// Example for rotation: Calculate a basic rotation matrix for illustration
-				constexpr float angle = 0.01f;		// Rotation angle TODO (Replace with calculated rotation angle based on mouse input)
+				// Calculate rotation angle based on mouse drag distance
+				const float angle = dPos.length() * rotationSens;
 
-				const Matrix4 transformMatrix =
-					  Matrix4::rotateX(angle)
-					* Matrix4::rotateY(angle)
-					* Matrix4::rotateZ(angle);
-				mesh->applyTransformation(selectionMode, transformMode, transformMatrix);
+				// Create rotation matrix
+				Matrix4 rotation =
+					  Matrix4::rotateX(angle * direction.x)
+					* Matrix4::rotateY(angle * direction.y)
+					* Matrix4::rotateZ(angle * direction.z);
+
+				// Apply rotation
+				mesh->applyTransformation(selectionMode, transformMode, rotation);
 				break;
 			}
 			default: break;

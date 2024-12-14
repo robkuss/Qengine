@@ -5,9 +5,6 @@
 #include <future>
 
 void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformMode, const Matrix4& transformation) {
-	const auto oldPos	= position;
-	const auto oldScale	= scale;
-
 	// Update Object transformation
 	switch (transformMode.mode) {
 		case Mode::GRAB:   position = vector3(transformation * vector4(position, 1.0f)); break;
@@ -16,22 +13,8 @@ void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformM
 		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
 	}
 
-	const auto dPos   = position - oldPos;
-	const auto dScale = scale / oldScale;
-
 	for (const auto& v : vertices) {
-		switch (transformMode.mode) {
-			case Mode::GRAB:
-				v->position = v->position + dPos;
-			break;
-			case Mode::SCALE:
-				v->position = oldPos + (v->position - oldPos) * dScale;
-			break;
-			case Mode::ROTATE:
-				v->position = oldPos + vector3(transformation * vector4(v->position - oldPos, 1.0f));
-			break;
-			default: break;
-		}
+		v->position = vector3(transformation * vector4(v->position - position, 1.0f)) + position;
 	}
 
 	updateNormals();

@@ -35,8 +35,10 @@ private:
 	std::vector<Vertex> selectedVertices;
 
 	Vector3 lastTransform   = Vector3::ZERO;
+	Vector2 lastMousePos	= Vector2(0.0, 0.0);
 
-	float scalingSens		= 1000.0f;	// Scaling sensitivity
+	const float scalingSens		= 0.001;	// Scaling sensitivity
+	const float rotationSens	= 10.0f;	// Rotation sensitivity
 
 	void select(const Vector2 &mousePos, bool preserve);
 

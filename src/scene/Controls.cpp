@@ -46,7 +46,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 			const auto mousePos = Vector2(*vp->mouseX, *vp->mouseY);
 			vp->setMouseRay(mousePos);
 			vp->sceneManager->context->mouseRay = &vp->mouseRay;
-			vp->sceneManager->select(mousePos, false);	// TODO implement selection preservation when Ctrl/Shift pressed
+			vp->sceneManager->select(mousePos, false);
 		}
 		else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
 			vp->initRotation(action == GLFW_PRESS);
@@ -66,7 +66,8 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 				}
 			} else {
 				// Object transformation
-				vp->sceneManager->transform(mouseX, mouseY, unproject(Vector2(*vp->mouseX, *vp->mouseY), vp->viewport, vp->viewMatrix, vp->projMatrix), vp->camPos);
+				const Vector3 worldPos = unproject(Vector2(*vp->mouseX, *vp->mouseY), vp->viewport, vp->viewMatrix, vp->projMatrix);
+				vp->sceneManager->transform(mouseX, mouseY, worldPos, vp->camPos);
 			}
 		}
 	});
@@ -121,7 +122,7 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 
 		default: {
 			#ifdef TEXT
-				// text->setErrorText("Invalid key.");
+				text->setErrorText("Invalid key.");
 			#endif
 		}
 	}

@@ -125,7 +125,7 @@ void Viewport::render() {
 	sceneManager->render();
 
 	#ifdef DRAW_MOUSE_RAY
-		drawMouseRay();
+		drawRay(rayStart, rayEnd);
 	#endif
 
 	#ifdef TEXT
@@ -305,8 +305,10 @@ void Viewport::setPerspective(const float h, const float v) {
 }
 
 void Viewport::setMouseRay(const Vector2& mousePos) {
-	mouseRay.origin = camPos;
 	mouseRay.direction = unproject(mousePos, viewport, viewMatrix, projMatrix).normalize();
+	const auto directionScaled = mouseRay.direction * MOUSE_RAY_LENGTH;
+	rayStart = mouseRay.origin = camPos;
+	rayEnd   = mouseRay.origin + directionScaled;
 }
 
 // Drawing functions
@@ -355,7 +357,7 @@ void Viewport::drawGrid() {
 	glEnd();
 }
 
-void Viewport::drawMouseRay() const {
+void Viewport::drawRay(const Vector3& rayStart, const Vector3& rayEnd) {
 	glPointSize(5);
 	glBegin(GL_POINTS);
 	color3f(Colors::RED);
