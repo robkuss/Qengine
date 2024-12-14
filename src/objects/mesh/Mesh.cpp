@@ -101,8 +101,8 @@ void Mesh::updateNormals() const {
 
 	// Update face normals
 	for (const auto& t : triangles) {
-		t->normal = faceNormal(*t);
-		t->centroid = centroid(*t);
+		t->normal = t->faceNormal();
+		t->centroid = t->center();
 	}
 }
 

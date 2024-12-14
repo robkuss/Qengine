@@ -3,7 +3,6 @@
 #include "vector/Vector2.h"
 #include "vector/Vector3.h"
 #include "vector/Vector4.h"
-#include "geometry/Triangle.h"
 
 #include <scene/Mode.h>
 
@@ -38,21 +37,6 @@ inline Vector3 clampDirection(const SubMode& subMode) {
 		case SubMode::Z: return {0, 0, 1};
 		default: return Vector3::ONE;
 	}
-}
-
-/** Calculate the normal of a Triangle */
-inline Vector3 faceNormal(const Triangle& t) {
-	// Compute the two edge vectors
-	const Vector3 e1 = t.v1->position - t.v0->position;
-	const Vector3 e2 = t.v2->position - t.v0->position;
-
-	// Compute the normal using the cross product
-	return e1.cross(e2).normalize();
-}
-
-/** Calculate the centroid of a Triangle */
-inline Vector3 centroid(const Triangle& t) {
-	return (t.v0->position + t.v1->position + t.v2->position) / 3.0f;
 }
 
 /** Map 3D world space to 2D screen space */

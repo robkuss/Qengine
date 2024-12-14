@@ -37,7 +37,7 @@ private:
             const float sinTheta = sin(theta);
             const float cosTheta = cos(theta);
             for (int seg = 0; seg < segments + 1; ++seg) {
-                const auto phi = static_cast<float>(2 * PI * seg / segments); // Longitude angle
+                const auto phi = seg == segments ? 0 : static_cast<float>(2 * PI * seg / segments); // Longitude angle
                 const float sinPhi = sin(phi);
                 const float cosPhi = cos(phi);
 
