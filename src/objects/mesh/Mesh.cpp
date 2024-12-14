@@ -9,7 +9,11 @@ void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformM
 	switch (transformMode.mode) {
 		case Mode::GRAB:   position = vector3(transformation * vector4(position, 1.0f)); break;
 		case Mode::SCALE:  scale	= vector3(transformation * vector4(scale, 1.0f));	 break;
-		case Mode::ROTATE: rotation = vector3(transformation * vector4(rotation, 0.0f)); break;
+		case Mode::ROTATE: {
+			rotation = vector3(transformation * vector4(rotation, 0.0f));
+			rotationEuler = rotationEuler + transformation.extractEulerAngles();
+			break;
+		}
 		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
 	}
 

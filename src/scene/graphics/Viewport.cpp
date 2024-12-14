@@ -181,7 +181,7 @@ void Viewport::drawOnScreenText() const {
 			case 7:  out << "Cube:"; break;
 			case 8:  out << "    Pos: "   << cube.position.toString();  break;
 			case 9:  out << "    Scale: " << cube.scale.toString();     break;
-			case 10: out << "    Rot: "   << cube.rotation.toString();  break;
+			case 10: out << "    Rot: "   << cube.rotationEuler.toString(); break;
 			default: out << "Vertex Count: " << vertexCount; break;
 		}
 		#ifdef TEXT

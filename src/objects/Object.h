@@ -14,6 +14,7 @@ public:
 	Vector3 position = Vector3::ZERO;
 	Vector3 scale	 = Vector3::ONE;
 	Vector3 rotation = Vector3::ZERO;
+	Vector3 rotationEuler = Vector3::ZERO;	// Euler Angles for debug output
 
 	// Constructor & Destructor
 	explicit Object(std::string name) : name(std::move(name)), id(nextID++) {}

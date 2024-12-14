@@ -213,6 +213,32 @@ struct Matrix4 {
 	    return Matrix4(inv);
 	}
 
+	/** Extract Euler angles from a transformation matrix */
+	[[nodiscard]] Vector3 extractEulerAngles() const {
+		// Compute sy (the magnitude of the first column vector of the 3x3 rotation submatrix)
+		const float sy = std::sqrt(m11 * m11 + m21 * m21);
+
+		// Check for singularity (gimbal lock)
+		const bool singular = sy < EPSILON;
+
+		float x, y, z; // Rotation angles (pitch, yaw, roll)
+		if (!singular) {
+			x = std::atan2(m32, m33); // Pitch (rotation around X-axis)
+			y = std::atan2(-m31, sy); // Yaw (rotation around Y-axis)
+			z = std::atan2(m21, m11); // Roll (rotation around Z-axis)
+		} else {
+			x = std::atan2(-m23, m22); // Alternate calculation for pitch in singular case
+			y = std::atan2(-m31, sy);  // Yaw remains the same
+			z = 0;							 // Roll is indeterminate
+		}
+
+		return {
+			static_cast<float>(degrees(x)),
+			static_cast<float>(degrees(y)),
+			static_cast<float>(degrees(z))
+		};
+	}
+
 	/**
 	 * Converts the matrix to column-major order and stores the result in the provided array.
 	 *
