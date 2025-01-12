@@ -4,7 +4,7 @@
 #include "vector/Vector3.h"
 #include "vector/Vector4.h"
 
-#include <scene/Mode.h>
+#include <viewport/Mode.h>
 
 
 constexpr float EPSILON		= 1e-9f;					// Infinitesimal

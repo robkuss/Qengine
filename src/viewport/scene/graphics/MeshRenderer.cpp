@@ -6,8 +6,8 @@
 #include <ranges>
 
 #include "material/texture/Texture.h"
-#include "scene/graphics/color/Colors.h"
-#include "scene/RenderContext.h"
+#include "color/Colors.h"
+#include "viewport/scene/RenderContext.h"
 
 /** Reinterpret Vertex as GLfloat* */
 void vertex3fv(const Vertex& v) {
@@ -155,7 +155,7 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 			glPointSize(3.0f);
 
 			for (const auto&[first, second]: mesh.edgeToFaceMap) {
-				if (isSilhouetteEdge(second, context.camPos)) {
+				if (isSilhouetteEdge(second, context.activeCamera->camPos)) {
 					renderEdge(first, color, color);
 
 					// Highlight the vertices of the silhouette edges

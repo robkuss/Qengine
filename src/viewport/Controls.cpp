@@ -1,8 +1,4 @@
-#include <math/vector/Vector2.h>
-#include <scene/graphics/Viewport.h>
-
-#include "Mode.h"
-#include "SceneManager.h"
+#include "scene/SceneManager.h"
 
 // Controls
 
@@ -43,13 +39,13 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* cbWindow, const int button, const int action, const int) {
 		const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow));
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-			const auto mousePos = Vector2(*vp->mouseX, *vp->mouseY);
+			const auto mousePos = Vector2(*vp->activeCamera.mouseX, *vp->activeCamera.mouseY);
 			vp->setMouseRay(mousePos);
 			vp->sceneManager->context->mouseRay = &vp->mouseRay;
 			vp->sceneManager->select(mousePos, false);
 		}
 		else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-			vp->initRotation(action == GLFW_PRESS);
+			vp->activeCamera.initRotation(action == GLFW_PRESS);
 		}
 	});
 
@@ -57,17 +53,17 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	glfwSetCursorPosCallback(window, [](GLFWwindow* cbWindow, const double mouseX, const double mouseY) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
 			// Update the mouse position in the Viewport
-			glfwGetCursorPos(cbWindow, vp->mouseX, vp->mouseY);
+			glfwGetCursorPos(cbWindow, vp->activeCamera.mouseX, vp->activeCamera.mouseY);
 
 			if (vp->sceneManager->transformMode == NONE) {
 				// Viewport rotation
-				if (vp->rotating) {
-					vp->rotate(mouseX, mouseY);
+				if (vp->activeCamera.rotating) {
+					vp->activeCamera.rotate(mouseX, mouseY);
 				}
 			} else {
 				// Object transformation
-				const Vector3 worldPos = unproject(Vector2(*vp->mouseX, *vp->mouseY), vp->viewport, vp->viewMatrix, vp->projMatrix);
-				vp->sceneManager->transform(mouseX, mouseY, worldPos, vp->camPos);
+				const Vector3 worldPos = unproject(Vector2(*vp->activeCamera.mouseX, *vp->activeCamera.mouseY), vp->viewport, vp->activeCamera.viewMatrix, vp->activeCamera.projMatrix);
+				vp->sceneManager->transform(mouseX, mouseY, worldPos, vp->activeCamera.camPos);
 			}
 		}
 	});
@@ -75,7 +71,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	// Mouse scroll callback
 	glfwSetScrollCallback(window, [](GLFWwindow* cbWindow, const double, const double yOffset) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow)))
-			vp->zoom(yOffset);
+			vp->activeCamera.zoom(yOffset);
 	});
 
 	// Key callbacks
@@ -95,12 +91,12 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 		case GLFW_KEY_TAB : sceneManager->toggleSelectionMode(); break;				// TAB -> Toggle Object/Edit Mode
 
 		// Number keys for perspective toggling
-		case GLFW_KEY_1: setPerspective(  0.0f,  0.0f); break;					// 1 -> Front View  (towards negative X)
-		case GLFW_KEY_2: setPerspective(-90.0f,  0.0f); break;					// 2 -> Right View  (towards negative Y)
-		case GLFW_KEY_3: setPerspective(  0.0f, 90.0f); break;					// 3 -> Top View    (towards negative Z)
-		case GLFW_KEY_4: setPerspective(180.0f,  0.0f); break;					// 4 -> Back View   (towards positive X)
-		case GLFW_KEY_5: setPerspective( 90.0f,  0.0f); break;					// 5 -> Left View   (towards positive Y)
-		case GLFW_KEY_6: setPerspective(  0.0f,-90.0f); break;					// 6 -> Bottom View (towards positive Z)
+		case GLFW_KEY_1: activeCamera.setPerspective(  0.0f,  0.0f); break;		// 1 -> Front View  (towards negative X)
+		case GLFW_KEY_2: activeCamera.setPerspective(-90.0f,  0.0f); break;		// 2 -> Right View  (towards negative Y)
+		case GLFW_KEY_3: activeCamera.setPerspective(  0.0f, 90.0f); break;		// 3 -> Top View    (towards negative Z)
+		case GLFW_KEY_4: activeCamera.setPerspective(180.0f,  0.0f); break;		// 4 -> Back View   (towards positive X)
+		case GLFW_KEY_5: activeCamera.setPerspective( 90.0f,  0.0f); break;		// 5 -> Left View   (towards positive Y)
+		case GLFW_KEY_6: activeCamera.setPerspective(  0.0f,-90.0f); break;		// 6 -> Bottom View (towards positive Z)
 
 		// Set Transform Mode
 		case GLFW_KEY_G: sceneManager->setTransformMode(GRAB); break;				// G -> Grab

@@ -4,6 +4,8 @@
 #include <ranges>
 #include <future>
 
+#include <viewport/Mode.h>
+
 void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformMode, const Matrix4& transformation) {
 	// Update Object transformation
 	switch (transformMode.mode) {
@@ -14,7 +16,7 @@ void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformM
 			rotationEuler = rotationEuler + transformation.extractEulerAngles();
 			break;
 		}
-		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
+		default: break;
 	}
 
 	for (const auto& v : vertices) {

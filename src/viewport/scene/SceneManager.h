@@ -5,7 +5,7 @@ class Object;
 class Mesh;
 
 #include "RenderContext.h"
-#include "graphics/Viewport.h"
+#include "viewport/Viewport.h"
 
 class SceneManager {
 public:

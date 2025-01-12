@@ -3,7 +3,7 @@
 #include <memory>
 
 #include <math/vector/Vector2.h>
-#include <scene/graphics/MeshRenderer.h>
+#include "graphics/MeshRenderer.h"
 #include "RenderContext.h"
 
 
@@ -72,8 +72,8 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 				if (const auto projV = project(
 					v->position,
 					context->viewport,
-					context->viewMatrix,
-					context->projMatrix
+					context->activeCamera->viewMatrix,
+					context->activeCamera->projMatrix
 				); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
 					intersectingVertices.push_back(*v);
 				}
@@ -144,7 +144,6 @@ void SceneManager::selectVertex(const Vertex& v) {
 	if (std::ranges::find(selectedVertices, v) == selectedVertices.end()) {
 		selectedVertices.push_back(v);
 		context->selectedVertices = selectedVertices;
-		std::cout << "Selected " << v.texCoords.x << ", " << v.texCoords.y << std::endl;
 	} else {
 		deselectVertex(v);
 	}
@@ -189,7 +188,7 @@ void SceneManager::transform(
 		const auto camDist = mesh->position.distance(camPos); // Distance from Object to camera
 
 		const auto mouseDist = static_cast<float>(	// Distance from Object to mouse
-			 project(mesh->position, context->viewport, context->viewMatrix, context->projMatrix)
+			 project(mesh->position, context->viewport, context->activeCamera->viewMatrix, context->activeCamera->projMatrix)
 			.distance(Vector2(mouseX, mouseY))
 		);
 
@@ -231,7 +230,7 @@ void SceneManager::transform(
 				mesh->applyTransformation(selectionMode, transformMode, rotation);
 				break;
 			}
-			default: break;
+			default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
 		}
 	}
 

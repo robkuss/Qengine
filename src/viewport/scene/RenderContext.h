@@ -6,20 +6,22 @@
 #include <math/ray/Ray.h>
 
 #include <math/vector/Vector3.h>
-#include "Mode.h"
+
+#include "Camera.h"
+#include "../Mode.h"
 
 class Object;
 struct Vertex;
 
 struct RenderContext {
-	Vector3 camPos{};
 	std::array<int, 4> viewport{};
-	std::array<float, 16> viewMatrix{};
-	std::array<float, 16> projMatrix{};
+	Camera* activeCamera = nullptr;
 	Mode selectionMode;
 	std::vector<std::shared_ptr<Object>> selectedObjects{};
 	std::vector<Vertex> selectedVertices{};
 	Ray* mouseRay = nullptr; // Use pointer to avoid issues with non-copyable reference
+	bool depthIsolation = false;
+	bool fixedPosition  = false;
 
 	explicit RenderContext(const Mode selectionMode) : selectionMode(selectionMode) {}
 };

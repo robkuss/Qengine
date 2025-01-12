@@ -1,11 +1,12 @@
 #pragma once
 
-#include <ostream>
 #include <utility>
 #include <string>
 
 #include <math/vector/Vector3.h>
 #include <math/matrix/Matrix4.h>
+
+class Mode;
 
 class Object {
 public:

@@ -7,7 +7,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include <scene/graphics/color/Colors.h>
+#include <viewport/scene/graphics/color/Colors.h>
 
 // Struct to represent each character glyph
 struct Character {

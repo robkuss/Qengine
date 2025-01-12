@@ -11,6 +11,7 @@ struct Vertex {
 
 	// Constructors
 	explicit Vertex(const Vector3& position, const Vector2& texCoords) : position(position), normal(Vector3::ZERO), texCoords(texCoords) {}
+	explicit Vertex(const Vector3& position, const Vector3& normal, const Vector2& texCoords) : position(position), normal(normal), texCoords(texCoords) {}
 	explicit Vertex(const float x, const float y, const float z, const Vector2& texCoords) : position(Vector3(x, y, z)), normal(Vector3::ZERO), texCoords(texCoords) {}
 
 	// Equality operator without floating-point tolerance
