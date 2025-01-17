@@ -1,21 +1,36 @@
-#include "SceneManager.h"
+#define GLFW_INCLUDE_GLEXT
+
+#include "Scene.h"
 
 #include <memory>
 
-#include <math/vector/Vector2.h>
 #include "graphics/MeshRenderer.h"
-#include "RenderContext.h"
 
 
-SceneManager::SceneManager() {
+Scene::Scene() {
 	context = new RenderContext(selectionMode);
 }
 
-void SceneManager::render() const {
+void Scene::render() const {
+	// Enable lighting
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT1);
+	glEnable(GL_LIGHT2);
+
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& obj : sceneObjects) {
 		if (const auto mesh = dynamic_cast<Mesh*>(obj.get())) {
 			MeshRenderer::render(*mesh, *context);
+		}
+	}
+
+	// Disable lighting after rendering
+	glDisable(GL_LIGHTING);
+
+	// Loop through the sceneObjects and render Mesh instances
+	for (const auto& obj : sceneObjects) {
+		if (const auto mesh = dynamic_cast<Mesh*>(obj.get())) {
+			MeshRenderer::renderSilhouette(*mesh, *context);
 		}
 	}
 }
@@ -30,7 +45,7 @@ void SceneManager::render() const {
  *
  * @see getMouseRay for the ray computation logic.
  */
-void SceneManager::select(const Vector2& mousePos, const bool preserve) {
+void Scene::select(const Vector2& mousePos, const bool preserve) {
 	const auto ray = context->mouseRay;
 
 	// If in Object Mode, select entire Objects
@@ -99,31 +114,31 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
 	applyTransformation();
 }
 
-void SceneManager::selectAllObjects() {
+void Scene::selectAllObjects() {
 	for (const auto& obj : sceneObjects) {
 		selectedObjects.push_back(obj);
 	}
 	context->selectedObjects = selectedObjects;
 }
 
-void SceneManager::deselectAllObjects() {
+void Scene::deselectAllObjects() {
 	selectedObjects.clear();
 	context->selectedObjects.clear();
 }
 
-void SceneManager::selectAllVertices(const std::shared_ptr<Mesh>& mesh) {
+void Scene::selectAllVertices(const std::shared_ptr<Mesh>& mesh) {
 	for (const auto& v : mesh->vertices) {
 		selectedVertices.push_back(*v);
 	}
 	context->selectedVertices = selectedVertices;
 }
 
-void SceneManager::deselectAllVertices() {
+void Scene::deselectAllVertices() {
 	selectedVertices.clear();
 	context->selectedVertices.clear();
 }
 
-void SceneManager::selectObject(const std::shared_ptr<Object>& obj) {
+void Scene::selectObject(const std::shared_ptr<Object>& obj) {
 	if (std::ranges::find(selectedObjects, obj) == selectedObjects.end()) {
 		selectedObjects.push_back(obj);
 		context->selectedObjects = selectedObjects;
@@ -132,7 +147,7 @@ void SceneManager::selectObject(const std::shared_ptr<Object>& obj) {
 	}
 }
 
-void SceneManager::deselectObject(const std::shared_ptr<Object>& obj) {
+void Scene::deselectObject(const std::shared_ptr<Object>& obj) {
 	if (const auto it = std::ranges::find(selectedObjects, obj);
 			it != selectedObjects.end()) {
 		selectedObjects.erase(it);
@@ -140,7 +155,7 @@ void SceneManager::deselectObject(const std::shared_ptr<Object>& obj) {
 	}
 }
 
-void SceneManager::selectVertex(const Vertex& v) {
+void Scene::selectVertex(const Vertex& v) {
 	if (std::ranges::find(selectedVertices, v) == selectedVertices.end()) {
 		selectedVertices.push_back(v);
 		context->selectedVertices = selectedVertices;
@@ -149,7 +164,7 @@ void SceneManager::selectVertex(const Vertex& v) {
 	}
 }
 
-void SceneManager::deselectVertex(const Vertex& v) {
+void Scene::deselectVertex(const Vertex& v) {
 	if (const auto it = std::ranges::find(selectedVertices, v);
 			it != selectedVertices.end()) {
 		selectedVertices.erase(it);
@@ -157,7 +172,7 @@ void SceneManager::deselectVertex(const Vertex& v) {
 	}
 }
 
-std::vector<std::shared_ptr<Mesh>> SceneManager::getSelectedMeshes() const {
+std::vector<std::shared_ptr<Mesh>> Scene::getSelectedMeshes() const {
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	for (const auto& obj : selectedObjects) {
 		// Check if the object is a Mesh by using dynamic_pointer_cast
@@ -168,7 +183,7 @@ std::vector<std::shared_ptr<Mesh>> SceneManager::getSelectedMeshes() const {
 	return meshes;
 }
 
-void SceneManager::transform(
+void Scene::transform(
 	const double mouseX,
 	const double mouseY,
 	const Vector3 worldPos,
@@ -238,7 +253,7 @@ void SceneManager::transform(
 	lastTransform = worldPos;
 }
 
-void SceneManager::applyTransformation() {
+void Scene::applyTransformation() {
 	if (transformMode != NONE) {
 		lastTransform		  = Vector3::ZERO;	// Reset transformation data
 		transformMode		  = NONE;			// Go back to View Mode
@@ -246,7 +261,7 @@ void SceneManager::applyTransformation() {
 	}
 }
 
-void SceneManager::toggleSelectionMode() {
+void Scene::toggleSelectionMode() {
 	if (selectionMode == OBJECT) {
 		// Don't change mode if no Object is selected
 		if (!selectedObjects.empty()) {
@@ -261,7 +276,7 @@ void SceneManager::toggleSelectionMode() {
 	deselectAllVertices();
 }
 
-void SceneManager::setTransformMode(const Mode& mode) {
+void Scene::setTransformMode(const Mode& mode) {
 	// Don't change mode if no Object is selected
 	if (selectedObjects.empty()) return;
 	transformMode = mode;
@@ -270,7 +285,7 @@ void SceneManager::setTransformMode(const Mode& mode) {
 	transformMode.subMode = SubMode::NONE;
 }
 
-void SceneManager::setTransformSubMode(const SubMode& subMode) {
+void Scene::setTransformSubMode(const SubMode& subMode) {
 	// Don't change mode if no Object is selected
 	if (selectedObjects.empty() || transformMode.type != ModeType::TRANSFORM) return;
 
@@ -278,7 +293,7 @@ void SceneManager::setTransformSubMode(const SubMode& subMode) {
 	transformMode.subMode = subMode;
 }
 
-void SceneManager::toggleShadingMode() const {
+void Scene::toggleShadingMode() const {
 	if (const auto meshes = getSelectedMeshes(); !meshes.empty()) {
 		for (const auto& mesh : meshes) {
 			mesh->setShadingMode(mesh->shadingMode == ShadingMode::SMOOTH
@@ -286,4 +301,21 @@ void SceneManager::toggleShadingMode() const {
 				: ShadingMode::SMOOTH);
 		}
 	}
+}
+
+void Scene::setLight(const Color& diffuse, const Color& ambient, const Color& specular) {
+	constexpr float noLight[4] = {0, 0, 0, 1};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
+
+	const float diffuseF[3] = {diffuse.red(), diffuse.green(), diffuse.blue()};
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseF);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, diffuseF);
+
+	const float ambientF[3] = {ambient.red(), ambient.green(), ambient.blue()};
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientF);
+	glLightfv(GL_LIGHT2, GL_AMBIENT, ambientF);
+
+	const float specularF[3] = {specular.red(), specular.green(), specular.blue()};
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specularF);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, specularF);
 }

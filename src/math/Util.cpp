@@ -2,7 +2,7 @@
 
 #include "math/matrix/Matrix4.h"
 
-Vector2 project(const Vector3& worldPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
+Vector2 project(const Vector3& worldPoint, const std::array<int, 4>* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
 	// TODO Make this better
 	auto clip = Vector4(
        viewMatrix[0] * worldPoint.x + viewMatrix[4] * worldPoint.y + viewMatrix[8] * worldPoint.z + viewMatrix[12],
@@ -21,16 +21,16 @@ Vector2 project(const Vector3& worldPoint, const std::array<int, 4>& viewport, c
 	const float ndcX = clip.x / clip.w;
 	const float ndcY = clip.y / clip.w;
 
-	float screenX = (ndcX * 0.5f + 0.5f) * static_cast<float>(viewport[2]);
-	float screenY = (1.0f - (ndcY * 0.5f + 0.5f)) * static_cast<float>(viewport[3]);
+	float screenX = (ndcX * 0.5f + 0.5f) * static_cast<float>((*viewport)[2]);
+	float screenY = (1.0f - (ndcY * 0.5f + 0.5f)) * static_cast<float>((*viewport)[3]);
 
 	return {screenX, screenY};
 }
 
-Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
+Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
 	// Convert mouse coordinates to normalized device coordinates (NDC)
-	const auto x = static_cast<float>(2.0 * screenPoint.x / viewport[2] - 1.0);
-	const auto y = static_cast<float>(1.0 - 2.0 * screenPoint.y / viewport[3]);
+	const auto x = static_cast<float>(2.0 * screenPoint.x / (*viewport)[2] - 1.0);
+	const auto y = static_cast<float>(1.0 - 2.0 * screenPoint.y / (*viewport)[3]);
 
 	const auto viewSpace = Vector4(x, y, 1.0f, 1.0f);									// Create a vector in clip space
 	const auto clipSpace = Matrix4(projMatrix).invert() * viewSpace;					// Transform from clip space to view space by applying the inverse of the projection matrix

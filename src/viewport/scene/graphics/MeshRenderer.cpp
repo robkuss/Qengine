@@ -1,9 +1,11 @@
 #include "MeshRenderer.h"
 
+#include <algorithm>
 #include <iostream>
 #include <GL/gl.h>
 
 #include <ranges>
+#include <viewport/scene/Camera.h>
 
 #include "material/texture/Texture.h"
 #include "color/Colors.h"
@@ -51,11 +53,6 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
         glEnd();
     };
 
-    // Enable lighting
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT1);
-    glEnable(GL_LIGHT2);
-
     // Draw the mesh with the base color
     drawWithColor(mesh.color);
 
@@ -74,9 +71,6 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
         glDisable(GL_BLEND);
     	glEnable(GL_DEPTH_TEST);  // Re-enable depth testing
     }
-
-    // Disable lighting after rendering
-    glDisable(GL_LIGHTING);
 }
 
 void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context) {
@@ -122,17 +116,10 @@ void MeshRenderer::renderTriangles(const Mesh& mesh, const RenderContext& contex
 	}
 }
 
+
 void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 	glEnable(GL_TEXTURE_2D);
 	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, mesh.texture->id);
-
-	const bool isSelected = std::ranges::find_if(
-		context.selectedObjects,
-		[&mesh](const std::shared_ptr<Object>& obj) {
-			const auto meshPtr = dynamic_cast<const Mesh*>(obj.get());
-			return meshPtr != nullptr && *meshPtr == mesh;
-		}
-	) != context.selectedObjects.end();
 
 	// Enable backface culling
 	glEnable(GL_CULL_FACE);
@@ -140,38 +127,39 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 	// Draw the faces
 	renderTriangles(mesh, context);
 
-	if (isSelected) {
-		if (context.selectionMode == EDIT) {
-			// Draw the edges
-			renderEdges(mesh, context);
+	if (mesh.isSelected(context) && context.selectionMode == EDIT) {
+		// Draw the edges
+		renderEdges(mesh, context);
 
-			// Draw the vertices
-			renderVertices(mesh, context);
-
-		} else {
-			// Highlight only the outline of the Mesh in Object Mode
-			const auto color = Colors::MESH_SELECT_COLOR;
-			glLineWidth(4.0f);
-			glPointSize(3.0f);
-
-			for (const auto&[first, second]: mesh.edgeToFaceMap) {
-				if (isSilhouetteEdge(second, context.activeCamera->camPos)) {
-					renderEdge(first, color, color);
-
-					// Highlight the vertices of the silhouette edges
-					renderVertex(*first.v0);
-					renderVertex(*first.v1);
-				}
-			}
-		}
+		// Draw the vertices
+		renderVertices(mesh, context);
 	}
 
 	glDisable(GL_CULL_FACE);
 
+	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void MeshRenderer::renderSilhouette(const Mesh& mesh, const RenderContext& context) {
+	if (mesh.isSelected(context) && context.selectionMode == OBJECT) {
+		// Highlight only the outline of the Mesh in Object Mode
+		const auto color = Colors::MESH_SELECT_COLOR;
+		glLineWidth(4.0f);
+		glPointSize(3.0f);
+
+		for (const auto&[first, second]: mesh.edgeToFaceMap) {
+			if (isSilhouetteEdge(second, context.activeCamera->camPos)) {
+				renderEdge(first, color, color);
+
+				// Highlight the vertices of the silhouette edges
+				renderVertex(*first.v0);
+				renderVertex(*first.v1);
+			}
+		}
+	}
+
 	// Reset line width back to default
 	glLineWidth(1.0f);
-
-	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 bool MeshRenderer::isSilhouetteEdge(

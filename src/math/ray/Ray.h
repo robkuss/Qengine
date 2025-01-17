@@ -17,7 +17,7 @@ public:
 
 	[[nodiscard]] bool intersects(const Mesh& mesh) const;
 	[[nodiscard]] bool intersects(const Triangle& t) const;
-	[[nodiscard]] static bool intersects(const Vector2 &vertexPos, const Vector2 &mousePos, float tolerance) ;
+	[[nodiscard]] static bool intersects(const Vector2 &vertexPos, const Vector2 &mousePos, float tolerance);
 };
 
 

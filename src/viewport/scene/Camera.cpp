@@ -32,10 +32,10 @@ void Camera::gluPerspective(const float aspect) {
 
 	// Update the projection matrix
 	projMatrix = {
-		Z_NEAR / fw, 0.0f,			0.0f,				   0.0f,
-		0.0f,        Z_NEAR / fh,	0.0f,				   0.0f,
+		Z_NEAR / fw, 0.0f,		    0.0f,				  0.0f,
+		0.0f,        Z_NEAR / fh,   0.0f,				  0.0f,
 		0.0f,        0.0f,		  -(Z_FAR + Z_NEAR) / dz, -1.0f,
-		0.0f,        0.0f, -(2.0f * Z_FAR * Z_NEAR) / dz,  0.0f
+		0.0f,        0.0f,		  -(2.0f * Z_FAR * Z_NEAR) / dz,  0.0f
 	};
 
 	glLoadIdentity();

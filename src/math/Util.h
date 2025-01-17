@@ -40,7 +40,7 @@ inline Vector3 clampDirection(const SubMode& subMode) {
 }
 
 /** Map 3D world space to 2D screen space */
-Vector2 project(const Vector3& worldPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
+Vector2 project(const Vector3& worldPoint, const std::array<int, 4>* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
 
 /** Map 2D screen space to 3D world space */
-Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>& viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
+Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);

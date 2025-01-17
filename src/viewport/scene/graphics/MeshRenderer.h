@@ -15,6 +15,7 @@ struct Triangle;
 class MeshRenderer {
 public:
 	static void render(const Mesh& mesh, const RenderContext& context);
+	static void renderSilhouette(const Mesh& mesh, const RenderContext& context);
 
 private:
 	static void renderVertex(const Vertex& v);

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+#include <viewport/scene/RenderContext.h>
 
 #include "objects/Object.h"
 
@@ -41,8 +42,10 @@ public:
 	void initializeTriangles();
 	void updateNormals() const;
 
+	[[nodiscard]] bool isSelected(const RenderContext& context) const;
+
 private:
-	friend class SceneManager;
+	friend class Scene;
 	friend class MeshRenderer;
 
 	// adjacency information

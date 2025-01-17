@@ -4,21 +4,22 @@ class Ray;
 class Object;
 class Mesh;
 
-#include "RenderContext.h"
 #include "viewport/Viewport.h"
 
-class SceneManager {
+class Scene {
 public:
 	RenderContext* context{};
 
 	// Constructor & Destructor
-	explicit SceneManager();
-	~SceneManager() = default;
+	explicit Scene();
+	~Scene() = default;
 
 	void render() const;
 
 	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
+
+	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
 
 private:
 	// Grant a few Viewport functions access to private members using the best keyword in C++
@@ -40,11 +41,11 @@ private:
 	const float scalingSens		= 0.001;	// Scaling sensitivity
 	const float rotationSens	= 10.0f;	// Rotation sensitivity
 
-	void select(const Vector2 &mousePos, bool preserve);
+	void select(const Vector2& mousePos, bool preserve);
 
 	void selectAllObjects();
 	void deselectAllObjects();
-	void selectAllVertices(const std::shared_ptr<Mesh> &mesh);
+	void selectAllVertices(const std::shared_ptr<Mesh>& mesh);
 	void deselectAllVertices();
 
 	void selectObject(const std::shared_ptr<Object>& obj);
@@ -55,8 +56,6 @@ private:
 	[[nodiscard]] std::vector<std::shared_ptr<Mesh>> getSelectedMeshes() const;
 
 	void transform(double mouseX, double mouseY, Vector3 worldPos, Vector3 camPos);
-	void doSingleTransformation(const std::shared_ptr<Mesh> &mesh, const Vector3 &position, const Vector3 &direction, const Vector3 &camPos, const
-	                            Vector3 &worldPos, const Vector2 &mousePos) const;
 	void applyTransformation();
 
 	void toggleSelectionMode();

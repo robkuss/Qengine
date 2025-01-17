@@ -1,6 +1,6 @@
 #pragma once
+
 #include <math/ray/Ray.h>
-#include <math/vector/Vector3.h>
 
 
 // Constants

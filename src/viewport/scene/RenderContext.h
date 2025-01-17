@@ -3,18 +3,16 @@
 #include <array>
 #include <memory>
 #include <vector>
-#include <math/ray/Ray.h>
 
-#include <math/vector/Vector3.h>
+#include <viewport/Mode.h>
 
-#include "Camera.h"
-#include "../Mode.h"
-
+class Ray;
+class Camera;
 class Object;
 struct Vertex;
 
 struct RenderContext {
-	std::array<int, 4> viewport{};
+	std::array<int, 4>* viewport = nullptr;
 	Camera* activeCamera = nullptr;
 	Mode selectionMode;
 	std::vector<std::shared_ptr<Object>> selectedObjects{};

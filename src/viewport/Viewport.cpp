@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include <viewport/scene/SceneManager.h>
+#include <viewport/scene/Scene.h>
 #include <viewport/scene/graphics/color/Colors.h>
 #include <math/vector/Vector2.h>
 
@@ -17,7 +17,7 @@
 
 
 Viewport::Viewport(const std::string& title, const int width, const int height)
-		: title(title), width(width), height(height), sceneManager(new SceneManager()) {
+		: title(title), width(width), height(height), scene(new Scene()) {
 	glfwSetErrorCallback([](int, const char *description) {
 		std::cerr << "GLFW Error: " << description << std::endl;
 	});
@@ -67,7 +67,8 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 
 	aspect = static_cast<float>(width) / static_cast<float>(height);
 
-	sceneManager->context->activeCamera = &activeCamera;
+	scene->context->viewport = &viewport;
+	scene->context->activeCamera = &activeCamera;
 }
 
 Viewport::~Viewport() {
@@ -94,7 +95,7 @@ void Viewport::start() {
 		Colors::WHITE,
 		thmTexture
 	);
-	sceneManager->addObject(cube);
+	scene->addObject(cube);
 
 	// Add Earth to Scene
 	const auto earth = std::make_shared<Sphere>(
@@ -106,7 +107,7 @@ void Viewport::start() {
 		Colors::WHITE,
 		earthTexture
 	);
-	sceneManager->addObject(earth);
+	scene->addObject(earth);
 
 	const auto skybox = std::make_shared<Skybox>(
 		"Skybox",
@@ -115,10 +116,10 @@ void Viewport::start() {
 	);
 	skybox->applyTransformation(OBJECT, SCALE, Matrix4::scale(Vector3(5.0f, 5.0f, 5.0f)));
 	//sceneManager->addObject(skybox);
-	
+
 
 	clearColor(Colors::BG_COLOR);	// Background color
-	setLight(Colors::LIGHT_SUN, Colors::LIGHT_AMBIENT, Colors::WHITE);
+	Scene::setLight(Colors::LIGHT_SUN, Colors::LIGHT_AMBIENT, Colors::WHITE);
 
 	// Get matrices
 	activeCamera.gluPerspective(aspect); // projection matrix
@@ -140,9 +141,6 @@ void Viewport::render() {
 	glViewport(0, 0, width, height);
 	glGetIntegerv(GL_VIEWPORT, viewport.data());
 
-	const auto context = sceneManager->context;
-	context->viewport = viewport;
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Draw the coordinate system
@@ -153,7 +151,7 @@ void Viewport::render() {
 	glLightfv(GL_LIGHT1, GL_POSITION, light1Pos);
 	glLightfv(GL_LIGHT2, GL_POSITION, light2Pos);
 
-	sceneManager->render();
+	scene->render();
 
 	#ifdef DRAW_MOUSE_RAY
 		drawRay(rayStart, rayEnd);
@@ -193,10 +191,10 @@ void Viewport::centerWindow() const {
 }
 
 void Viewport::drawOnScreenText() const {
-	const auto cube = *sceneManager->sceneObjects[0];
-	const auto mouseWorld = unproject(Vector2(*activeCamera.mouseX, *activeCamera.mouseY), viewport, activeCamera.viewMatrix, activeCamera.projMatrix);
+	const auto cube = *scene->sceneObjects[0];
+	const auto mouseWorld = unproject(Vector2(*activeCamera.mouseX, *activeCamera.mouseY), &viewport, activeCamera.viewMatrix, activeCamera.projMatrix);
 	size_t vertexCount = 0;
-	for (const auto& obj : sceneManager->sceneObjects) {
+	for (const auto& obj : scene->sceneObjects) {
 		vertexCount += dynamic_cast<Mesh*>(obj.get())->vertices.size();
 	}
 	for (int i = 0; i <= 11; i++) {
@@ -208,9 +206,9 @@ void Viewport::drawOnScreenText() const {
 			case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << activeCamera.camDist; break;
 			case 4:  out << "Mouse Screen: " << activeCamera.mouseX[0]  << " / " << activeCamera.mouseY[0]; break;
 			case 5:  out << "Mouse World: "  << mouseWorld.toString(); break;
-			case 6:	 out << "Mode: " << sceneManager->selectionMode.modeToString();
-				if (sceneManager->transformMode.mode    != Mode::NONE)	out << " " << sceneManager->transformMode.modeToString();
-				if (sceneManager->transformMode.subMode != SubMode::NONE) out << " " << sceneManager->transformMode.subModeToString(); break;
+			case 6:	 out << "Mode: " << scene->selectionMode.modeToString();
+				if (scene->transformMode.mode    != Mode::NONE)	out << " " << scene->transformMode.modeToString();
+				if (scene->transformMode.subMode != SubMode::NONE) out << " " << scene->transformMode.subModeToString(); break;
 			case 7:  out << "Cube:"; break;
 			case 8:  out << "    Pos: "   << cube.position.toString();  break;
 			case 9:  out << "    Scale: " << cube.scale.toString();     break;
@@ -224,7 +222,7 @@ void Viewport::drawOnScreenText() const {
 }
 
 void Viewport::setMouseRay(const Vector2& mousePos) {
-	mouseRay.direction = unproject(mousePos, viewport, activeCamera.viewMatrix, activeCamera.projMatrix).normalize();
+	mouseRay.direction = unproject(mousePos, &viewport, activeCamera.viewMatrix, activeCamera.projMatrix).normalize();
 	const auto directionScaled = mouseRay.direction * MOUSE_RAY_LENGTH;
 	rayStart = mouseRay.origin = activeCamera.camPos;
 	rayEnd   = mouseRay.origin + directionScaled;
@@ -290,21 +288,4 @@ void Viewport::drawRay(const Vector3& rayStart, const Vector3& rayEnd) {
 	glVertex3f(rayStart.x, rayStart.y, rayStart.z);
 	glVertex3f(rayEnd.x, rayEnd.y, rayEnd.z);
 	glEnd();
-}
-
-void Viewport::setLight(const Color& diffuse, const Color& ambient, const Color& specular) {
-	constexpr float noLight[4] = {0, 0, 0, 1};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
-
-	const float diffuseF[3] = {diffuse.red(), diffuse.green(), diffuse.blue()};
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseF);
-	glLightfv(GL_LIGHT2, GL_DIFFUSE, diffuseF);
-
-	const float ambientF[3] = {ambient.red(), ambient.green(), ambient.blue()};
-	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientF);
-	glLightfv(GL_LIGHT2, GL_AMBIENT, ambientF);
-
-	const float specularF[3] = {specular.red(), specular.green(), specular.blue()};
-	glLightfv(GL_LIGHT1, GL_SPECULAR, specularF);
-	glLightfv(GL_LIGHT2, GL_SPECULAR, specularF);
 }

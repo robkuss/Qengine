@@ -50,7 +50,7 @@ private:
 	std::string title;
 	int width, height;
 	float aspect;
-	SceneManager* sceneManager{};
+	Scene* scene{};
 
 	#ifdef TEXT
 		Text* text{};	// For on-screen debug text
@@ -79,13 +79,11 @@ private:
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
 
-	void setMouseRay(const Vector2 &mousePos);
-	static void drawRay(const Vector3 &rayStart, const Vector3 &rayEnd);
+	void setMouseRay(const Vector2& mousePos);
+	static void drawRay(const Vector3& rayStart, const Vector3& rayEnd);
 
 	static void drawAxes();
 	static void drawGrid();
-
-	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
 
 	void getFPS();
 };
