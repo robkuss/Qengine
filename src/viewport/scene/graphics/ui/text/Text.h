@@ -1,10 +1,12 @@
 #pragma once
 
+#include <string>
+#include <atomic>
 #include <map>
-#include <fstream>
 
 #include <GL/glew.h>
 #include <ft2build.h>
+
 #include FT_FREETYPE_H
 
 #include <viewport/scene/graphics/color/Colors.h>
@@ -17,30 +19,38 @@ struct Character {
 	FT_Pos advance;			    // Offset to advance to next glyph
 };
 
+enum class TextMode {
+	CENTER,
+	LEFT,
+	RIGHT
+};
+
+inline FT_Library library;
+inline FT_Face font;
+inline GLuint fontTexture;
+inline std::map<char, Character> characters;
+
+inline std::string nonFatalErrorText;
+
+
 class Text {
 public:
 	constexpr static float fontScale   = 0.5f;
+	constexpr static int   fontSize	   = 48;
+	constexpr static float lineSpacing = 1.2f;
 
 	Text();
 	~Text();
 
-	void renderText(const char *text, float x, float y, Color color);
+	static void renderText(const std::string& text, TextMode textMode, float x, float y, int textSize, Color color);
 	void setErrorText(const std::string& text);
-	void drawErrorText(int windowH);
+	static void drawErrorText(int windowH);
 
 	static float line(int lineNumber);
 
 private:
-	constexpr static auto  fontPath	   = "../resources/fonts/cour.ttf";
-	constexpr static int   fontSize	   = 48;
-	constexpr static float lineSpacing = 1.2f;
+	constexpr static auto fontPath = "../resources/fonts/cour.ttf";
 
-	FT_Library library{};
-	FT_Face font{};
-	GLuint fontTexture{};
-	std::map<char, Character> characters;
-
-	std::string nonFatalErrorText;
 	double errorTime = 0.0;
 	std::atomic<bool> errorTimerRunning = false;
 };

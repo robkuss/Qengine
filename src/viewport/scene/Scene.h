@@ -34,8 +34,9 @@ public:
 	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
 
 private:
-	// Grant the Debugger and a few Viewport functions access to private members using the best keyword in C++
+	// Grant the Debugger, Input elements and a few Viewport functions access to private members using the best keyword in C++
 	friend class Debug;
+	friend class Input;
 	friend void Viewport::setCallbacks(GLFWwindow* window);
 	friend void Viewport::onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
 

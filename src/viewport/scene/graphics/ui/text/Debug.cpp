@@ -33,7 +33,7 @@ void Debug::drawDebugText(const Viewport* vp) {
 		}
 
 		#ifdef TEXT
-			vp->ui->text->renderText(out.str().c_str(), UI::firstLineX, Text::line(i), Colors::TEXT_COLOR);
+			Text::renderText(out.str(), TextMode::LEFT, UI::firstLineX, Text::line(i), Text::fontSize, Colors::TEXT_COLOR);
 		#endif
 	}
 }

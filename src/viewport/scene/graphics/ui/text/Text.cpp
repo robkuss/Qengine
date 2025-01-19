@@ -91,11 +91,13 @@ float Text::line(const int lineNumber) {
 /**
  * Draw UI Text somewhere on the screen
  * @param text the String that will be rendered to the screen
+ * @param textMode center, left, or right
  * @param x the x position in screen coordinates where the text will be drawn
  * @param y the y position in screen coordinates where the text will be drawn
+ * @param textSize font size for this particular text
  * @param color the color that the text will be drawn in
  */
-void Text::renderText(const char* text, const float x, const float y, const Color color) {
+void Text::renderText(const std::string& text, TextMode textMode, const float x, const float y, int textSize, const Color color) {
     // Enable necessary settings for text rendering
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, fontTexture);
@@ -178,5 +180,12 @@ void Text::setErrorText(const std::string& text) {
 /** Draw a non-fatal error text at the bottom of the screen */
 void Text::drawErrorText(const int windowH) {
     if (!nonFatalErrorText.empty())
-        renderText(nonFatalErrorText.c_str(), UI::firstLineX, static_cast<float>(windowH) - UI::bottomLineY, Colors::RED);
+        renderText(
+            nonFatalErrorText,
+            TextMode::LEFT,
+            UI::firstLineX,
+            static_cast<float>(windowH) - UI::bottomLineY,
+            fontSize,
+            Colors::RED
+        );
 }
