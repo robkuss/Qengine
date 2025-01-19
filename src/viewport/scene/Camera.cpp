@@ -49,9 +49,9 @@ void Camera::gluPerspective(const float aspect) {
 void Camera::gluLookAt() {
 	glMatrixMode(GL_MODELVIEW);      // Subsequent matrix operations will affect the modelview matrix
 
-	const Vector3 forward = (lookAt - camPos).normalize();	 // Calculate the forward vector (direction from eye to center)
-	const Vector3 side = forward.cross(up).normalize();	 // Calculate the side vector (perpendicular to both forward and up vectors)
-	const Vector3 zUp = side.cross(forward);			 // Recalculate the actual up vector to ensure orthogonality
+	const Vector3 forward = (lookAt - camPos).normalize();	// Calculate the forward vector (direction from eye to center)
+	const Vector3 side = forward.cross(up).normalize();		// Calculate the side vector (perpendicular to both forward and up vectors)
+	const Vector3 zUp = side.cross(forward);				// Recalculate the actual up vector to ensure orthogonality
 
 	// Update the view matrix
 	viewMatrix = {
@@ -65,20 +65,7 @@ void Camera::gluLookAt() {
 	glMultMatrixf(viewMatrix.data());
 }
 
-/*void Camera::loadProjectionMatrix(const double aspect) {
-	constexpr double zNear = 0.1;
-	constexpr double zFar = 100.0;
-	const auto fov = static_cast<float>(radians(45.0));
-
-	const double h = zNear * tanf(fov * 0.5f);
-	const double w = h * aspect;
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glFrustum(-w, w, -h, h, zNear, zFar);
-}
-
-void Camera::loadViewMatrix() const {
+/*void Camera::loadViewMatrix() const {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 

@@ -1,10 +1,22 @@
 #pragma once
 
+#include <memory>
+#include <vector>
+
+#include <math/vector/Vector2.h>
+#include <math/vector/Vector3.h>
+#include <viewport/Mode.h>
+
+#include <viewport/Viewport.h>
+
+class Color;
 class Ray;
 class Object;
 class Mesh;
 
-#include "viewport/Viewport.h"
+struct RenderContext;
+struct Vertex;
+
 
 class Scene {
 public:
@@ -16,14 +28,14 @@ public:
 
 	void render() const;
 
-	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.push_back(obj); }
+	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.emplace_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
 
 	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
 
 private:
-	// Grant a few Viewport functions access to private members using the best keyword in C++
-	friend void Viewport::drawOnScreenText() const;
+	// Grant the Debugger and a few Viewport functions access to private members using the best keyword in C++
+	friend class Debug;
 	friend void Viewport::setCallbacks(GLFWwindow* window);
 	friend void Viewport::onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
 

@@ -3,8 +3,12 @@
 #include "Scene.h"
 
 #include <memory>
+#include <math/ray/Ray.h>
 
+#include "Camera.h"
 #include "graphics/MeshRenderer.h"
+
+constexpr float SELECT_TOLERANCE = 20.0f;		// Tolerance in pixel distance for mouse picking
 
 
 Scene::Scene() {
@@ -56,7 +60,7 @@ void Scene::select(const Vector2& mousePos, const bool preserve) {
 			// Attempt to cast Object to Mesh
 			if (const auto mesh = dynamic_cast<const Mesh*>(obj.get())) {
 				if (ray->intersects(*mesh)) {
-					intersectingObjects.push_back(obj);
+					intersectingObjects.emplace_back(obj);
 				}
 			} else {
 				// TODO Implement selection logic for Objects that aren't Meshes
@@ -84,13 +88,13 @@ void Scene::select(const Vector2& mousePos, const bool preserve) {
 		std::vector<Vertex> intersectingVertices;
 		for (const auto& mesh : getSelectedMeshes()) {
 			for (const auto& v : mesh->vertices) {
-				if (const auto projV = project(
+				if (Ray::intersects(project(
 					v->position,
 					context->viewport,
 					context->activeCamera->viewMatrix,
 					context->activeCamera->projMatrix
-				); Ray::intersects(projV, mousePos, SELECT_TOLERANCE)) {
-					intersectingVertices.push_back(*v);
+				), mousePos, SELECT_TOLERANCE)) {
+					intersectingVertices.emplace_back(*v);
 				}
 			}
 
@@ -116,7 +120,7 @@ void Scene::select(const Vector2& mousePos, const bool preserve) {
 
 void Scene::selectAllObjects() {
 	for (const auto& obj : sceneObjects) {
-		selectedObjects.push_back(obj);
+		selectedObjects.emplace_back(obj);
 	}
 	context->selectedObjects = selectedObjects;
 }
@@ -128,7 +132,7 @@ void Scene::deselectAllObjects() {
 
 void Scene::selectAllVertices(const std::shared_ptr<Mesh>& mesh) {
 	for (const auto& v : mesh->vertices) {
-		selectedVertices.push_back(*v);
+		selectedVertices.emplace_back(*v);
 	}
 	context->selectedVertices = selectedVertices;
 }
@@ -140,7 +144,7 @@ void Scene::deselectAllVertices() {
 
 void Scene::selectObject(const std::shared_ptr<Object>& obj) {
 	if (std::ranges::find(selectedObjects, obj) == selectedObjects.end()) {
-		selectedObjects.push_back(obj);
+		selectedObjects.emplace_back(obj);
 		context->selectedObjects = selectedObjects;
 	} else {
 		deselectObject(obj);
@@ -157,7 +161,7 @@ void Scene::deselectObject(const std::shared_ptr<Object>& obj) {
 
 void Scene::selectVertex(const Vertex& v) {
 	if (std::ranges::find(selectedVertices, v) == selectedVertices.end()) {
-		selectedVertices.push_back(v);
+		selectedVertices.emplace_back(v);
 		context->selectedVertices = selectedVertices;
 	} else {
 		deselectVertex(v);
@@ -177,7 +181,7 @@ std::vector<std::shared_ptr<Mesh>> Scene::getSelectedMeshes() const {
 	for (const auto& obj : selectedObjects) {
 		// Check if the object is a Mesh by using dynamic_pointer_cast
 		if (const auto mesh = std::dynamic_pointer_cast<Mesh>(obj)) {
-			meshes.push_back(mesh);
+			meshes.emplace_back(mesh);
 		}
 	}
 	return meshes;

@@ -30,7 +30,8 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* cbWindow, const int width, const int height) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
 			vp->windowResize(width, height);
-			vp->render(); // Force a re-render during resizing
+			vp->render();		// Force a re-render during resizing
+			vp->ui->update();	// Resize UI
 			glfwSwapBuffers(cbWindow);
 		}
 	});

@@ -11,13 +11,8 @@
 #include <math/ray/Ray.h>
 
 #include "scene/Camera.h"
+#include "scene/graphics/ui/UI.h"
 
-
-// Options
-#define TEXT	// For on-screen debug text
-#ifdef TEXT
-	#include "scene/graphics/ui/text/Text.cpp"
-#endif
 
 // #define DRAW_MOUSE_RAY
 
@@ -27,14 +22,14 @@ class SceneManager;	// Forward declaration for friend
 // Constants
 constexpr int ANTIALIASING_SAMPLES		= 10;
 
-constexpr float SELECT_TOLERANCE		= 20.0f;			// Tolerance in pixel distance for mouse picking
 constexpr float AXES_LENGTH				= 100.0f;
 constexpr float MOUSE_RAY_LENGTH		= 1000.0f;
 
 
 class Viewport {
 public:
-	std::array<int, 4> viewport {};
+	std::array<int, 4> viewport{};
+	UI* ui{};
 
 	explicit Viewport(const std::string& title, int width, int height);
 	~Viewport();
@@ -43,18 +38,15 @@ public:
 
 	void setCallbacks(GLFWwindow* window);
 	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
-	void drawOnScreenText() const;
 
 private:
+	friend class Debug;
+
 	GLFWwindow* window = nullptr;
 	std::string title;
 	int width, height;
 	float aspect;
 	Scene* scene{};
-
-	#ifdef TEXT
-		Text* text{};	// For on-screen debug text
-	#endif
 
 	// FPS tracking
 	double previousTime = 0.0;

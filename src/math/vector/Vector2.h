@@ -8,6 +8,7 @@ public:
 	double x, y;
 
 	// Constructor
+	Vector2() : x(0.0), y(0.0) {}	// Default constructor
 	Vector2(const double x, const double y) : x(x), y(y) {}
 
 	// Access by index

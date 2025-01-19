@@ -35,8 +35,11 @@ add_executable(Qengine
 	src/objects/mesh/Mesh.cpp
 	src/math/Util.cpp
 	src/material/texture/Texture.cpp
-	src/viewport/scene/graphics/ui/UI.h
-		src/viewport/scene/graphics/ui/UI.cpp
+	src/viewport/scene/graphics/ui/UI.cpp
+	src/viewport/scene/graphics/ui/UIBar.cpp
+	src/viewport/scene/graphics/ui/text/Text.cpp
+		src/viewport/scene/graphics/ui/text/Debug.cpp
+		src/viewport/scene/graphics/ui/text/Debug.h
 )
 
 # Define static linking

@@ -1,23 +1,20 @@
 #include "Viewport.h"
 
 #include <cmath>
-#include <sstream>
-#include <iomanip>
+#include <iostream>
 
 #include <viewport/scene/Scene.h>
-#include <viewport/scene/graphics/color/Colors.h>
-#include <math/vector/Vector2.h>
 
-#include <objects/Object.h>
 #include <objects/mesh/cube/Cube.cpp>
 #include <objects/mesh/sphere/Sphere.cpp>
 #include <objects/mesh/skybox/Skybox.cpp>
 
 #include "material/texture/Texture.h"
+#include "scene/graphics/ui/UI.h"
 
 
 Viewport::Viewport(const std::string& title, const int width, const int height)
-		: title(title), width(width), height(height), scene(new Scene()) {
+	: title(title), width(width), height(height), scene(new Scene()) {
 	glfwSetErrorCallback([](int, const char *description) {
 		std::cerr << "GLFW Error: " << description << std::endl;
 	});
@@ -51,8 +48,8 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 	setCallbacks(window);
 
 	// OpenGL setup
-	glEnable(GL_MULTISAMPLE); // Enable multi-sampling (antialiasing)
-	glEnable(GL_DEPTH_TEST);  // Enable depth testing
+	glEnable(GL_MULTISAMPLE);	// Enable multi-sampling (antialiasing)
+	glEnable(GL_DEPTH_TEST);	// Enable depth testing
 	glEnable(GL_RESCALE_NORMAL);
 
 	glEnable(GL_LIGHTING);
@@ -61,31 +58,29 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
 
 	// Other setup
-	#ifdef TEXT
-		text = new Text();	// Initialize FreeType for on-screen debug text
-	#endif
+	glViewport(0, 0, width, height);	// Initialize viewport
+	glGetIntegerv(GL_VIEWPORT, viewport.data());
+
+	ui = new UI(this);	// Initialize user interface
+	ui->setup();
 
 	aspect = static_cast<float>(width) / static_cast<float>(height);
 
-	scene->context->viewport = &viewport;
+	scene->context->viewport = &viewport;	// Set up render context
 	scene->context->activeCamera = &activeCamera;
 }
 
 Viewport::~Viewport() {
 	// Cleanup
-	#ifdef TEXT
-		text->~Text();
-	#endif
-
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
 
 void Viewport::start() {
-	auto noTexture	  = std::shared_ptr<Texture>{};
-	auto thmTexture   = std::make_shared<Texture>("../resources/textures/thm2k.png");
-	auto earthTexture = std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
-	auto starsTexture = std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
+	const auto noTexture	  = std::shared_ptr<Texture>{};
+	const auto& thmTexture   = noTexture; //std::make_shared<Texture>("../resources/textures/thm2k.png");
+	const auto& earthTexture = noTexture; //std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
+	const auto& starsTexture = noTexture; //std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
 
 	// Add Default Cube to Scene
 	const auto cube = std::make_shared<Cube>(
@@ -158,10 +153,7 @@ void Viewport::render() {
 	#endif
 
 	// Render UI
-	#ifdef TEXT
-		drawOnScreenText();
-		text->drawErrorText(width, height);
-	#endif
+	ui->render();
 
 	getFPS();
 }
@@ -190,37 +182,6 @@ void Viewport::centerWindow() const {
 	glfwSetWindowPos(window, windowPosX, windowPosY);
 }
 
-void Viewport::drawOnScreenText() const {
-	const auto cube = *scene->sceneObjects[0];
-	const auto mouseWorld = unproject(Vector2(*activeCamera.mouseX, *activeCamera.mouseY), &viewport, activeCamera.viewMatrix, activeCamera.projMatrix);
-	size_t vertexCount = 0;
-	for (const auto& obj : scene->sceneObjects) {
-		vertexCount += dynamic_cast<Mesh*>(obj.get())->vertices.size();
-	}
-	for (int i = 0; i <= 11; i++) {
-		std::ostringstream out;
-		switch (i) {
-			case 0:  out << "FPS: " << fps; break;
-			case 1:  out << "Camera Pos: " << activeCamera.camPos.toString(); break;
-			case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << activeCamera.rotH << " / " << activeCamera.rotV; break;
-			case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << activeCamera.camDist; break;
-			case 4:  out << "Mouse Screen: " << activeCamera.mouseX[0]  << " / " << activeCamera.mouseY[0]; break;
-			case 5:  out << "Mouse World: "  << mouseWorld.toString(); break;
-			case 6:	 out << "Mode: " << scene->selectionMode.modeToString();
-				if (scene->transformMode.mode    != Mode::NONE)	out << " " << scene->transformMode.modeToString();
-				if (scene->transformMode.subMode != SubMode::NONE) out << " " << scene->transformMode.subModeToString(); break;
-			case 7:  out << "Cube:"; break;
-			case 8:  out << "    Pos: "   << cube.position.toString();  break;
-			case 9:  out << "    Scale: " << cube.scale.toString();     break;
-			case 10: out << "    Rot: "   << cube.rotationEuler.toString(); break;
-			default: out << "Vertex Count: " << vertexCount; break;
-		}
-		#ifdef TEXT
-			text->renderText(out.str().c_str(), Text::firstLineX, Text::line(i), width, height, Colors::TEXT_COLOR);
-		#endif
-	}
-}
-
 void Viewport::setMouseRay(const Vector2& mousePos) {
 	mouseRay.direction = unproject(mousePos, &viewport, activeCamera.viewMatrix, activeCamera.projMatrix).normalize();
 	const auto directionScaled = mouseRay.direction * MOUSE_RAY_LENGTH;
@@ -233,6 +194,7 @@ void Viewport::setMouseRay(const Vector2& mousePos) {
 
 /** Draw the coordinate system axes. */
 void Viewport::drawAxes() {
+	glLineWidth(1.0f);
 	glBegin(GL_LINES);
 
 	// X-axis in red
@@ -255,6 +217,7 @@ void Viewport::drawAxes() {
 
 /** Draw a grid in the xy-plane to visualize the coordinate system. */
 void Viewport::drawGrid() {
+	glLineWidth(1.0f);
 	glBegin(GL_LINES);
 
 	// Grid lines in the x direction (front-back lines)
@@ -283,6 +246,7 @@ void Viewport::drawRay(const Vector3& rayStart, const Vector3& rayEnd) {
 	glVertex3f(rayEnd.x, rayEnd.y, rayEnd.z);
 	glEnd();
 
+	glLineWidth(1.0f);
 	glBegin(GL_LINES);
 	color3f(Colors::RAY_COLOR);
 	glVertex3f(rayStart.x, rayStart.y, rayStart.z);

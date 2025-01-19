@@ -1,9 +1,11 @@
 #include "Text.h"
 
+#include "../UI.h"
+
 #include <iostream>
 
 // Function to initialize FreeType and load the font
-inline Text::Text() {
+Text::Text() {
     // Initialize the FreeType library
     if (FT_Init_FreeType(&library)) {
         std::cerr << "ERROR: Could not initialize FreeType library" << std::endl;
@@ -64,7 +66,7 @@ inline Text::Text() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-inline Text::~Text() {
+Text::~Text() {
     if (font) {
         FT_Done_Face(font);
         font = nullptr;     // Optional: set to nullptr to avoid dangling pointer
@@ -82,8 +84,8 @@ inline Text::~Text() {
 
 
 /** Line number to screen coordinates */
-inline float Text::line(const int lineNumber) {
-    return firstLineY * fontScale + static_cast<float>(lineNumber) * fontSize * fontScale * lineSpacing;
+float Text::line(const int lineNumber) {
+    return UI::firstLineY * fontScale + static_cast<float>(lineNumber) * fontSize * fontScale * lineSpacing;
 }
 
 /**
@@ -91,29 +93,20 @@ inline float Text::line(const int lineNumber) {
  * @param text the String that will be rendered to the screen
  * @param x the x position in screen coordinates where the text will be drawn
  * @param y the y position in screen coordinates where the text will be drawn
- * @param windowW the width of the window
- * @param windowH the height of the window
  * @param color the color that the text will be drawn in
  */
-inline void Text::renderText(const char* text, const float x, const float y, const int windowW, const int windowH, const Color color) {
-    // Save the current matrix state (3D perspective matrix)
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-
-    glOrtho(0, windowW, windowH, 0, -1, 1);
-
-    // Switch to the model view matrix to render the text
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
+void Text::renderText(const char* text, const float x, const float y, const Color color) {
     // Enable necessary settings for text rendering
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, fontTexture);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     color3f(color);
+
+    // Switch to the model view matrix
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
 
     // Move to the position where the text should be drawn
     glTranslatef(x, y, 0.0f);
@@ -160,12 +153,6 @@ inline void Text::renderText(const char* text, const float x, const float y, con
 
     // Restore the model view matrix
     glPopMatrix();
-
-    // Restore the projection matrix (back to 3D perspective)
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-
-    // Switch back to the model view matrix
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -173,7 +160,7 @@ inline void Text::renderText(const char* text, const float x, const float y, con
  * Set a non-fatal error text to be displayed at the bottom of the screen.
  * The text will disappear after 3 seconds.
  */
-inline void Text::setErrorText(const std::string& text) {
+void Text::setErrorText(const std::string& text) {
     nonFatalErrorText = text;
 
     if (!errorTimerRunning) {
@@ -189,7 +176,7 @@ inline void Text::setErrorText(const std::string& text) {
 }
 
 /** Draw a non-fatal error text at the bottom of the screen */
-inline void Text::drawErrorText(const int windowW, const int windowH) {
+void Text::drawErrorText(const int windowH) {
     if (!nonFatalErrorText.empty())
-        renderText(nonFatalErrorText.c_str(), firstLineX, static_cast<float>(windowH) - bottomLineY, windowW, windowH, Colors::RED);
+        renderText(nonFatalErrorText.c_str(), UI::firstLineX, static_cast<float>(windowH) - UI::bottomLineY, Colors::RED);
 }
