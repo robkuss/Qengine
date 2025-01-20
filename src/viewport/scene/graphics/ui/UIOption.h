@@ -43,17 +43,13 @@ public:
 		options.emplace_back(optionList);
 	}
 
-	void update() override;
 	void render() const override;
-	void setVertices() override;
+	void setVertices(float windowW, float windowH) override;
 
 private:
 	std::vector<UIOption> options;
 };
 
-inline void UIOptionList::update() {
-
-}
 
 inline void UIOptionList::render() const {
 	/*for (const auto& option : options) {
@@ -61,6 +57,6 @@ inline void UIOptionList::render() const {
 	}*/
 }
 
-inline void UIOptionList::setVertices() {
+inline void UIOptionList::setVertices(const float windowW, const float windowH) {
 
 }

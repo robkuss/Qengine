@@ -1,8 +1,7 @@
 #include "UI.h"
 
 #include "UIBar.h"
-
-#include "text/Debug.h"
+#include "text/Debug.h"		// TODO delete this
 
 #include <memory>
 
@@ -25,10 +24,8 @@ constexpr float tabPadding	= 1.5f;		// Upper and lower padding within the bar
 constexpr float buttonWidth	= 120.0f;
 
 
-UI::UI(const Viewport *viewport) : viewport(viewport) {
-	vp = &viewport->viewport;
-
-	Text();	// Initialize FreeType for on-screen text
+UI::UI(RenderContext* context): Scene(context) {
+	Text(); // Initialize FreeType for on-screen text
 }
 
 UI::~UI() {
@@ -51,27 +48,37 @@ void UI::setup() {
 	);
 
 	// Create UITabs
+	const auto fileButton = std::make_shared<Button>("File", tabFontSize);
+	const auto editButton = std::make_shared<Button>("Edit", tabFontSize);
+	const auto addButton  = std::make_shared<Button>("Add",  tabFontSize);
 
-	const auto fileButton = std::make_shared<Button>(viewport->scene, "File", tabFontSize);
-	const auto editButton = std::make_shared<Button>(viewport->scene, "Edit", tabFontSize);
-	const auto addButton  = std::make_shared<Button>(viewport->scene,  "Add", tabFontSize);
+	for (const auto& button : std::vector{fileButton, editButton, addButton}) {
+		button->mouseX = mouseX;
+		button->mouseY = mouseY;
+	}
 
 	const auto fileTab	  = std::make_shared<UITab>(fileButton, fileOptions);
 	const auto editTab	  = std::make_shared<UITab>(editButton, editOptions);
-	const auto addTab	  = std::make_shared<UITab>(addButton, addOptions);
+	const auto addTab	  = std::make_shared<UITab>(addButton,  addOptions);
 
 	int i = 0;
 	for (const auto& tab : std::vector{fileTab, editTab, addTab}) {
+		const auto windowW = static_cast<float>(context->viewport->at(2));
+		const auto windowH = static_cast<float>(context->viewport->at(3));
+
 		tab->x  = tab->button->x  = firstTabX + static_cast<float>(i) * buttonWidth;
 		tab->button->y = tabPadding;
 		tab->sx = tab->button->sx = Dim(buttonWidth, DimType::Pixels);
 		tab->sy = Dim(barHeight, DimType::Pixels);
 		tab->button->sy = Dim(barHeight - 2*tabPadding, DimType::Pixels);
-		tab->setVertices();
-		tab->button->setVertices();
+
+		tab->setVertices(windowW, windowH);
+		tab->button->setVertices(windowW, windowH);
 		tab->button->setActivated(true);
+
 		addElement(tab, 1);
 		addElement(tab->button, 2);
+
 		i++;
 	}
 
@@ -103,7 +110,10 @@ void UI::addElement(const std::shared_ptr<UIElement> &element, const int layer) 
 void UI::update() const {
 	for (const auto& layer : elements) {
 		for (const auto& element : layer) {
-			element->update();
+			element->setVertices(
+				static_cast<float>(context->viewport->at(2)),
+				static_cast<float>(context->viewport->at(3))
+			);
 		}
 	}
 
@@ -129,7 +139,7 @@ void UI::render() const {
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, (*vp)[2], (*vp)[3], 0, -1, 1);
+	glOrtho(0, context->viewport->at(2), context->viewport->at(3), 0, -1, 1);
 
 	// Save model view matrix
 	glMatrixMode(GL_MODELVIEW);
@@ -144,9 +154,9 @@ void UI::render() const {
 	}
 
 	#ifdef DEBUG
-		Debug::drawDebugText(viewport->scene, viewport->activeCamera, viewport->fps);
+		Debug::drawDebugText(this, context->activeCamera);
 	#endif
-	Text::drawErrorText((*vp)[3]);
+	Text::drawErrorText(context->viewport->at(3));
 
 	// Restore matrices
 	glPopMatrix();

@@ -1,3 +1,4 @@
+#include "viewport/Viewport.h"
 #include "scene/Scene.h"
 
 // Controls
@@ -39,32 +40,36 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	// Mouse button callbacks
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* cbWindow, const int button, const int action, const int) {
 		const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow));
-		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-			const auto mousePos = Vector2(*vp->scene->mouseX, *vp->scene->mouseY);
-			vp->setMouseRay(mousePos);
-			vp->scene->context->mouseRay = &vp->mouseRay;
-			vp->scene->select(mousePos, false);
-		}
-		else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-			vp->activeCamera.initRotation(action == GLFW_PRESS, *vp->scene->mouseX, *vp->scene->mouseY);
+		for (const auto& scene : vp->scenes) {
+			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+				const auto mousePos = Vector2(*mouseX, *mouseY);
+				vp->setMouseRay(mousePos);
+				scene->context->mouseRay = &vp->mouseRay;
+				scene->select(mousePos, false);
+			}
+			else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+				vp->activeCamera.initRotation(action == GLFW_PRESS, *mouseX, *mouseY);
+			}
 		}
 	});
 
 	// Cursor position callback
-	glfwSetCursorPosCallback(window, [](GLFWwindow* cbWindow, const double mouseX, const double mouseY) {
+	glfwSetCursorPosCallback(window, [](GLFWwindow* cbWindow, const double x, const double y) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
 			// Update the mouse position in the Viewport
-			glfwGetCursorPos(cbWindow, vp->scene->mouseX, vp->scene->mouseY);
+			glfwGetCursorPos(cbWindow, mouseX, mouseY);
 
-			if (vp->scene->transformMode == NONE) {
-				// Viewport rotation
-				if (vp->activeCamera.rotating) {
-					vp->activeCamera.rotate(mouseX, mouseY);
+			for (const auto& scene : vp->scenes) {
+				if (scene->transformMode == NONE) {
+					// Viewport rotation
+					if (vp->activeCamera.rotating) {
+						vp->activeCamera.rotate(x, y);
+					}
+				} else {
+					// Object transformation
+					const Vector3 worldPos = unproject(Vector2(*mouseX, *mouseY), &vp->viewport, vp->activeCamera.viewMatrix, vp->activeCamera.projMatrix);
+					scene->transform(x, y, worldPos, vp->activeCamera.camPos);
 				}
-			} else {
-				// Object transformation
-				const Vector3 worldPos = unproject(Vector2(*vp->scene->mouseX, *vp->scene->mouseY), &vp->viewport, vp->activeCamera.viewMatrix, vp->activeCamera.projMatrix);
-				vp->scene->transform(mouseX, mouseY, worldPos, vp->activeCamera.camPos);
 			}
 		}
 	});
@@ -88,7 +93,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 /** Key callbacks */
 void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
 	if (action != GLFW_PRESS) return;
-	switch (key) {
+	for (const auto& scene : scenes) switch (key) {
 		case GLFW_KEY_TAB : scene->toggleSelectionMode(); break;					// TAB -> Toggle Object/Edit Mode
 
 		// Number keys for perspective toggling

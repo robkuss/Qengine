@@ -6,26 +6,20 @@
 class Button final : public Input {
 public:
 	explicit Button(
-		const Scene* scene = nullptr,
 		const std::string& text = "",
 		const int textSize = 48,
 		const TextMode textMode = TextMode::LEFT,
 		const std::vector<Color>& colors = BUTTON_COLORS
-	) : Input(scene, text, textSize, colors),
+	) : Input(text, textSize, colors),
 		  textMode(textMode) {
 	}
 
-	void update() override;
 	void render() const override;
 
 private:
 	TextMode textMode;
 };
 
-
-inline void Button::update() {
-
-}
 
 inline void Button::render() const {
 	Input::render();

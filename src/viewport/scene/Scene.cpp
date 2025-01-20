@@ -11,15 +11,14 @@
 constexpr float SELECT_TOLERANCE = 20.0f;		// Tolerance in pixel distance for mouse picking
 
 
-Scene::Scene() {
-	context = new RenderContext(selectionMode);
-}
-
 void Scene::render() const {
 	// Enable lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT1);
 	glEnable(GL_LIGHT2);
+
+	glLightfv(GL_LIGHT1, GL_POSITION, light1Pos);
+	glLightfv(GL_LIGHT2, GL_POSITION, light2Pos);
 
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& obj : sceneObjects) {
@@ -63,7 +62,7 @@ void Scene::select(const Vector2& mousePos, const bool preserve) {
 					intersectingObjects.emplace_back(obj);
 				}
 			} else {
-				// TODO Implement selection logic for Objects that aren't Meshes
+				// TODO Implement selection logic for Objects that aren't Meshes (e.g. Cameras, light sources etc.)
 			}
 		}
 
@@ -324,9 +323,9 @@ void Scene::setLight(const Color& diffuse, const Color& ambient, const Color& sp
 	glLightfv(GL_LIGHT2, GL_SPECULAR, specularF);
 }
 
-Vector3 Scene::mouseWorld() const {
+Vector3 Scene::mouseWorld(const double mouseX, const double mouseY) const {
 	return unproject(
-		Vector2(*mouseX, *mouseY),
+		Vector2(mouseX, mouseY),
 		context->viewport,
 		context->activeCamera->viewMatrix,
 		context->activeCamera->projMatrix

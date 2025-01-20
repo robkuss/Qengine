@@ -16,19 +16,15 @@ public:
 	) :   button(button),
 	      optionList(optionList) {}
 
-	void update() override;
 	void render() const override;
-	void setVertices() override;
+	void setVertices(float windowW, float windowH) override;
 };
 
-inline void UITab::update() {
-
-}
 
 inline void UITab::render() const {
 
 }
 
-inline void UITab::setVertices() {
+inline void UITab::setVertices(const float windowW, const float windowH) {
 
 }

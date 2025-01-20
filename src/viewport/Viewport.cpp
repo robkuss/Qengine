@@ -13,8 +13,10 @@
 #include "scene/graphics/ui/UI.h"
 
 
+std::vector<Scene*> Viewport::scenes;
+
 Viewport::Viewport(const std::string& title, const int width, const int height)
-	: title(title), width(width), height(height), scene(new Scene()) {
+	: title(title), width(width), height(height) {
 	glfwSetErrorCallback([](int, const char *description) {
 		std::cerr << "GLFW Error: " << description << std::endl;
 	});
@@ -61,13 +63,7 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 	glViewport(0, 0, width, height);	// Initialize viewport
 	glGetIntegerv(GL_VIEWPORT, viewport.data());
 
-	ui = new UI(this);	// Initialize user interface
-	ui->setup();
-
 	aspect = static_cast<float>(width) / static_cast<float>(height);
-
-	scene->context->viewport = &viewport;	// Set up render context
-	scene->context->activeCamera = &activeCamera;
 }
 
 Viewport::~Viewport() {
@@ -77,6 +73,28 @@ Viewport::~Viewport() {
 }
 
 void Viewport::start() {
+	// Allocate RenderContext
+	const auto renderContext = new RenderContext();
+
+	// Create Scenes
+	Scene background(renderContext);
+	Scene foreground(renderContext);
+	ui = new UI(renderContext);
+
+	scenes.push_back(&background);
+	scenes.push_back(&foreground);
+	scenes.push_back(ui);
+
+	// Set up render context for each Scene
+	for (const auto& scene : scenes) {
+		scene->context->viewport	 = &viewport;
+		scene->context->activeCamera = &activeCamera;
+	}
+
+	// Set up UI afterwards
+	ui->setup();
+
+	// Load Textures
 	const auto noTexture	  = std::shared_ptr<Texture>{};
 	const auto& thmTexture   = noTexture; //std::make_shared<Texture>("../resources/textures/thm2k.png");
 	const auto& earthTexture = noTexture; //std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
@@ -90,7 +108,7 @@ void Viewport::start() {
 		Colors::WHITE,
 		thmTexture
 	);
-	scene->addObject(cube);
+	background.addObject(cube);
 
 	// Add Earth to Scene
 	const auto earth = std::make_shared<Sphere>(
@@ -102,7 +120,7 @@ void Viewport::start() {
 		Colors::WHITE,
 		earthTexture
 	);
-	scene->addObject(earth);
+	background.addObject(earth);
 
 	const auto skybox = std::make_shared<Skybox>(
 		"Skybox",
@@ -110,7 +128,7 @@ void Viewport::start() {
 		starsTexture
 	);
 	skybox->applyTransformation(OBJECT, SCALE, Matrix4::scale(Vector3(5.0f, 5.0f, 5.0f)));
-	//sceneManager->addObject(skybox);
+	foreground.addObject(skybox);
 
 
 	clearColor(Colors::BG_COLOR);	// Background color
@@ -122,17 +140,18 @@ void Viewport::start() {
 
 	// Start rendering the Viewport
 	while (!glfwWindowShouldClose(window)) {
-		glfwGetFramebufferSize(window, &width, &height);
-
 		render();
+
+		getFPS();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 }
 
-/** Viewport rendering loop called every frame */
 void Viewport::render() {
+	glfwGetFramebufferSize(window, &width, &height);
+
 	glViewport(0, 0, width, height);
 	glGetIntegerv(GL_VIEWPORT, viewport.data());
 
@@ -142,21 +161,19 @@ void Viewport::render() {
 	drawAxes();
 	drawGrid();
 
-	// Render scene objects
-	glLightfv(GL_LIGHT1, GL_POSITION, light1Pos);
-	glLightfv(GL_LIGHT2, GL_POSITION, light2Pos);
-
-	scene->render();
+	// Render Scenes
+	for (int i = 0; i < scenes.size() - 1; i++) {
+		scenes[i]->render();
+	}
 
 	#ifdef DRAW_MOUSE_RAY
 		drawRay(rayStart, rayEnd);
 	#endif
 
-	// Render UI
+	// Render UI last
 	ui->render();
-
-	getFPS();
 }
+
 
 void Viewport::getFPS() {
 	if (const double currentTime = glfwGetTime(); currentTime - previousTime >= 1.0) {

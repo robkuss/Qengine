@@ -1,10 +1,6 @@
 #include "UIBar.h"
 
 
-void UIBar::update() {
-	setVertices();
-}
-
 void UIBar::render() const {
 	color3f(Colors::UI_COLOR);
 	glBegin(GL_QUADS);
@@ -23,10 +19,10 @@ void UIBar::render() const {
 	glEnd();
 }
 
-void UIBar::setVertices() {
-	auto absDim = [](const Dim dim, const int dir) {
+void UIBar::setVertices(const float windowW, const float windowH) {
+	auto absDim = [windowW, windowH](const Dim dim, const int dir) {
 		return dim.type == DimType::Percent
-			? static_cast<float>(dir == 0 ? (*vp)[2] : (*vp)[3]) * dim.value
+			? static_cast<float>(dir == 0 ? windowW : windowH) * dim.value
 			: dim.value;
 	};
 

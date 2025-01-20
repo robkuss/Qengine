@@ -12,7 +12,6 @@ public:
 		Args... args
 	) {
 		addTabs(args...);   // Add variadic tabs
-		setVertices();		// Configure vertices
 	}
 
 	// Helper to add multiple tabs recursively (variadic template unpacking)
@@ -30,9 +29,8 @@ public:
 		tabs.emplace_back(tab);
 	}
 
-	void update() override;
 	void render() const override;
-	void setVertices() override;
+	void setVertices(float windowW, float windowH) override;
 
 private:
 	std::vector<std::shared_ptr<UITab>> tabs;

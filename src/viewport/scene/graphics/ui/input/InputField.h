@@ -12,15 +12,13 @@ enum class InputMode {
 class InputField final : public Input {
 public:
 	explicit InputField(
-		const Scene* scene = nullptr,
 		const std::string& text = "",
 		const int textSize = 48,
 		const std::vector<Color>& colors = BUTTON_COLORS
-	) : Input(scene, text, textSize, colors),
+	) : Input(text, textSize, colors),
 		  mode(InputMode::IDLE) {
 	}
 
-	void update() override;
 	void render() const override;
 
 	[[nodiscard]] std::string getInputRaw() const {
@@ -40,10 +38,6 @@ private:
 	std::string input;
 };
 
-
-inline void InputField::update() override {
-
-}
 
 inline void InputField::render() const override {
 	Input::render();

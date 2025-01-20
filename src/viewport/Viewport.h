@@ -25,50 +25,49 @@ constexpr int ANTIALIASING_SAMPLES		= 25;
 constexpr float AXES_LENGTH				= 100.0f;
 constexpr float MOUSE_RAY_LENGTH		= 1000.0f;
 
+// These really shouldn't be here
+inline int  fps		= 0;
+inline auto mouseX	= new double[1];
+inline auto mouseY	= new double[1];
+
 
 class Viewport {
 public:
 	std::array<int, 4> viewport{};
+
+	// Scenes (TODO shouldn't be public)
+	static std::vector<Scene*> scenes;
 	UI* ui{};
 
-	explicit Viewport(const std::string& title, int width, int height);
+	Viewport(const std::string& title, int width, int height);
 	~Viewport();
 
 	void start();
+	void render();
 
 	void setCallbacks(GLFWwindow* window);
 	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
 
 private:
-	friend class Debug;
-	friend class UI;
-
 	GLFWwindow* window = nullptr;
 	std::string title;
 	int width, height;
 	float aspect;
-	Scene* scene{};
 
 	// FPS tracking
 	double previousTime = 0.0;
 	int frameCount		= 0;
-	int fps				= 0;
 
-	// Lighting
-	GLfloat light1Pos[4] = {2, 3, 6, 0};
-	GLfloat light2Pos[4] = {-2, -3, -6, 0};
-
-	// Mouse Ray
+	// Mouse data
+	Vector2 lastMousePos	 = Vector2(0.0, 0.0);
 	mutable Vector3 rayStart = Vector3::MINUS_ONE;
 	mutable Vector3 rayEnd   = Vector3::ONE;
-	Ray mouseRay = Ray(rayStart, rayEnd);
+	Ray mouseRay			 = Ray(rayStart, rayEnd);
 
 	// Camera
 	Camera activeCamera = Camera();
 
 	// Functions
-	void render();
-
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
 

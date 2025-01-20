@@ -1,15 +1,21 @@
 #pragma once
 
+#include <viewport/Viewport.h>
+#include <viewport/scene/Camera.h>
 #include <viewport/scene/Scene.h>
 
 // Options
 #define DEBUG	// For on-screen debug text
 
+constexpr float debugTextSize	= 24;
+const Color debugTextColor		= Colors::TEXT_COLOR;
+
+
 class Debug {
 public:
-	static void drawDebugText(const Scene* scene, const Camera& camera, const int fps) {
-		const auto cube = scene->sceneObjects[0];
-		const auto mouseWorld = scene->mouseWorld();
+	static void drawDebugText(const Scene* scene, const Camera* camera) {
+		const auto cube = Viewport::scenes[0]->sceneObjects[0];
+		const auto mouseWorld = scene->mouseWorld(*mouseX, *mouseY);
 
 		size_t vertexCount = 0;
 		for (const auto& obj : scene->sceneObjects) {
@@ -21,10 +27,10 @@ public:
 
 			switch (i) {
 				case 0:  out << "FPS: " << fps; break;
-				case 1:  out << "Camera Pos: " << camera.camPos.toString(); break;
-				case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << camera.rotH << " / " << camera.rotV; break;
-				case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camera.camDist; break;
-				case 4:  out << "Mouse Screen: " << *scene->mouseX  << " / " << *scene->mouseY; break;
+				case 1:  out << "Camera Pos: " << camera->camPos.toString(); break;
+				case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << camera->rotH << " / " << camera->rotV; break;
+				case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camera->camDist; break;
+				case 4:  out << "Mouse Screen: " << mouseX  << " / " << mouseY; break;
 				case 5:  out << "Mouse World: "  << mouseWorld.toString(); break;
 				case 6:	 out << "Mode: " << scene->selectionMode.modeToString();
 				if (scene->transformMode.mode    != Mode::NONE)    out << " " << scene->transformMode.modeToString();
@@ -36,7 +42,7 @@ public:
 				default: out << "Vertex Count: " << vertexCount; break;
 			}
 
-			Text::renderText(out.str(), TextMode::LEFT, UI::firstLineX, Text::line(i, 24), 24, Colors::TEXT_COLOR);
+			Text::renderText(out.str(), TextMode::LEFT, UI::firstLineX, Text::line(i, debugTextSize), debugTextSize, debugTextColor);
 		}
 	}
 };

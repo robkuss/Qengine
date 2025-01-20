@@ -37,7 +37,6 @@ public:
 
 	virtual ~UIElement() = default;
 
-	virtual void update() = 0;
 	virtual void render() const = 0;
-	virtual void setVertices() = 0;
+	virtual void setVertices(float windowW, float windowH) = 0;
 };
