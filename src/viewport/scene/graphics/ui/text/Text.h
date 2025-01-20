@@ -46,7 +46,7 @@ public:
 	void setErrorText(const std::string& text);
 	static void drawErrorText(int windowH);
 
-	static float line(int lineNumber);
+	static float line(int lineNumber, int textSize);
 
 private:
 	constexpr static auto fontPath = "../resources/fonts/cour.ttf";

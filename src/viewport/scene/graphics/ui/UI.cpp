@@ -6,12 +6,23 @@
 
 #include <memory>
 
+#define PC_100 (Dim(1.0f, DimType::Percent))	// 100%
+#define PC_50  (Dim(0.5f, DimType::Percent))	// 50%
+#define PC_25  (Dim(0.25f, DimType::Percent))	// 25%
+
 
 // Position markers
 int UI::boundLeft, UI::boundRight, UI::boundTop, UI::boundBottom;
 float UI::firstLineX;
 float UI::firstLineY;
 float UI::bottomLineY;
+
+constexpr int tabFontSize	= 20;
+
+constexpr float barHeight	= 40.0f;
+constexpr float firstTabX	= barHeight;
+constexpr float tabPadding	= 1.5f;		// Upper and lower padding within the bar
+constexpr float buttonWidth	= 120.0f;
 
 
 UI::UI(const Viewport *viewport) : viewport(viewport) {
@@ -40,22 +51,17 @@ void UI::setup() {
 	);
 
 	// Create UITabs
-	const auto fileButton = std::make_shared<Button>(viewport->scene, "File");
-	const auto editButton = std::make_shared<Button>(viewport->scene, "Edit");
-	const auto addButton  = std::make_shared<Button>(viewport->scene,  "Add");
+
+	const auto fileButton = std::make_shared<Button>(viewport->scene, "File", tabFontSize);
+	const auto editButton = std::make_shared<Button>(viewport->scene, "Edit", tabFontSize);
+	const auto addButton  = std::make_shared<Button>(viewport->scene,  "Add", tabFontSize);
 
 	const auto fileTab	  = std::make_shared<UITab>(fileButton, fileOptions);
 	const auto editTab	  = std::make_shared<UITab>(editButton, editOptions);
 	const auto addTab	  = std::make_shared<UITab>(addButton, addOptions);
 
-	constexpr auto barHeight = 40.0f;
-
 	int i = 0;
 	for (const auto& tab : std::vector{fileTab, editTab, addTab}) {
-		constexpr auto firstTabX = 50.f;
-		constexpr auto tabPadding = 5.0f;
-		constexpr auto buttonWidth = 120.0f;
-
 		tab->x  = tab->button->x  = firstTabX + static_cast<float>(i) * buttonWidth;
 		tab->button->y = tabPadding;
 		tab->sx = tab->button->sx = Dim(buttonWidth, DimType::Pixels);
@@ -76,7 +82,7 @@ void UI::setup() {
 		addTab
 	);
 	bar->x = bar->y = 0;
-	bar->sx = Dim(1.0f, DimType::Percent);
+	bar->sx = PC_100;
 	bar->sy = Dim(barHeight, DimType::Pixels);
 	addElement(bar, 0);
 
@@ -109,9 +115,9 @@ void UI::update() const {
 		if (vertex->y < boundBottom) boundBottom = static_cast<int>(vertex->y);
 	}
 
-	firstLineX  = (10.0f + static_cast<float>(boundLeft))   / Text::fontScale;
-	firstLineY  = (35.0f + static_cast<float>(boundTop))    / Text::fontScale;
-	bottomLineY = (10.0f + static_cast<float>(boundBottom)) / Text::fontScale;
+	firstLineX  = 15.0f + static_cast<float>(boundLeft);
+	firstLineY  = 35.0f + static_cast<float>(boundTop) ;
+	bottomLineY = 10.0f + static_cast<float>(boundBottom);
 }
 
 void UI::render() const {

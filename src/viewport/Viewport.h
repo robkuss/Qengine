@@ -20,7 +20,7 @@ class Vector2;
 class SceneManager;	// Forward declaration for friend
 
 // Constants
-constexpr int ANTIALIASING_SAMPLES		= 10;
+constexpr int ANTIALIASING_SAMPLES		= 25;
 
 constexpr float AXES_LENGTH				= 100.0f;
 constexpr float MOUSE_RAY_LENGTH		= 1000.0f;

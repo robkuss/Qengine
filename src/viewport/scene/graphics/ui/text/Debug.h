@@ -36,7 +36,7 @@ public:
 				default: out << "Vertex Count: " << vertexCount; break;
 			}
 
-			Text::renderText(out.str(), TextMode::LEFT, UI::firstLineX, Text::line(i), Text::fontSize, Colors::TEXT_COLOR);
+			Text::renderText(out.str(), TextMode::LEFT, UI::firstLineX, Text::line(i, 24), 24, Colors::TEXT_COLOR);
 		}
 	}
 };

@@ -8,7 +8,7 @@ public:
 	explicit Button(
 		const Scene* scene = nullptr,
 		const std::string& text = "",
-		const int textSize = 12,
+		const int textSize = 48,
 		const TextMode textMode = TextMode::LEFT,
 		const std::vector<Color>& colors = BUTTON_COLORS
 	) : Input(scene, text, textSize, colors),
@@ -30,26 +30,24 @@ inline void Button::update() {
 inline void Button::render() const {
 	Input::render();
 
-	const float sxHalf = sx.value / 2.0f;
-
 	float adjustedX;
 	switch (textMode) {
 		case TextMode::LEFT:
-			adjustedX = x + static_cast<float>(textSize);
+			adjustedX = x + static_cast<float>(textSize) / 2.0f;
 		break;
 		case TextMode::RIGHT:
-			adjustedX = 2 * x - static_cast<float>(textSize);
+			adjustedX = x + sx.value - static_cast<float>(textSize) / 2.0f;
 		break;
 		default: // CENTER
-			adjustedX = x + sxHalf;
+			adjustedX = x + sx.value / 2.0f;
 	}
 
 	Text::renderText(
 		text,
 		textMode,
 		adjustedX,
-		y + sy.value / 2.0f + static_cast<float>(textSize) / 2.0f + 2.0f,
-		Text::fontSize,
+		y + sy.value / 2.0f + static_cast<float>(textSize) / 3.0f,
+		textSize,
 		activated ? Colors::BUTTON_TEXT_COLOR : Colors::BUTTON_DEACT_FILL
 	);
 }

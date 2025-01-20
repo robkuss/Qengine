@@ -14,7 +14,7 @@ public:
 	explicit InputField(
 		const Scene* scene = nullptr,
 		const std::string& text = "",
-		const int textSize = 12,
+		const int textSize = 48,
 		const std::vector<Color>& colors = BUTTON_COLORS
 	) : Input(scene, text, textSize, colors),
 		  mode(InputMode::IDLE) {

@@ -22,7 +22,7 @@ public:
 	explicit Input(
 		const Scene* scene = nullptr,
 		std::string text = "",
-		const int textSize = 12,
+		const int textSize = 48,
 		const std::vector<Color>& colors = BUTTON_COLORS
 	) :   scene(scene),
 		  rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),

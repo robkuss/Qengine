@@ -84,8 +84,8 @@ void Text::destruct() {
 
 
 /** Line number to screen coordinates */
-float Text::line(const int lineNumber) {
-    return UI::firstLineY * fontScale + static_cast<float>(lineNumber) * fontSize * fontScale * lineSpacing;
+float Text::line(const int lineNumber, const int textSize) {
+    return UI::firstLineY + static_cast<float>(lineNumber) * static_cast<float>(textSize) * lineSpacing;
 }
 
 /**
@@ -113,8 +113,9 @@ void Text::renderText(const std::string& text, TextMode textMode, const float x,
 
     // Move to the position where the text should be drawn
     glTranslatef(x, y, 0.0f);
-    const auto scalar = static_cast<float>(textSize) / fontSize;
-    glScalef(fontScale * scalar, fontScale * scalar, 1.0f);
+
+    const float scalar = static_cast<float>(textSize) / static_cast<float>(fontSize);
+    glScalef(scalar, scalar, 1.0f);
 
     // Render the text character by character
     for (int i = 0; text[i] != '\0'; ++i) {
@@ -145,13 +146,13 @@ void Text::renderText(const std::string& text, TextMode textMode, const float x,
         glTexCoord2f(1.0f, 1.0f);
         glVertex2f(xpos + static_cast<float>(sizeX), ypos);
 
-        glTexCoord2f(0.0, 1.0);
+        glTexCoord2f(0.0f, 1.0f);
         glVertex2f(xpos, ypos);
 
         glEnd();
 
         // Move the cursor to the next position (advance by glyph's advance value)
-        glTranslatef(static_cast<float>(advance) / 64, 0.0f, 0.0f);
+        glTranslatef(static_cast<float>(advance) / 64.0f, 0.0f, 0.0f);
     }
 
     // Restore the model view matrix
