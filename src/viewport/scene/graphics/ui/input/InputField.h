@@ -9,40 +9,19 @@ enum class InputMode {
 	SAVING
 };
 
-class InputField : public Input {
-	InputMode mode;
-	std::string input;
-
+class InputField final : public Input {
 public:
-	InputField(const Scene* scene, const float x, const float y, float const sx, float const sy, const std::string& text, const int textSize, const std::vector<Color>& colors)
-		: Input(scene, x, y, sx, sy, text, textSize, colors), mode(InputMode::IDLE) {}
-
-	void drawInputField() {
-		drawBox();
-		glBegin(GL_QUADS);
-		glVertex2f(x + 20 - sx / 2, y - sy / 10);
-		glVertex2f(x + sx / 4 - sx / 2, y - sy / 10);
-		glVertex2f(x + sx / 4 - sx / 2, y + sy / 10);
-		glVertex2f(x + 20 - sx / 2, y + sy / 10);
-		glEnd();
-
-		Text::renderText(
-			text + ":",
-			TextMode::LEFT,
-			x - sx / 2 + 20,
-			y - sy / 8,
-			textSize,
-			getColor()
-		);
-		Text::renderText(
-			input + (mode == InputMode::TYPING ? "|" : ""),
-			TextMode::LEFT,
-			x - sx / 2.75f + 30,
-			y,
-			static_cast<int>(textSize * 1.2),
-			getColor()
-		);
+	explicit InputField(
+		const Scene* scene = nullptr,
+		const std::string& text = "",
+		const int textSize = 12,
+		const std::vector<Color>& colors = BUTTON_COLORS
+	) : Input(scene, text, textSize, colors),
+		  mode(InputMode::IDLE) {
 	}
+
+	void update() override;
+	void render() const override;
 
 	[[nodiscard]] std::string getInputRaw() const {
 		return input;
@@ -55,4 +34,45 @@ public:
 	void resetInput() {
 		input.clear();
 	}
+
+private:
+	InputMode mode;
+	std::string input;
 };
+
+
+inline void InputField::update() override {
+
+}
+
+inline void InputField::render() const override {
+	Input::render();
+
+	const float sxHalf = sx.value / 2.0f;
+	const float syTenths = sy.value / 10.0f;
+
+	glBegin(GL_QUADS);
+	glVertex2f(x + 20 - sxHalf, y - syTenths);
+	glVertex2f(x + sx.value / 4 - sxHalf, y - syTenths);
+	glVertex2f(x + sx.value / 4 - sxHalf, y + syTenths);
+	glVertex2f(x + 20 - sxHalf, y + syTenths);
+	glEnd();
+
+	Text::renderText(
+		text + ":",
+		TextMode::LEFT,
+		x - sxHalf + 20,
+		y - sy.value / 8,
+		textSize,
+		activated ? Colors::BLACK : Colors::BUTTON_DEACT_FILL
+	);
+
+	Text::renderText(
+		input + (mode == InputMode::TYPING ? "|" : ""),
+		TextMode::LEFT,
+		x - sx.value / 2.75f + 30,
+		y,
+		static_cast<int>(textSize * 1.2),
+		activated ? Colors::BLACK : Colors::BUTTON_DEACT_FILL
+	);
+}

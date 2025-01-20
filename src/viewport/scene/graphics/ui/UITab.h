@@ -2,20 +2,23 @@
 
 #include "UIElement.h"
 #include "UIOption.h"
-
-#include <utility>
+#include "input/Button.h"
 
 
 class UITab final : public UIElement {
 public:
-	std::string name;                       // Tab name
-	std::shared_ptr<UIOptionList> options;  // Root OptionList for the Tab
+	std::shared_ptr<Button> button;				// Tab button
+	std::shared_ptr<UIOptionList> optionList;	// Root OptionList for the Tab
 
-	UITab(std::string name, const std::shared_ptr<UIOptionList>& options)
-		: name(std::move(name)), options(options) {}
+	explicit UITab(
+		const std::shared_ptr<Button>& button,
+		const std::shared_ptr<UIOptionList>& optionList
+	) :   button(button),
+	      optionList(optionList) {}
 
 	void update() override;
 	void render() const override;
+	void setVertices() override;
 };
 
 inline void UITab::update() {
@@ -23,5 +26,9 @@ inline void UITab::update() {
 }
 
 inline void UITab::render() const {
+
+}
+
+inline void UITab::setVertices() {
 
 }

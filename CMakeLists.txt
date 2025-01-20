@@ -38,9 +38,6 @@ add_executable(Qengine
 	src/viewport/scene/graphics/ui/UI.cpp
 	src/viewport/scene/graphics/ui/UIBar.cpp
 	src/viewport/scene/graphics/ui/text/Text.cpp
-	src/viewport/scene/graphics/ui/text/Debug.cpp
-		src/viewport/scene/graphics/ui/input/Button.h
-		src/viewport/scene/graphics/ui/input/InputField.h
 )
 
 # Define static linking

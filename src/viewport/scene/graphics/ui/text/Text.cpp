@@ -66,7 +66,7 @@ Text::Text() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Text::~Text() {
+void Text::destruct() {
     if (font) {
         FT_Done_Face(font);
         font = nullptr;     // Optional: set to nullptr to avoid dangling pointer
@@ -97,12 +97,13 @@ float Text::line(const int lineNumber) {
  * @param textSize font size for this particular text
  * @param color the color that the text will be drawn in
  */
-void Text::renderText(const std::string& text, TextMode textMode, const float x, const float y, int textSize, const Color color) {
-    // Enable necessary settings for text rendering
+void Text::renderText(const std::string& text, TextMode textMode, const float x, const float y, const int textSize, const Color color) {
+    // Save OpenGL state
+    glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
+
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, fontTexture);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     color3f(color);
 
     // Switch to the model view matrix
@@ -112,13 +113,17 @@ void Text::renderText(const std::string& text, TextMode textMode, const float x,
 
     // Move to the position where the text should be drawn
     glTranslatef(x, y, 0.0f);
-    glScalef(fontScale, fontScale, 1.0f);
+    const auto scalar = static_cast<float>(textSize) / fontSize;
+    glScalef(fontScale * scalar, fontScale * scalar, 1.0f);
 
     // Render the text character by character
     for (int i = 0; text[i] != '\0'; ++i) {
         char c = text[i];
         auto it = characters.find(c);
-        if (it == characters.end()) std::cerr << "Character " << c << " not found in the map" << std::endl;
+        if (it == characters.end()) {
+            std::cerr << "Character " << c << " not found in the map" << std::endl;
+            continue;
+        }
         auto&[textureID, sizeX, sizeY, bearingX, bearingY, advance] = it->second;
 
         // Correct kerning by considering the glyph's bearing.x
@@ -149,13 +154,11 @@ void Text::renderText(const std::string& text, TextMode textMode, const float x,
         glTranslatef(static_cast<float>(advance) / 64, 0.0f, 0.0f);
     }
 
-    // Restore settings
-    glDisable(GL_BLEND);
-    glDisable(GL_TEXTURE_2D);
-
     // Restore the model view matrix
     glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
+
+    // Restore OpenGL state
+    glPopAttrib();
 }
 
 /**

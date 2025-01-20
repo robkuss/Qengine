@@ -6,6 +6,7 @@
 namespace Colors {
 	const auto WHITE					= Color(255, 255, 255);
 	const auto BLACK					= Color(  0,   0,   0);
+	const auto GREY						= Color(127, 127, 127);
 
 	const auto RED						= Color(255,   0,   0);
 	const auto YELLOW					= Color(255, 255,   0);
@@ -24,7 +25,13 @@ namespace Colors {
 	const auto TEXT_COLOR				= Color(192, 192, 192);
 	const auto LIGHT_SUN				= Color(230, 230, 230);
 	const auto LIGHT_AMBIENT			= Color( 13,  13,  13);
-	const auto SKY						= Color(128, 128, 128);
+	const auto SKY					= GREY;
 
 	const auto UI_COLOR					= Color( 70,  70,  70);
+	const auto BUTTON_REG_FILL		= UI_COLOR;
+	const auto BUTTON_REG_OUTLINE		= Color( 60,  60,  60);
+	const auto BUTTON_HIGH_FILL			= Color( 60,  60,  60);
+	const auto BUTTON_HIGH_OUTLINE	= BUTTON_REG_OUTLINE;
+	const auto BUTTON_DEACT_FILL		= Color(110, 110, 110);
+	const auto BUTTON_TEXT_COLOR		= TEXT_COLOR;
 }

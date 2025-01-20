@@ -2,16 +2,16 @@
 
 #define GLFW_INCLUDE_GLEXT
 
-#include <array>
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-#include <math/vector/Vector3.h>
-#include <math/ray/Ray.h>
-
+#include "math/vector/Vector3.h"
+#include "math/ray/Ray.h"
 #include "scene/Camera.h"
 #include "scene/graphics/ui/UI.h"
+
+#include <array>
 
 
 // #define DRAW_MOUSE_RAY
@@ -41,6 +41,7 @@ public:
 
 private:
 	friend class Debug;
+	friend class UI;
 
 	GLFWwindow* window = nullptr;
 	std::string title;

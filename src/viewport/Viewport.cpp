@@ -3,13 +3,13 @@
 #include <cmath>
 #include <iostream>
 
-#include <viewport/scene/Scene.h>
-
-#include <objects/mesh/cube/Cube.cpp>
-#include <objects/mesh/sphere/Sphere.cpp>
-#include <objects/mesh/skybox/Skybox.cpp>
+#include "objects/mesh/cube/Cube.cpp"
+#include "objects/mesh/sphere/Sphere.cpp"
+#include "objects/mesh/skybox/Skybox.cpp"
 
 #include "material/texture/Texture.h"
+
+#include "scene/Scene.h"
 #include "scene/graphics/ui/UI.h"
 
 

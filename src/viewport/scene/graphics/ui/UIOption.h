@@ -15,12 +15,12 @@ using UIOption = std::variant<std::string, std::shared_ptr<UIOptionList>>;
 // Define the OptionList class
 class UIOptionList final : public UIElement {
 public:
-	std::vector<UIOption> options;
-
 	// Variadic constructor to initialize with multiple options
 	template <typename... Args>
-	explicit UIOptionList(Args... args) {
-		addOptions(args...);
+	explicit UIOptionList(
+		Args... args
+	) {
+		addOptions(args...);	// Add options using variadic template
 	}
 
 	// Helper to add multiple options recursively (variadic template unpacking)
@@ -45,6 +45,10 @@ public:
 
 	void update() override;
 	void render() const override;
+	void setVertices() override;
+
+private:
+	std::vector<UIOption> options;
 };
 
 inline void UIOptionList::update() {
@@ -52,7 +56,11 @@ inline void UIOptionList::update() {
 }
 
 inline void UIOptionList::render() const {
-	for (const auto& option : options) {
+	/*for (const auto& option : options) {
 
-	}
+	}*/
+}
+
+inline void UIOptionList::setVertices() {
+
 }

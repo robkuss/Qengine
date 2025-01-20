@@ -40,7 +40,7 @@ public:
 	constexpr static float lineSpacing = 1.2f;
 
 	Text();
-	~Text();
+	static void destruct();
 
 	static void renderText(const std::string& text, TextMode textMode, float x, float y, int textSize, Color color);
 	void setErrorText(const std::string& text);
