@@ -68,7 +68,7 @@ inline void Input::update() {
 inline void Input::render() const {
 	glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT);	// Save line width and color state
 
-	const auto isBelowMouse = below(scene->lastMousePos.x, scene->lastMousePos.y);
+	const auto isBelowMouse = below(*scene->mouseX, *scene->mouseY);
 
 	// Draw the filled rectangle
 	if (isBelowMouse) {
