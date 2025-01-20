@@ -31,6 +31,8 @@ public:
 	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.emplace_back(obj); }
 	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
 
+	[[nodiscard]] Vector3 mouseWorld() const;
+
 	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
 
 private:
@@ -49,7 +51,11 @@ private:
 	std::vector<Vertex> selectedVertices;
 
 	Vector3 lastTransform   = Vector3::ZERO;
+
+	// Mouse data
 	Vector2 lastMousePos	= Vector2(0.0, 0.0);
+	double* mouseX			= new double[1];
+	double* mouseY			= new double[1];
 
 	const float scalingSens		= 0.001;	// Scaling sensitivity
 	const float rotationSens	= 10.0f;	// Rotation sensitivity

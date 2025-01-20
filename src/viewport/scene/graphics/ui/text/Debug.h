@@ -7,12 +7,12 @@
 
 class Debug {
 public:
-	static void drawDebugText(const Viewport *vp) {
-		const auto cube = vp->scene->sceneObjects[0];
-		const auto mouseWorld = unproject(Vector2(*vp->activeCamera.mouseX, *vp->activeCamera.mouseY), &vp->viewport, vp->activeCamera.viewMatrix, vp->activeCamera.projMatrix);
+	static void drawDebugText(const Scene* scene, const Camera& camera, const int fps) {
+		const auto cube = scene->sceneObjects[0];
+		const auto mouseWorld = scene->mouseWorld();
 
 		size_t vertexCount = 0;
-		for (const auto& obj : vp->scene->sceneObjects) {
+		for (const auto& obj : scene->sceneObjects) {
 			vertexCount += dynamic_cast<Mesh*>(obj.get())->vertices.size();
 		}
 
@@ -20,15 +20,15 @@ public:
 			std::ostringstream out;
 
 			switch (i) {
-				case 0:  out << "FPS: " << vp->fps; break;
-				case 1:  out << "Camera Pos: " << vp->activeCamera.camPos.toString(); break;
-				case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << vp->activeCamera.rotH << " / " << vp->activeCamera.rotV; break;
-				case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << vp->activeCamera.camDist; break;
-				case 4:  out << "Mouse Screen: " << vp->activeCamera.mouseX[0]  << " / " << vp->activeCamera.mouseY[0]; break;
+				case 0:  out << "FPS: " << fps; break;
+				case 1:  out << "Camera Pos: " << camera.camPos.toString(); break;
+				case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << camera.rotH << " / " << camera.rotV; break;
+				case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camera.camDist; break;
+				case 4:  out << "Mouse Screen: " << *scene->mouseX  << " / " << *scene->mouseY; break;
 				case 5:  out << "Mouse World: "  << mouseWorld.toString(); break;
-				case 6:	 out << "Mode: " << vp->scene->selectionMode.modeToString();
-				if (vp->scene->transformMode.mode    != Mode::NONE)    out << " " << vp->scene->transformMode.modeToString();
-				if (vp->scene->transformMode.subMode != SubMode::NONE) out << " " << vp->scene->transformMode.subModeToString(); break;
+				case 6:	 out << "Mode: " << scene->selectionMode.modeToString();
+				if (scene->transformMode.mode    != Mode::NONE)    out << " " << scene->transformMode.modeToString();
+				if (scene->transformMode.subMode != SubMode::NONE) out << " " << scene->transformMode.subModeToString(); break;
 				case 7:  out << "Cube:"; break;
 				case 8:  out << "    Pos: "   << cube->position.toString();  break;
 				case 9:  out << "    Scale: " << cube->scale.toString();     break;

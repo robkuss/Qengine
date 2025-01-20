@@ -323,3 +323,12 @@ void Scene::setLight(const Color& diffuse, const Color& ambient, const Color& sp
 	glLightfv(GL_LIGHT1, GL_SPECULAR, specularF);
 	glLightfv(GL_LIGHT2, GL_SPECULAR, specularF);
 }
+
+Vector3 Scene::mouseWorld() const {
+	return unproject(
+		Vector2(*mouseX, *mouseY),
+		context->viewport,
+		context->activeCamera->viewMatrix,
+		context->activeCamera->projMatrix
+	);
+}

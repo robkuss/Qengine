@@ -35,9 +35,6 @@ public:
 	double rotH			= 0.0;
 	double rotV			= 0.0;
 
-	double* mouseX		= new double[1];
-	double* mouseY		= new double[1];
-
 	void gluPerspective(float aspect);
 	void gluLookAt();
 	/*static void loadProjectionMatrix(double aspect) ;
@@ -45,7 +42,7 @@ public:
 	void loadFixedViewMatrix() const;*/
 
 	void updatePosition();
-	void initRotation(bool isRotating);
+	void initRotation(bool isRotating, double mouseX, double mouseY);
 	void rotate(double mouseX, double mouseY);
 	void zoom(double yoffset);
 	void setPerspective(float h, float v);

@@ -119,11 +119,11 @@ void Camera::updatePosition() {
 	gluLookAt();
 }
 
-void Camera::initRotation(const bool isRotating) {
+void Camera::initRotation(const bool isRotating, const double mouseX, const double mouseY) {
 	rotating = isRotating;
 	if (rotating) {
-		lastH = mouseX[0];
-		lastV = mouseY[0];
+		lastH = mouseX;
+		lastV = mouseY;
 	}
 }
 

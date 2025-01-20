@@ -67,18 +67,20 @@ Text::Text() {
 }
 
 void Text::destruct() {
+    // Cleanup
     if (font) {
         FT_Done_Face(font);
-        font = nullptr;     // Optional: set to nullptr to avoid dangling pointer
+        font = nullptr;     // Set to nullptr to avoid dangling pointer
     }
-    // Free the library handle if it was initialized
+
     if (library) {
         FT_Done_FreeType(library);
-        library = nullptr;  // Optional: set to nullptr to indicate it's freed
+        library = nullptr;  // Set to nullptr to indicate it's freed
     }
+
     if (fontTexture) {
         glDeleteTextures(1, &fontTexture);
-        fontTexture = 0;    // Optional: set to 0 to avoid accidental reuse
+        fontTexture = 0;    // Set to 0 to avoid accidental reuse
     }
 }
 

@@ -144,7 +144,7 @@ void UI::render() const {
 	}
 
 	#ifdef DEBUG
-		Debug::drawDebugText(viewport);
+		Debug::drawDebugText(viewport->scene, viewport->activeCamera, viewport->fps);
 	#endif
 	Text::drawErrorText((*vp)[3]);
 
