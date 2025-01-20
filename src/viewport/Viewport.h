@@ -34,6 +34,7 @@ inline auto mouseY	= new double[1];
 class Viewport {
 public:
 	std::array<int, 4> viewport{};
+	std::shared_ptr<SceneManager> context{};
 
 	// Scenes (TODO shouldn't be public)
 	static std::vector<Scene*> scenes;

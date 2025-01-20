@@ -9,7 +9,7 @@
 
 #include "material/texture/Texture.h"
 #include "color/Colors.h"
-#include "viewport/scene/RenderContext.h"
+#include "viewport/scene/SceneManager.h"
 
 /** Reinterpret Vertex as GLfloat* */
 void vertex3fv(const Vertex& v) {
@@ -73,7 +73,7 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
     }
 }
 
-void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context) {
+void MeshRenderer::renderVertices(const Mesh& mesh, const SceneManager& context) {
 	glPointSize(4.0f);
 
 	for (const auto& v : mesh.vertices) {
@@ -86,7 +86,7 @@ void MeshRenderer::renderVertices(const Mesh& mesh, const RenderContext& context
 	}
 }
 
-void MeshRenderer::renderEdges(const Mesh& mesh, const RenderContext& context) {
+void MeshRenderer::renderEdges(const Mesh& mesh, const SceneManager& context) {
 	glLineWidth(2.0f);
 
 	for (const auto& edge : mesh.edgeToFaceMap | std::views::keys) {
@@ -103,7 +103,7 @@ void MeshRenderer::renderEdges(const Mesh& mesh, const RenderContext& context) {
 	}
 }
 
-void MeshRenderer::renderTriangles(const Mesh& mesh, const RenderContext& context) {
+void MeshRenderer::renderTriangles(const Mesh& mesh, const SceneManager& context) {
 	for (const auto& triangle : mesh.triangles) {
 		// Highlight if all 3 Vertices of the Triangle are currently selected
 		const auto vertices = {*triangle->v0, *triangle->v1, *triangle->v2};
@@ -117,7 +117,7 @@ void MeshRenderer::renderTriangles(const Mesh& mesh, const RenderContext& contex
 }
 
 
-void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
+void MeshRenderer::render(const Mesh& mesh, const SceneManager& context) {
 	glEnable(GL_TEXTURE_2D);
 	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, mesh.texture->id);
 
@@ -140,7 +140,7 @@ void MeshRenderer::render(const Mesh& mesh, const RenderContext& context) {
 	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void MeshRenderer::renderSilhouette(const Mesh& mesh, const RenderContext& context) {
+void MeshRenderer::renderSilhouette(const Mesh& mesh, const SceneManager& context) {
 	if (mesh.isSelected(context) && context.selectionMode == OBJECT) {
 		// Highlight only the outline of the Mesh in Object Mode
 		const auto color = Colors::MESH_SELECT_COLOR;

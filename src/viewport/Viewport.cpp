@@ -74,22 +74,20 @@ Viewport::~Viewport() {
 
 void Viewport::start() {
 	// Allocate RenderContext
-	const auto renderContext = new RenderContext();
+	context = std::make_shared<SceneManager>();
 
 	// Create Scenes
-	Scene background(renderContext);
-	Scene foreground(renderContext);
-	ui = new UI(renderContext);
+	Scene background(context);
+	Scene foreground(context);
+	ui = new UI(context);
 
 	scenes.push_back(&background);
 	scenes.push_back(&foreground);
 	scenes.push_back(ui);
 
-	// Set up render context for each Scene
-	for (const auto& scene : scenes) {
-		scene->context->viewport	 = &viewport;
-		scene->context->activeCamera = &activeCamera;
-	}
+	// Set up render context
+	context->viewport	  = &viewport;
+	context->activeCamera = &activeCamera;
 
 	// Set up UI afterwards
 	ui->setup();
@@ -122,13 +120,13 @@ void Viewport::start() {
 	);
 	background.addObject(earth);
 
-	const auto skybox = std::make_shared<Skybox>(
+	/*const auto skybox = std::make_shared<Skybox>(
 		"Skybox",
 		Colors::WHITE,
 		starsTexture
 	);
 	skybox->applyTransformation(OBJECT, SCALE, Matrix4::scale(Vector3(5.0f, 5.0f, 5.0f)));
-	foreground.addObject(skybox);
+	foreground.addObject(skybox);*/
 
 
 	clearColor(Colors::BG_COLOR);	// Background color
@@ -204,6 +202,7 @@ void Viewport::setMouseRay(const Vector2& mousePos) {
 	const auto directionScaled = mouseRay.direction * MOUSE_RAY_LENGTH;
 	rayStart = mouseRay.origin = activeCamera.camPos;
 	rayEnd   = mouseRay.origin + directionScaled;
+	context->mouseRay = &mouseRay;
 }
 
 

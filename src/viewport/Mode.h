@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 enum class ModeType {
     NONE,
     VIEW,       // Select (Object & Edit Mode)

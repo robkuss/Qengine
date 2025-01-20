@@ -1,9 +1,10 @@
 #include "UI.h"
 
 #include "UIBar.h"
-#include "text/Debug.h"		// TODO delete this
+#include "text/Debug.h"
 
 #include <memory>
+
 
 #define PC_100 (Dim(1.0f, DimType::Percent))	// 100%
 #define PC_50  (Dim(0.5f, DimType::Percent))	// 50%
@@ -24,7 +25,7 @@ constexpr float tabPadding	= 1.5f;		// Upper and lower padding within the bar
 constexpr float buttonWidth	= 120.0f;
 
 
-UI::UI(RenderContext* context): Scene(context) {
+UI::UI(const std::shared_ptr<SceneManager>& context): Scene(context) {
 	Text(); // Initialize FreeType for on-screen text
 }
 
@@ -139,7 +140,14 @@ void UI::render() const {
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, context->viewport->at(2), context->viewport->at(3), 0, -1, 1);
+	glOrtho(
+		0,
+		context->viewport->at(2),
+		context->viewport->at(3),
+		0,
+		-1,
+		1
+	);
 
 	// Save model view matrix
 	glMatrixMode(GL_MODELVIEW);
@@ -154,7 +162,7 @@ void UI::render() const {
 	}
 
 	#ifdef DEBUG
-		Debug::drawDebugText(this, context->activeCamera);
+		Debug::drawDebugText(this, context.get(), context->activeCamera);
 	#endif
 	Text::drawErrorText(context->viewport->at(3));
 

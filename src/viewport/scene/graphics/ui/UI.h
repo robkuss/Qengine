@@ -19,7 +19,7 @@ public:
 
 	static int boundTop, boundBottom, boundLeft, boundRight;
 
-	explicit UI(RenderContext *context);
+	explicit UI(const std::shared_ptr<SceneManager>& context);
 	~UI();
 
 	void setup();

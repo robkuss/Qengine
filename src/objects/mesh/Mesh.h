@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
-#include <viewport/scene/RenderContext.h>
+#include <viewport/scene/SceneManager.h>
 
 #include "objects/Object.h"
 
@@ -24,14 +24,16 @@ enum class ShadingMode {
 
 class Mesh : public Object {
 public:
-	std::vector<std::shared_ptr<Vertex>> vertices = {};
-	std::vector<std::shared_ptr<Triangle>> triangles = {};
-	std::vector<int> faceIndices = {};
+	std::vector<std::shared_ptr<Vertex>> vertices		= {};
+	std::vector<std::shared_ptr<Triangle>> triangles	= {};
+	std::vector<int> faceIndices						= {};
+
+	std::shared_ptr<Texture> texture					= nullptr;
+	ShadingMode shadingMode								= ShadingMode::FLAT;
 	Color color;
-	std::shared_ptr<Texture> texture = nullptr;
 
 	// Constructor & Destructor
-	Mesh(const std::string& name, const Color& color, const std::shared_ptr<Texture>& texture) : Object{name}, color(color), texture(texture) {}
+	Mesh(const std::string& name, const Color& color, const std::shared_ptr<Texture>& texture) : Object{name}, texture(texture), color(color) {}
 	~Mesh() override = default;
 
 	void buildEdgeToFaceMap();
@@ -42,17 +44,16 @@ public:
 	void initializeTriangles();
 	void updateNormals() const;
 
-	[[nodiscard]] bool isSelected(const RenderContext& context) const;
+	void setShadingMode(ShadingMode shadingMode);
+
+	[[nodiscard]] bool isSelected(const SceneManager& context) const;
 
 private:
-	friend class Scene;
 	friend class MeshRenderer;
 
 	// adjacency information
 	std::unordered_map<Edge, std::vector<std::shared_ptr<Triangle>>> edgeToFaceMap;
 	std::unordered_map<std::shared_ptr<Vertex>, std::vector<Edge>> vertexToEdgeMap;
-
-	ShadingMode shadingMode = ShadingMode::FLAT;
 
 	virtual void initializeVertices()    = 0;
 	virtual void initializeFaceIndices() = 0;
@@ -64,6 +65,4 @@ private:
 	void setPosition(const Vector3& translation);
 	void setScale(const Vector3& scale);
 	void setRotation(const Vector3& rotation);
-
-	void setShadingMode(ShadingMode shadingMode);
 };
