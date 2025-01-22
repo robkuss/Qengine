@@ -3,30 +3,19 @@
 #include "UI.h"
 #include "UITab.h"
 
-
 class UIBar final : public UIElement {
 public:
-	// Constructor with all properties and variadic list of OptionLists
-	template <typename... Args>
+	// Constructor
 	explicit UIBar(
-		Args... args
-	) {
-		addTabs(args...);   // Add variadic tabs
-	}
+		std::vector<std::shared_ptr<UITab>> tabs,
+		const float x = 0.0f,
+		const float y = 0.0f,
+		const Dim sx = NODIM,
+		const Dim sy = NODIM
+	) :   UIElement(x, y, sx, sy),
+		  tabs(std::move(tabs)) {
 
-	// Helper to add multiple tabs recursively (variadic template unpacking)
-	template <typename T, typename... Args>
-	void addTabs(T first, Args... rest) {
-		addTab(first);
-		addTabs(rest...);
-	}
-
-	// Base case for recursion (no arguments)
-	static void addTabs() {}
-
-	// Add a single tab (root OptionList)
-	void addTab(const std::shared_ptr<UITab>& tab) {
-		tabs.emplace_back(tab);
+		setVertices();
 	}
 
 	void render() const override;

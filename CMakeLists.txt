@@ -38,11 +38,9 @@ add_executable(Qengine
 	src/viewport/scene/graphics/ui/UI.cpp
 	src/viewport/scene/graphics/ui/UIBar.cpp
 	src/viewport/scene/graphics/ui/text/Text.cpp
-		src/viewport/scene/SceneManager.cpp
-		src/viewport/scene/SceneManager.h
-		src/math/matrix/Matrix4.cpp
-		src/math/geometry/Triangle.cpp
-		src/viewport/scene/graphics/ui/UIOption.cpp
+	src/viewport/scene/SceneManager.cpp
+	src/math/matrix/Matrix4.cpp
+	src/math/geometry/Triangle.cpp
 )
 
 # Define static linking

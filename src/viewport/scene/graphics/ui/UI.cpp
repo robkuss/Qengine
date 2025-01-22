@@ -7,24 +7,12 @@
 #include <ranges>
 
 
-#define PC_100 (Dim(1.0f, DimType::Percent))	// 100%
-#define PC_50  (Dim(0.5f, DimType::Percent))	// 50%
-#define PC_25  (Dim(0.25f, DimType::Percent))	// 25%
-
-
 int *UI::width, *UI::height;
 
 int UI::boundLeft, UI::boundRight, UI::boundTop, UI::boundBottom;
 float UI::firstLineX;
 float UI::firstLineY;
 float UI::bottomLineY;
-
-constexpr int tabFontSize	= 20;
-
-constexpr float barHeight	= 40.0f;
-constexpr float firstTabX	= barHeight;
-constexpr float tabPadding	= 1.5f;		// Upper and lower padding within the bar
-constexpr float buttonWidth	= 120.0f;
 
 
 UI::UI(int* w, int* h) : Scene() {
@@ -37,58 +25,42 @@ UI::~UI() {
 	Text::destruct();
 }
 
-
 void UI::setup() {
-	// Create UIOptionLists
-	auto fileOptions  = std::make_shared<UIOptionList>("New", "Open", "Save");
-	auto editOptions  = std::make_shared<UIOptionList>("Undo", "Redo", "Cut", "Copy", "Paste");
+	std::map<std::string, UIOption> labels = {
+		{"File", std::vector<std::string>{"New", "Open", "Save"}},
+		{"Edit", std::vector<std::string>{"Undo", "Redo", "Cut", "Copy", "Paste"}},
+		{"Add", UIOptionList{
+	        {"Mesh", {"Cube", "Sphere"}},
+			{"Light", {"Point", "Sun"}}
+		}}
+	};
 
-	auto meshOptions  = std::make_shared<UIOptionList>("Cube", "Sphere");
-	auto lightOptions = std::make_shared<UIOptionList>("Point", "Sun");
-
-	// Create the "Add" tab's option list
-	auto addOptions = std::make_shared<UIOptionList>(
-		std::make_shared<UIOptionList>("Mesh", meshOptions),
-		std::make_shared<UIOptionList>("Light", lightOptions)
-	);
-
-	// Create UITabs
-	const auto fileButton = std::make_shared<Button>("File", tabFontSize);
-	const auto editButton = std::make_shared<Button>("Edit", tabFontSize);
-	const auto addButton  = std::make_shared<Button>("Add",  tabFontSize);
-
-	const auto fileTab	  = std::make_shared<UITab>(fileButton, fileOptions);
-	const auto editTab	  = std::make_shared<UITab>(editButton, editOptions);
-	const auto addTab	  = std::make_shared<UITab>(addButton,  addOptions);
-
+	auto tabs = std::vector<std::shared_ptr<UITab>>();
 	int i = 0;
-	for (const auto& tab : std::vector{fileTab, editTab, addTab}) {
-		tab->x  = tab->button->x  = firstTabX + static_cast<float>(i) * buttonWidth;
-		tab->button->y = tabPadding;
-		tab->sx = tab->button->sx = Dim(buttonWidth, DimType::Pixels);
-		tab->sy = Dim(barHeight, DimType::Pixels);
-		tab->button->sy = Dim(barHeight - 2*tabPadding, DimType::Pixels);
-
-		tab->setVertices();
-		tab->button->setVertices();
-		tab->button->setActivated(true);
-
+	for (const auto& [key, value] : labels) {
+		const auto button = std::make_shared<Button>(key, tabFontSize);
+		const auto optionList = std::make_shared<UIOptionList>();
+		const auto tab = std::make_shared<UITab>(
+			button,
+			optionList,
+			firstTabX + static_cast<float>(i) * buttonWidth,
+			0.0f,
+			Dim(buttonWidth, DimType::Pixels),
+			UNIT
+		);
+		addElement(button, 2);
 		addElement(tab, 1);
-		addElement(tab->button, 2);
-
+		tabs.emplace_back(tab);
 		i++;
 	}
 
 	// Create UIBar
-	const auto bar = std::make_shared<UIBar>(
-		fileTab,
-		editTab,
-		addTab
-	);
-	bar->x = bar->y = 0;
-	bar->sx = PC_100;
-	bar->sy = Dim(barHeight, DimType::Pixels);
-	addElement(bar, 0);
+	addElement(
+		std::make_shared<UIBar>(
+			tabs,
+			0.0f, 0.0f, PC_100, UNIT
+		),
+	0);
 
 	update();
 }

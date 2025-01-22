@@ -5,14 +5,20 @@
 #include <string>
 #include <variant>
 #include <vector>
-#include <memory>
 
-class UIOptionList;
 
-// Define the Option type
-using UIOption = std::variant<std::string, std::shared_ptr<UIOptionList>>;
+using UIOptionList = std::map<
+	std::string,
+	std::vector<std::string>
+>;
+
+using UIOption = std::variant<
+	std::vector<std::string>,
+	UIOptionList
+>;
 
 // Define the OptionList class
+/*
 class UIOptionList final : public UIElement {
 public:
 	// Variadic constructor to initialize with multiple options
@@ -47,16 +53,15 @@ public:
 	void setVertices() override;
 
 private:
-	std::vector<UIOption> options;
+	std::map<std::string, UIOption> options;
 };
 
 
 inline void UIOptionList::render() const {
-	/*for (const auto& option : options) {
 
-	}*/
 }
 
 inline void UIOptionList::setVertices() {
 
 }
+*/
