@@ -98,9 +98,9 @@ void Viewport::start() {
 	ui->setup();
 
 	// Load Textures
-	const auto noTexture	  = std::shared_ptr<Texture>{};
-	const auto& thmTexture   = noTexture; //std::make_shared<Texture>("../resources/textures/thm2k.png");
-	const auto& earthTexture = noTexture; //std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
+	const auto noTexture	 = std::shared_ptr<Texture>{};
+	const auto& thmTexture	 = std::make_shared<Texture>("../resources/textures/thm2k.png");
+	const auto& earthTexture = std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
 	const auto& starsTexture = noTexture; //std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
 
 	// Add Default Cube to Scene

@@ -29,10 +29,13 @@ void Scene::render() const {
 	glLightfv(GL_LIGHT2, GL_POSITION, light2Pos);
 
 	const auto& sceneMeshes = filterMeshes(sceneObjects);
+	const auto& selectedVertices = SceneManager::selectedVertices;
+	const auto selectionMode = SceneManager::selectionMode;
+	const auto camPos = SceneManager::activeCamera->camPos;
 
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& mesh : sceneMeshes) {
-		MeshRenderer::render(*mesh, SceneManager::selectedVertices, SceneManager::selectionMode, SceneManager::isMeshSelected(mesh));
+		MeshRenderer::render(*mesh, selectedVertices, selectionMode, SceneManager::isMeshSelected(mesh));
 	}
 
 	// Disable lighting after rendering
@@ -40,7 +43,7 @@ void Scene::render() const {
 
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& mesh : sceneMeshes) {
-		MeshRenderer::renderSilhouette(*mesh, SceneManager::selectionMode, SceneManager::activeCamera->camPos, SceneManager::isMeshSelected(mesh));
+		MeshRenderer::renderSilhouette(*mesh, selectionMode, camPos, SceneManager::isMeshSelected(mesh));
 	}
 }
 

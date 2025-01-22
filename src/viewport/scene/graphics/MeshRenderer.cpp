@@ -33,8 +33,6 @@ void MeshRenderer::renderEdge(const Edge& e, const Color& firstColor, const Colo
 void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const bool isSelected) {
     // Function to draw a triangle with a specified color and transparency
     auto drawWithColor = [&mesh, &t](const Color& color) {
-    	const bool isFlatShading = mesh.shadingMode == ShadingMode::FLAT;
-
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color.toGLfloat());
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, color.toGLfloat());
         glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0f);
@@ -42,7 +40,7 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
         glBegin(GL_TRIANGLES);
     	for (const auto& v : {t.v0, t.v1, t.v2}) {
     		// Choose the shading mode
-    		const auto normal = isFlatShading
+    		const auto normal = mesh.shadingMode == ShadingMode::FLAT
     			? t.normal		// Flat shading
     			: v->normal;	// Smooth shading
     		glNormal3f(normal.x, normal.y, normal.z);
@@ -59,15 +57,9 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
     	// Disable depth testing to ensure selection color overlays correctly
     	glDisable(GL_DEPTH_TEST);
 
-        // Enable blending only for the selection color
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         // Draw the selection color
         drawWithColor(Colors::MESH_SELECT_COLOR.transparent(0.4f));
 
-        // Disable blending after drawing the selection color
-        glDisable(GL_BLEND);
     	glEnable(GL_DEPTH_TEST);  // Re-enable depth testing
     }
 }
@@ -117,24 +109,37 @@ void MeshRenderer::renderTriangles(const Mesh& mesh, const std::vector<Vertex>& 
 
 
 void MeshRenderer::render(const Mesh& mesh, const std::vector<Vertex>& selectedVertices, const Mode& selectionMode, const bool isMeshSelected) {
+	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, mesh.texture->id);
 
 	// Enable backface culling
 	glEnable(GL_CULL_FACE);
 
+	// Enable blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
 	// Draw the faces
 	renderTriangles(mesh, selectedVertices);
 
 	if (isMeshSelected && selectionMode == EDIT) {
+		glDisable(GL_LIGHTING);
+
 		// Draw the edges
 		renderEdges(mesh, selectedVertices);
 
 		// Draw the vertices
 		renderVertices(mesh, selectedVertices);
+
+		glEnable(GL_LIGHTING);
 	}
 
+	// Reset
 	glDisable(GL_CULL_FACE);
+
+	glDisable(GL_BLEND);
 
 	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -155,10 +160,10 @@ void MeshRenderer::renderSilhouette(const Mesh& mesh, const Mode& selectionMode,
 				renderVertex(*first.v1);
 			}
 		}
-	}
 
-	// Reset line width back to default
-	glLineWidth(1.0f);
+		// Reset line width back to default
+		glLineWidth(1.0f);
+	}
 }
 
 bool MeshRenderer::isSilhouetteEdge(
