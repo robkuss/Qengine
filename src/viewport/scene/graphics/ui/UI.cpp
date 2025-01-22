@@ -4,6 +4,7 @@
 #include "text/Debug.h"
 
 #include <memory>
+#include <ranges>
 
 
 #define PC_100 (Dim(1.0f, DimType::Percent))	// 100%
@@ -93,19 +94,15 @@ void UI::setup() {
 }
 
 void UI::addElement(const std::shared_ptr<UIElement> &element, const int layer) {
-	if (layer > highestRank) {
-		highestRank = layer;
-		elements.resize(highestRank + 1);
-	}
 	for (const auto& vertex : element->vertices) {
 		vertexPointers.push_back(&vertex);
 	}
-	elements[layer].push_back(element);
+	layers[layer].push_back(element);
 }
 
 void UI::update() const {
-	for (const auto& layer : elements) {
-		for (const auto& element : layer) {
+	for (const auto &elementsOnLayer: layers | std::views::values) {
+		for (const auto& element : elementsOnLayer) {
 			element->setVertices();
 		}
 	}
@@ -147,8 +144,8 @@ void UI::render() const {
 	glLoadIdentity();
 
 	// Render elements
-	for (int layer = 0; layer <= highestRank; ++layer) {
-		for (const auto& element : elements[layer]) {
+	for (const auto &elementsOnLayer: layers | std::views::values) {
+		for (const auto& element : elementsOnLayer) {
 			element->render();
 		}
 	}

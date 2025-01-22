@@ -38,8 +38,6 @@ protected:
 
 private:
 	// Elements are stored as pointers, sorted by layer (lowest layer first)
-	std::vector<std::vector<std::shared_ptr<UIElement>>> elements;
+	std::map<int, std::vector<std::shared_ptr<UIElement>>> layers;
 	std::vector<const Vector2*> vertexPointers;
-
-	int highestRank = 0;
 };
