@@ -6,18 +6,13 @@
 class Button final : public Input {
 public:
 	explicit Button(
-		const std::string& text = "",
+		const std::string& label = "",
 		const int textSize = 48,
 		const TextMode textMode = TextMode::LEFT,
 		const std::vector<Color>& colors = BUTTON_COLORS
-	) : Input(text, textSize, colors),
-		  textMode(textMode) {
-	}
+	) : Input(label, textSize, textMode, colors) {}
 
 	void render() const override;
-
-private:
-	TextMode textMode;
 };
 
 

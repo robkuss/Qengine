@@ -18,7 +18,7 @@ public:
 		const auto& foreground = SceneManager::scenes[0];
 		const auto camera = SceneManager::activeCamera;
 		const auto cube = foreground->sceneObjects[0];
-		const auto mouseWorld = SceneManager::mouseWorld(*mouseX, *mouseY);
+		const auto mouseWorld = SceneManager::mouseWorld();
 
 		size_t vertexCount = 0;
 		for (const auto& obj : foreground->sceneObjects) {
@@ -33,7 +33,7 @@ public:
 				case 1:  out << "Camera Pos: " << camera->camPos.toString(); break;
 				case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << camera->rotH << " / " << camera->rotV; break;
 				case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camera->camDist; break;
-				case 4:  out << "Mouse Screen: " << *mouseX  << " / " << *mouseY; break;
+				case 4:  out << "Mouse Screen: " << *SceneManager::mouseX  << " / " << *SceneManager::mouseY; break;
 				case 5:  out << "Mouse World: "  << mouseWorld.toString(); break;
 				case 6:	 out << "Mode: " << SceneManager::selectionMode.modeToString();
 				if (SceneManager::transformMode.mode    != Mode::NONE)    out << " " << SceneManager::transformMode.modeToString();

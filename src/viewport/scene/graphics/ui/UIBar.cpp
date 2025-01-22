@@ -1,3 +1,4 @@
+
 #include "UIBar.h"
 
 
@@ -19,10 +20,10 @@ void UIBar::render() const {
 	glEnd();
 }
 
-void UIBar::setVertices(const float windowW, const float windowH) {
-	auto absDim = [windowW, windowH](const Dim dim, const int dir) {
+void UIBar::setVertices() {
+	auto absDim = [this](const Dim dim, const int dir) {
 		return dim.type == DimType::Percent
-			? static_cast<float>(dir == 0 ? windowW : windowH) * dim.value
+			? static_cast<float>(dir == 0 ? *UI::width : *UI::height) * dim.value
 			: dim.value;
 	};
 

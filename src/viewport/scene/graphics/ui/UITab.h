@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "UIElement.h"
@@ -14,10 +15,10 @@ public:
 		const std::shared_ptr<Button>& button,
 		const std::shared_ptr<UIOptionList>& optionList
 	) :   button(button),
-	      optionList(optionList) {}
+		  optionList(optionList) {}
 
 	void render() const override;
-	void setVertices(float windowW, float windowH) override;
+	void setVertices() override;
 };
 
 
@@ -25,6 +26,6 @@ inline void UITab::render() const {
 
 }
 
-inline void UITab::setVertices(const float windowW, const float windowH) {
+inline void UITab::setVertices() {
 
 }

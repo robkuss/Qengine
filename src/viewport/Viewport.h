@@ -27,9 +27,6 @@ constexpr float MOUSE_RAY_LENGTH		= 1000.0f;
 
 // These really shouldn't be here
 inline int  fps		= 0;
-inline auto mouseX	= new double[1];
-inline auto mouseY	= new double[1];
-
 
 class Viewport {
 public:
@@ -44,7 +41,6 @@ public:
 
 private:
 	std::shared_ptr<std::array<int, 4>> viewport;
-	std::shared_ptr<SceneManager> sceneManager;
 	std::shared_ptr<Camera> activeCamera;
 
 	GLFWwindow* window = nullptr;
@@ -57,7 +53,7 @@ private:
 	int frameCount		= 0;
 
 	// Mouse data
-	Vector2 lastMousePos	 = Vector2(0.0, 0.0);
+	//Vector2 lastMousePos	 = Vector2(0.0, 0.0);
 	mutable Vector3 rayStart = Vector3::MINUS_ONE;
 	mutable Vector3 rayEnd   = Vector3::ONE;
 	std::shared_ptr<Ray> mouseRay;

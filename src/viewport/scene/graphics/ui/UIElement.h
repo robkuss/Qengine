@@ -4,6 +4,8 @@
 
 #include "math/vector/Vector2.h"
 
+class UI;
+
 enum class DimType {
 	Pixels,
 	Percent
@@ -21,8 +23,8 @@ public:
 	float y;		// y pos
 	Dim sx;			// Width
 	Dim sy;			// Height
-	int vertexCount;
 
+	int vertexCount;
 	std::vector<Vector2> vertices{};
 
 	explicit UIElement(
@@ -31,12 +33,13 @@ public:
 		const Dim sx = Dim(),
 		const Dim sy = Dim(),
 		const int vertexCount = 4
-	) : x(x), y(y), sx(sx), sy(sy), vertexCount(vertexCount) {
+	) :   x(x), y(y), sx(sx), sy(sy),
+	      vertexCount(vertexCount) {
 		vertices.resize(vertexCount);	// Ensure vertices has the required number of elements
 	}
 
 	virtual ~UIElement() = default;
 
 	virtual void render() const = 0;
-	virtual void setVertices(float windowW, float windowH) = 0;
+	virtual void setVertices() = 0;
 };

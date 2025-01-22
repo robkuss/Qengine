@@ -14,31 +14,27 @@ const auto BUTTON_COLORS = std::vector{
 
 class Input : public UIElement {
 public:
-	const double *mouseX, *mouseY;	// Pointers to Viewport mouse coordinates
-
 	explicit Input(
-		std::string text = "",
+		std::string label = "",
 		const int textSize = 48,
-		const std::vector<Color>& colors = BUTTON_COLORS,
-		const double* mouseX = nullptr,
-		const double* mouseY = nullptr
-	) :   mouseX(mouseX), mouseY(mouseY),
-		  rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
-		  text(std::move(text)), textSize(textSize), activated(true) {}
+		const TextMode textMode = TextMode::LEFT,
+		const std::vector<Color>& colors = BUTTON_COLORS
+	) :   rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
+		  text(std::move(label)), textSize(textSize), textMode(textMode), activated(true) {}
 
 	~Input() override = default;
 
 	[[nodiscard]] bool belowMouse() const {
 		if (!activated) return false;
 		// >= and < to avoid selecting two neighbors at the same time
-		return *mouseX >= x
-			&& *mouseX < x + sx.value
-			&& *mouseY >= y
-			&& *mouseY < y + sy.value;
+		return *SceneManager::mouseX >= x
+			&& *SceneManager::mouseX < x + sx.value
+			&& *SceneManager::mouseY >= y
+			&& *SceneManager::mouseY < y + sy.value;
 	}
 
 	void render() const override;
-	void setVertices(float windowW, float windowH) override;
+	void setVertices() override;
 
 	[[nodiscard]] std::string getText() const {
 		return text;
@@ -52,6 +48,7 @@ protected:
 	Color rf, ro, hf, ho, df;		// Regular, highlight and deactivated Colors (f = fill, o = outline)
 	std::string text;				// Label text for the input
 	int textSize;					// Font size of the text
+	TextMode textMode;				// Left, right, or center
 	bool activated;					// Determines if the input is activated or not
 };
 
@@ -90,10 +87,10 @@ inline void Input::render() const {
 	glPopAttrib();	// Restore line width and color state
 }
 
-inline void Input::setVertices(const float windowW, const float windowH) {
-	auto absDim = [windowW, windowH](const Dim dim, const int dir) {
+inline void Input::setVertices() {
+	auto absDim = [this](const Dim dim, const int dir) {
 		return dim.type == DimType::Percent
-			? static_cast<float>(dir == 0 ? windowW : windowH) * dim.value
+			? static_cast<float>(dir == 0 ? *UI::width : *UI::height) * dim.value
 			: dim.value;
 	};
 

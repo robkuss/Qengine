@@ -21,6 +21,8 @@ public:
 	static std::shared_ptr<std::array<int, 4>> viewport;
 	static std::shared_ptr<Camera> activeCamera;
 	static std::shared_ptr<Ray> mouseRay;
+	static double* mouseX;
+	static double* mouseY;
 
 	// Store scenes as weak pointers to avoid circular dependencies
 	static std::vector<std::shared_ptr<Scene>> scenes;
@@ -73,7 +75,7 @@ private:
 	static void applyTransformation();
 
 	// Other
-	[[nodiscard]] static Vector3 mouseWorld(double mouseX, double mouseY);
+	[[nodiscard]] static Vector3 mouseWorld();
 
 	static void toggleShadingMode();
 };

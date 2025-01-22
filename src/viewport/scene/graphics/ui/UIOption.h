@@ -44,7 +44,7 @@ public:
 	}
 
 	void render() const override;
-	void setVertices(float windowW, float windowH) override;
+	void setVertices() override;
 
 private:
 	std::vector<UIOption> options;
@@ -57,6 +57,6 @@ inline void UIOptionList::render() const {
 	}*/
 }
 
-inline void UIOptionList::setVertices(const float windowW, const float windowH) {
+inline void UIOptionList::setVertices() {
 
 }

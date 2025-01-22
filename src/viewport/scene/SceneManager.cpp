@@ -31,6 +31,10 @@ std::vector<Vertex> SceneManager::selectedVertices					= std::vector<Vertex>();
 Mode SceneManager::selectionMode = OBJECT;
 Mode SceneManager::transformMode = NONE;
 
+// Mouse data
+double* SceneManager::mouseX = new double[1];
+double* SceneManager::mouseY = new double[1];
+
 
 void SceneManager::addScene(const std::shared_ptr<Scene>& scene) {
 	scenes.emplace_back(scene); // Store as weak_ptr
@@ -98,9 +102,9 @@ void SceneManager::toggleShadingMode() {
 	}
 }
 
-Vector3 SceneManager::mouseWorld(const double mouseX, const double mouseY) {
+Vector3 SceneManager::mouseWorld() {
 	return unproject(
-		Vector2(mouseX, mouseY),
+		Vector2(*mouseX, *mouseY),
 		viewport.get(),
 		activeCamera->viewMatrix,
 		activeCamera->projMatrix

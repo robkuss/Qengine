@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "UIElement.h"
@@ -13,8 +14,10 @@ class Vector2;
 
 class UI final : public Scene {
 public:
+	static int *width, *height;
+
 	// Constructor & Destructor
-	UI(const int *width, const int *height);
+	UI(int *w, int *h);
 	~UI() override;
 
 	void setup();
@@ -34,9 +37,6 @@ protected:
 	static int boundTop, boundBottom, boundLeft, boundRight;
 
 private:
-	const int *width;
-	const int *height;
-
 	// Elements are stored as pointers, sorted by layer (lowest layer first)
 	std::vector<std::vector<std::shared_ptr<UIElement>>> elements;
 	std::vector<const Vector2*> vertexPointers;

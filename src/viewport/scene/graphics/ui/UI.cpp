@@ -11,7 +11,8 @@
 #define PC_25  (Dim(0.25f, DimType::Percent))	// 25%
 
 
-// Position markers
+int *UI::width, *UI::height;
+
 int UI::boundLeft, UI::boundRight, UI::boundTop, UI::boundBottom;
 float UI::firstLineX;
 float UI::firstLineY;
@@ -25,7 +26,9 @@ constexpr float tabPadding	= 1.5f;		// Upper and lower padding within the bar
 constexpr float buttonWidth	= 120.0f;
 
 
-UI::UI(const int* width, const int* height) : Scene(), width(width), height(height) {
+UI::UI(int* w, int* h) : Scene() {
+	width = w;
+	height = h;
 	Text();		// Initialize FreeType for on-screen text
 }
 
@@ -53,28 +56,20 @@ void UI::setup() {
 	const auto editButton = std::make_shared<Button>("Edit", tabFontSize);
 	const auto addButton  = std::make_shared<Button>("Add",  tabFontSize);
 
-	for (const auto& button : std::vector{fileButton, editButton, addButton}) {
-		button->mouseX = mouseX;
-		button->mouseY = mouseY;
-	}
-
 	const auto fileTab	  = std::make_shared<UITab>(fileButton, fileOptions);
 	const auto editTab	  = std::make_shared<UITab>(editButton, editOptions);
 	const auto addTab	  = std::make_shared<UITab>(addButton,  addOptions);
 
 	int i = 0;
 	for (const auto& tab : std::vector{fileTab, editTab, addTab}) {
-		const auto windowW = static_cast<float>(*width);
-		const auto windowH = static_cast<float>(*height);
-
 		tab->x  = tab->button->x  = firstTabX + static_cast<float>(i) * buttonWidth;
 		tab->button->y = tabPadding;
 		tab->sx = tab->button->sx = Dim(buttonWidth, DimType::Pixels);
 		tab->sy = Dim(barHeight, DimType::Pixels);
 		tab->button->sy = Dim(barHeight - 2*tabPadding, DimType::Pixels);
 
-		tab->setVertices(windowW, windowH);
-		tab->button->setVertices(windowW, windowH);
+		tab->setVertices();
+		tab->button->setVertices();
 		tab->button->setActivated(true);
 
 		addElement(tab, 1);
@@ -111,10 +106,7 @@ void UI::addElement(const std::shared_ptr<UIElement> &element, const int layer) 
 void UI::update() const {
 	for (const auto& layer : elements) {
 		for (const auto& element : layer) {
-			element->setVertices(
-				static_cast<float>(*width),
-				static_cast<float>(*height)
-			);
+			element->setVertices();
 		}
 	}
 

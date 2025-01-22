@@ -43,13 +43,13 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* cbWindow, const int button, const int action, const int) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
 			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-				const auto mousePos = Vector2(*mouseX, *mouseY);
+				const auto mousePos = Vector2(*SceneManager::mouseX, *SceneManager::mouseY);
 				vp->setMouseRay(mousePos);
 				SceneManager::select(mousePos, false);
 			}
 
 			else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-				vp->activeCamera->initRotation(action == GLFW_PRESS, *mouseX, *mouseY);
+				vp->activeCamera->initRotation(action == GLFW_PRESS, *SceneManager::mouseX, *SceneManager::mouseY);
 			}
 		}
 	});
@@ -58,7 +58,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	glfwSetCursorPosCallback(window, [](GLFWwindow* cbWindow, const double x, const double y) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
 			// Update the mouse position in the Viewport
-			glfwGetCursorPos(cbWindow, mouseX, mouseY);
+			glfwGetCursorPos(cbWindow, SceneManager::mouseX, SceneManager::mouseY);
 
 			if (SceneManager::transformMode == NONE) {
 				// Viewport rotation
@@ -67,7 +67,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 				}
 			} else {
 				// Object transformation
-				const Vector3 worldPos = unproject(Vector2(*mouseX, *mouseY), vp->viewport.get(), vp->activeCamera->viewMatrix, vp->activeCamera->projMatrix);
+				const Vector3 worldPos = unproject(Vector2(*SceneManager::mouseX, *SceneManager::mouseY), vp->viewport.get(), vp->activeCamera->viewMatrix, vp->activeCamera->projMatrix);
 				SceneManager::transform(x, y, worldPos, vp->activeCamera->camPos);
 			}
 		}
