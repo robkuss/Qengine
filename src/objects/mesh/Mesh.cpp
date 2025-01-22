@@ -2,20 +2,14 @@
 
 #include <vector>
 #include <ranges>
-#include <future>
 
+#include <math/Util.h>
 #include <viewport/Mode.h>
 
-bool Mesh::isSelected(const SceneManager& context) const {
-	return std::ranges::find_if(
-		context.selectedObjects,
-		[this](const std::shared_ptr<Object>& obj) {
-			const auto meshPtr = dynamic_cast<const Mesh*>(obj.get());
-			return meshPtr != nullptr && *meshPtr == *this;
-		}
-	) != context.selectedObjects.end();
-}
 
+/** Mesh-side transformation
+ * (Matrix operations, updating normals)
+ */
 void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformMode, const Matrix4& transformation) {
 	// Update Object transformation
 	switch (transformMode.mode) {

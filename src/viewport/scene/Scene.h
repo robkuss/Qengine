@@ -3,9 +3,6 @@
 #include <memory>
 #include <vector>
 
-#include <math/vector/Vector2.h>
-#include <math/vector/Vector3.h>
-
 #include "SceneManager.h"
 
 
@@ -18,27 +15,21 @@ struct Vertex;
 
 class Scene {
 public:
-	std::shared_ptr<SceneManager> context;
-
 	// Constructor & Destructor
-	explicit Scene(const std::shared_ptr<SceneManager>& context) : context(context) {}
-	~Scene() = default;
+	Scene() = default;
+	virtual ~Scene() = default;
 
-	void render() const;
+	virtual void render() const;
 
-	void addObject(const std::shared_ptr<Object>& obj)	  { sceneObjects.emplace_back(obj); }
-	void removeObject(const std::shared_ptr<Object>& obj) { sceneObjects.erase(std::ranges::find(sceneObjects, obj)); }
-
-	void select(const Vector2& mousePos, bool preserve) const;
+	void addObject(const std::shared_ptr<Object>& obj);
+	void removeObject(const std::shared_ptr<Object>& obj);
 
 	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
 
-	// Helpers
-	[[nodiscard]] Vector3 mouseWorld(double mouseX, double mouseY) const;
-
 private:
-	// Grant Debugger access to sceneObjects using the best keyword in C++
+	// Grant Debugger and SceneManager access to sceneObjects using the best keyword in C++
 	friend class Debug;
+	friend class SceneManager;
 
 	// Objects
 	std::vector<std::shared_ptr<Object>> sceneObjects;		// Scene Objects as shared pointers to prevent object slicing

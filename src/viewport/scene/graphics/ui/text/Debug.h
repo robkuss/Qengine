@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <viewport/Viewport.h>
 #include <viewport/scene/Camera.h>
 #include <viewport/scene/Scene.h>
@@ -10,15 +12,16 @@
 constexpr float debugTextSize	= 24;
 const Color debugTextColor		= Colors::TEXT_COLOR;
 
-
 class Debug {
 public:
-	static void drawDebugText(const Scene* scene, const SceneManager* context, const Camera* camera) {
-		const auto cube = Viewport::scenes[0]->sceneObjects[0];
-		const auto mouseWorld = scene->mouseWorld(*mouseX, *mouseY);
+	static void drawDebugText() {
+		const auto& foreground = SceneManager::scenes[0];
+		const auto camera = SceneManager::activeCamera;
+		const auto cube = foreground->sceneObjects[0];
+		const auto mouseWorld = SceneManager::mouseWorld(*mouseX, *mouseY);
 
 		size_t vertexCount = 0;
-		for (const auto& obj : scene->sceneObjects) {
+		for (const auto& obj : foreground->sceneObjects) {
 			vertexCount += dynamic_cast<Mesh*>(obj.get())->vertices.size();
 		}
 
@@ -32,9 +35,9 @@ public:
 				case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camera->camDist; break;
 				case 4:  out << "Mouse Screen: " << *mouseX  << " / " << *mouseY; break;
 				case 5:  out << "Mouse World: "  << mouseWorld.toString(); break;
-				case 6:	 out << "Mode: " << context->selectionMode.modeToString();
-				if (context->transformMode.mode    != Mode::NONE)    out << " " << context->transformMode.modeToString();
-				if (context->transformMode.subMode != SubMode::NONE) out << " " << context->transformMode.subModeToString(); break;
+				case 6:	 out << "Mode: " << SceneManager::selectionMode.modeToString();
+				if (SceneManager::transformMode.mode    != Mode::NONE)    out << " " << SceneManager::transformMode.modeToString();
+				if (SceneManager::transformMode.subMode != SubMode::NONE) out << " " << SceneManager::transformMode.subModeToString(); break;
 				case 7:  out << "Cube:"; break;
 				case 8:  out << "    Pos: "   << cube->position.toString();  break;
 				case 9:  out << "    Scale: " << cube->scale.toString();     break;

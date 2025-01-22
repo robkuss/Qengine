@@ -7,56 +7,73 @@
 #include <viewport/Mode.h>
 #include "math/geometry/Vertex.h"
 
+class Scene;
+class UI;
+class Object;
+class Camera;
 class Mesh;
 class Ray;
-class Camera;
-class Object;
 
 
 class SceneManager {
 public:
-	Mode selectionMode		= OBJECT;
-	Mode transformMode		= NONE;
+	// Pointers from Viewport
+	static std::shared_ptr<std::array<int, 4>> viewport;
+	static std::shared_ptr<Camera> activeCamera;
+	static std::shared_ptr<Ray> mouseRay;
 
-	std::array<int, 4>* viewport	= nullptr;
-	Camera* activeCamera			= nullptr;
-	Ray* mouseRay					= nullptr;
+	// Store scenes as weak pointers to avoid circular dependencies
+	static std::vector<std::shared_ptr<Scene>> scenes;
+	static std::shared_ptr<UI> ui;
 
-	bool depthIsolation				= false;
-	bool fixedPosition				= false;
+	static Mode selectionMode;
+	static Mode transformMode;
 
-	std::vector<std::shared_ptr<Object>> selectedObjects{};
-	std::vector<Vertex> selectedVertices{};
-
-	SceneManager() = default;
-
-	void selectAllObjects(const std::vector<std::shared_ptr<Object>> &sceneObjects);
-	void deselectAllObjects();
-	void selectAllVertices(const std::shared_ptr<Mesh>& mesh);
-	void deselectAllVertices();
-
-	void selectObject(const std::shared_ptr<Object>& obj);
-	void deselectObject(const std::shared_ptr<Object> &obj);
-	void selectVertex(const Vertex &v);
-	void deselectVertex(const Vertex &v);
-
-	void toggleSelectionMode();
-	void setTransformMode(const Mode& mode);
-	void setTransformSubMode(const SubMode& subMode);
-	void toggleShadingMode() const;
-
-	void transform(double mouseX, double mouseY, Vector3 worldPos, Vector3 camPos);
+	static std::vector<std::shared_ptr<Object>> selectedObjects;
+	static std::vector<Vertex> selectedVertices;
 
 private:
+	friend class Viewport;
 	friend class Scene;
+	friend class UI;
+	friend class Debug;
 
-	Vector3 lastTransform   = Vector3::ZERO;
+	// General
+	static void addScene(const std::shared_ptr<Scene> &scene);
+	static void deleteScene(const std::shared_ptr<Scene> &scene);
+	static void cleanupScenes();
 
-	// Constants
-	const float scalingSens		= 0.001;	// Scaling sensitivity
-	const float rotationSens	= 10.0f;	// Rotation sensitivity
+	// Rendering
+	static void renderScenes();
+	static void renderUI();
 
-	void applyTransformation();
+	// Selection
+	static void select(const Vector2 &mousePos, bool preserve);
 
-	[[nodiscard]] std::vector<std::shared_ptr<Mesh>> getSelectedMeshes() const;
+	static void selectAllObjects(const std::vector<std::shared_ptr<Object>> &sceneObjects);
+	static void deselectAllObjects();
+	static void selectAllVertices(const std::shared_ptr<Mesh>& mesh);
+	static void deselectAllVertices();
+
+	static void selectObject(const std::shared_ptr<Object>& obj);
+	static void deselectObject(const std::shared_ptr<Object> &obj);
+	static void selectVertex(const Vertex &v);
+	static void deselectVertex(const Vertex &v);
+
+	static void toggleSelectionMode();
+
+	[[nodiscard]] static bool isMeshSelected(const std::shared_ptr<Mesh> &mesh);
+	[[nodiscard]] static std::vector<std::shared_ptr<Mesh>> getSelectedMeshes();
+
+	// Transformation
+	static void setTransformMode(const Mode& mode);
+	static void setTransformSubMode(const SubMode& subMode);
+
+	static void transform(double mouseX, double mouseY, Vector3 worldPos, Vector3 camPos);
+	static void applyTransformation();
+
+	// Other
+	[[nodiscard]] static Vector3 mouseWorld(double mouseX, double mouseY);
+
+	static void toggleShadingMode();
 };

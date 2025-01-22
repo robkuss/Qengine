@@ -1,5 +1,4 @@
 #include "viewport/Viewport.h"
-#include "scene/Scene.h"
 
 // Controls
 
@@ -32,22 +31,25 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
 			vp->windowResize(width, height);
 			vp->render();		// Force a re-render during resizing
-			vp->ui->update();	// Resize UI
+
+			// Resize UI
+			SceneManager::ui->update();
+
 			glfwSwapBuffers(cbWindow);
 		}
 	});
 
 	// Mouse button callbacks
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* cbWindow, const int button, const int action, const int) {
-		const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow));
-		for (const auto& scene : scenes) {
+		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
 			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 				const auto mousePos = Vector2(*mouseX, *mouseY);
 				vp->setMouseRay(mousePos);
-				scene->select(mousePos, false);
+				SceneManager::select(mousePos, false);
 			}
+
 			else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-				vp->activeCamera.initRotation(action == GLFW_PRESS, *mouseX, *mouseY);
+				vp->activeCamera->initRotation(action == GLFW_PRESS, *mouseX, *mouseY);
 			}
 		}
 	});
@@ -58,23 +60,23 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 			// Update the mouse position in the Viewport
 			glfwGetCursorPos(cbWindow, mouseX, mouseY);
 
-			if (vp->context->transformMode == NONE) {
-					// Viewport rotation
-					if (vp->activeCamera.rotating) {
-						vp->activeCamera.rotate(x, y);
-					}
-				} else {
-					// Object transformation
-					const Vector3 worldPos = unproject(Vector2(*mouseX, *mouseY), &vp->viewport, vp->activeCamera.viewMatrix, vp->activeCamera.projMatrix);
-					vp->context->transform(x, y, worldPos, vp->activeCamera.camPos);
+			if (SceneManager::transformMode == NONE) {
+				// Viewport rotation
+				if (vp->activeCamera->rotating) {
+					vp->activeCamera->rotate(x, y);
 				}
+			} else {
+				// Object transformation
+				const Vector3 worldPos = unproject(Vector2(*mouseX, *mouseY), vp->viewport.get(), vp->activeCamera->viewMatrix, vp->activeCamera->projMatrix);
+				SceneManager::transform(x, y, worldPos, vp->activeCamera->camPos);
+			}
 		}
 	});
 
 	// Mouse scroll callback
 	glfwSetScrollCallback(window, [](GLFWwindow* cbWindow, const double, const double yOffset) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow)))
-			vp->activeCamera.zoom(yOffset);
+			vp->activeCamera->zoom(yOffset);
 	});
 
 	// Key callbacks
@@ -88,41 +90,43 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 }
 
 /** Key callbacks */
-void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
+void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) const {
 	if (action != GLFW_PRESS) return;
+
 	switch (key) {
 		case GLFW_KEY_TAB : {															// TAB -> Toggle Object/Edit Mode
-			context->toggleSelectionMode();
-			for (const auto& scene : scenes)
-				scene->deselectAllVertices();	// Reset vertex selection data
+			SceneManager::toggleSelectionMode();
+			SceneManager::deselectAllVertices();
 			break;
 		}
 
 		// Number keys for perspective toggling
-		case GLFW_KEY_1: activeCamera.setPerspective(  0.0f,  0.0f); break;			// 1 -> Front View  (towards negative X)
-		case GLFW_KEY_2: activeCamera.setPerspective(-90.0f,  0.0f); break;			// 2 -> Right View  (towards negative Y)
-		case GLFW_KEY_3: activeCamera.setPerspective(  0.0f, 90.0f); break;			// 3 -> Top View    (towards negative Z)
-		case GLFW_KEY_4: activeCamera.setPerspective(180.0f,  0.0f); break;			// 4 -> Back View   (towards positive X)
-		case GLFW_KEY_5: activeCamera.setPerspective( 90.0f,  0.0f); break;			// 5 -> Left View   (towards positive Y)
-		case GLFW_KEY_6: activeCamera.setPerspective(  0.0f,-90.0f); break;			// 6 -> Bottom View (towards positive Z)
+		case GLFW_KEY_1: activeCamera->setPerspective(  0.0f,  0.0f); break;		// 1 -> Front View  (towards negative X)
+		case GLFW_KEY_2: activeCamera->setPerspective(-90.0f,  0.0f); break;		// 2 -> Right View  (towards negative Y)
+		case GLFW_KEY_3: activeCamera->setPerspective(  0.0f, 90.0f); break;		// 3 -> Top View    (towards negative Z)
+		case GLFW_KEY_4: activeCamera->setPerspective(180.0f,  0.0f); break;		// 4 -> Back View   (towards positive X)
+		case GLFW_KEY_5: activeCamera->setPerspective( 90.0f,  0.0f); break;		// 5 -> Left View   (towards positive Y)
+		case GLFW_KEY_6: activeCamera->setPerspective(  0.0f,-90.0f); break;		// 6 -> Bottom View (towards positive Z)
 
 		// Set Transform Mode
-		case GLFW_KEY_G: context->setTransformMode(GRAB); break;						// G -> Grab
-		case GLFW_KEY_S: context->setTransformMode(SCALE); break;						// S -> Scale
-		case GLFW_KEY_R: context->setTransformMode(ROTATE); break; 						// R -> Rotate
-		case GLFW_KEY_E: context->setTransformMode(EXTRUDE); break;						// E -> Extrude
-		case GLFW_KEY_F: context->setTransformMode(FILL); break;						// F -> Fill
-		case GLFW_KEY_M: context->setTransformMode(MERGE); break;						// M -> Merge
+		case GLFW_KEY_G: SceneManager::setTransformMode(GRAB); break;					// G -> Grab
+		case GLFW_KEY_S: SceneManager::setTransformMode(SCALE); break;					// S -> Scale
+		case GLFW_KEY_R: SceneManager::setTransformMode(ROTATE); break; 				// R -> Rotate
+		case GLFW_KEY_E: SceneManager::setTransformMode(EXTRUDE); break;				// E -> Extrude
+		case GLFW_KEY_F: SceneManager::setTransformMode(FILL); break;					// F -> Fill
+		case GLFW_KEY_M: SceneManager::setTransformMode(MERGE); break;					// M -> Merge
 
 		// Set Transform SubMode
-		case GLFW_KEY_X || GLFW_KEY_Y || GLFW_KEY_Z: if (context->transformMode != NONE) {
-			case GLFW_KEY_X: context->setTransformSubMode(SubMode::X); break;			// X -> Snap transformation to X direction
-			case GLFW_KEY_Z: context->setTransformSubMode(SubMode::Y); break;			// Z -> Snap transformation to Y direction TODO: Make this depend on scancode, not key
-			case GLFW_KEY_Y: context->setTransformSubMode(SubMode::Z); break;			// Y -> Snap transformation to Z direction TODO: Make this depend on scancode, not key
+		case GLFW_KEY_X || GLFW_KEY_Y || GLFW_KEY_Z: {
+			if (SceneManager::transformMode != NONE) {
+				case GLFW_KEY_X: SceneManager::setTransformSubMode(SubMode::X); break;	// X -> Snap transformation to X direction
+				case GLFW_KEY_Z: SceneManager::setTransformSubMode(SubMode::Y); break;	// Z -> Snap transformation to Y direction TODO: Make this depend on scancode, not key
+				case GLFW_KEY_Y: SceneManager::setTransformSubMode(SubMode::Z); break;	// Y -> Snap transformation to Z direction TODO: Make this depend on scancode, not key
+			}
 		}
 
 		// Toggle Shading
-		case GLFW_KEY_LEFT_SHIFT: context->toggleShadingMode();					// Left Shift -> Toggle ShadingMode for selected Mesh
+		case GLFW_KEY_LEFT_SHIFT: SceneManager::toggleShadingMode();					// Left Shift -> Toggle ShadingMode for selected Mesh
 
 		default: {
 			#ifdef TEXT

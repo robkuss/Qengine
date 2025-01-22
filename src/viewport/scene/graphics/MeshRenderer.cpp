@@ -2,14 +2,13 @@
 
 #include <algorithm>
 #include <iostream>
+#include <ranges>
+
 #include <GL/gl.h>
 
-#include <ranges>
-#include <viewport/scene/Camera.h>
-
+#include <viewport/Mode.h>
 #include "material/texture/Texture.h"
 #include "color/Colors.h"
-#include "viewport/scene/SceneManager.h"
 
 /** Reinterpret Vertex as GLfloat* */
 void vertex3fv(const Vertex& v) {
@@ -73,12 +72,12 @@ void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const boo
     }
 }
 
-void MeshRenderer::renderVertices(const Mesh& mesh, const SceneManager& context) {
+void MeshRenderer::renderVertices(const Mesh& mesh, const std::vector<Vertex>& selectedVertices) {
 	glPointSize(4.0f);
 
 	for (const auto& v : mesh.vertices) {
 		// Highlight if the Vertex is currently selected
-		const auto color = std::ranges::find(context.selectedVertices, *v) != context.selectedVertices.end()
+		const auto color = std::ranges::find(selectedVertices, *v) != selectedVertices.end()
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_VERT_COLOR;
 		color3f(color);
@@ -86,38 +85,38 @@ void MeshRenderer::renderVertices(const Mesh& mesh, const SceneManager& context)
 	}
 }
 
-void MeshRenderer::renderEdges(const Mesh& mesh, const SceneManager& context) {
+void MeshRenderer::renderEdges(const Mesh& mesh, const std::vector<Vertex>& selectedVertices) {
 	glLineWidth(2.0f);
 
 	for (const auto& edge : mesh.edgeToFaceMap | std::views::keys) {
 		// Highlight if either of the 2 Vertices of the Edge are currently selected
-		const auto firstColor = std::ranges::find(context.selectedVertices, *edge.v0)
-				!= context.selectedVertices.end()
+		const auto firstColor = std::ranges::find(selectedVertices, *edge.v0)
+				!= selectedVertices.end()
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_EDGE_COLOR;
-		const auto secondColor = std::ranges::find(context.selectedVertices, *edge.v1)
-				!= context.selectedVertices.end()
+		const auto secondColor = std::ranges::find(selectedVertices, *edge.v1)
+				!= selectedVertices.end()
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_EDGE_COLOR;
 		renderEdge(edge, firstColor, secondColor);
 	}
 }
 
-void MeshRenderer::renderTriangles(const Mesh& mesh, const SceneManager& context) {
+void MeshRenderer::renderTriangles(const Mesh& mesh, const std::vector<Vertex>& selectedVertices) {
 	for (const auto& triangle : mesh.triangles) {
 		// Highlight if all 3 Vertices of the Triangle are currently selected
 		const auto vertices = {*triangle->v0, *triangle->v1, *triangle->v2};
 		const auto isSelected = std::ranges::all_of(vertices,
-		    [&context](const auto& vertex) {
-			    return std::ranges::find(context.selectedVertices, vertex)
-		    		!= context.selectedVertices.end();
+		    [selectedVertices](const auto& vertex) {
+			    return std::ranges::find(selectedVertices, vertex)
+		    		!= selectedVertices.end();
 		    });
 		renderTriangle(mesh, *triangle, isSelected);
 	}
 }
 
 
-void MeshRenderer::render(const Mesh& mesh, const SceneManager& context) {
+void MeshRenderer::render(const Mesh& mesh, const std::vector<Vertex>& selectedVertices, const Mode& selectionMode, const bool isMeshSelected) {
 	glEnable(GL_TEXTURE_2D);
 	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, mesh.texture->id);
 
@@ -125,14 +124,14 @@ void MeshRenderer::render(const Mesh& mesh, const SceneManager& context) {
 	glEnable(GL_CULL_FACE);
 
 	// Draw the faces
-	renderTriangles(mesh, context);
+	renderTriangles(mesh, selectedVertices);
 
-	if (mesh.isSelected(context) && context.selectionMode == EDIT) {
+	if (isMeshSelected && selectionMode == EDIT) {
 		// Draw the edges
-		renderEdges(mesh, context);
+		renderEdges(mesh, selectedVertices);
 
 		// Draw the vertices
-		renderVertices(mesh, context);
+		renderVertices(mesh, selectedVertices);
 	}
 
 	glDisable(GL_CULL_FACE);
@@ -140,15 +139,15 @@ void MeshRenderer::render(const Mesh& mesh, const SceneManager& context) {
 	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void MeshRenderer::renderSilhouette(const Mesh& mesh, const SceneManager& context) {
-	if (mesh.isSelected(context) && context.selectionMode == OBJECT) {
+void MeshRenderer::renderSilhouette(const Mesh& mesh, const Mode& selectionMode, const Vector3& camPos, const bool isMeshSelected) {
+	if (isMeshSelected && selectionMode == OBJECT) {
 		// Highlight only the outline of the Mesh in Object Mode
 		const auto color = Colors::MESH_SELECT_COLOR;
 		glLineWidth(4.0f);
 		glPointSize(3.0f);
 
 		for (const auto&[first, second]: mesh.edgeToFaceMap) {
-			if (isSilhouetteEdge(second, context.activeCamera->camPos)) {
+			if (isSilhouetteEdge(second, camPos)) {
 				renderEdge(first, color, color);
 
 				// Highlight the vertices of the silhouette edges

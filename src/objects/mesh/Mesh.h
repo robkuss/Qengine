@@ -1,14 +1,9 @@
 #pragma once
 
-#include <string>
 #include <unordered_map>
-#include <vector>
 #include <memory>
-#include <viewport/scene/SceneManager.h>
 
 #include "objects/Object.h"
-
-#include "math/geometry/Vertex.h"
 #include "math/geometry/Edge.h"
 #include "math/geometry/Triangle.h"
 
@@ -45,8 +40,6 @@ public:
 	void updateNormals() const;
 
 	void setShadingMode(ShadingMode shadingMode);
-
-	[[nodiscard]] bool isSelected(const SceneManager& context) const;
 
 private:
 	friend class MeshRenderer;

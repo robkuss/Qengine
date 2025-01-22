@@ -3,10 +3,10 @@
 #include "vector/Vector2.h"
 #include "vector/Vector3.h"
 #include "vector/Vector4.h"
+#include "objects/mesh/Mesh.h"
+#include "viewport/Mode.h"
 
-#include <viewport/Mode.h>
-
-
+// Constants
 constexpr float EPSILON		= 1e-9f;					// Infinitesimal
 constexpr double PI			= 3.14159265358979323846;	// Because for some reason there is no Pi in cmath
 
@@ -44,3 +44,15 @@ Vector2 project(const Vector3& worldPoint, const std::array<int, 4>* viewport, c
 
 /** Map 2D screen space to 3D world space */
 Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix);
+
+
+/** Helper to get all Meshes from a given vector of Objects */
+inline std::vector<std::shared_ptr<Mesh>> filterMeshes(const std::vector<std::shared_ptr<Object>>& objects) {
+	std::vector<std::shared_ptr<Mesh>> meshes;
+	for (const auto& obj : objects) {
+		if (const auto mesh = std::dynamic_pointer_cast<Mesh>(obj)) {
+			meshes.emplace_back(mesh);
+		}
+	}
+	return meshes;
+}

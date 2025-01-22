@@ -1,7 +1,8 @@
 #include "Viewport.h"
 
-#include <cmath>
+#include <array>
 #include <iostream>
+#include <ranges>
 
 #include "objects/mesh/cube/Cube.cpp"
 #include "objects/mesh/sphere/Sphere.cpp"
@@ -12,8 +13,6 @@
 #include "scene/Scene.h"
 #include "scene/graphics/ui/UI.h"
 
-
-std::vector<Scene*> Viewport::scenes;
 
 Viewport::Viewport(const std::string& title, const int width, const int height)
 	: title(title), width(width), height(height) {
@@ -60,8 +59,12 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
 
 	// Other setup
+	viewport	 = std::make_shared<std::array<int, 4>>();
+	activeCamera = std::make_shared<Camera>();
+	mouseRay	 = std::make_shared<Ray>(rayStart, rayEnd);
+
 	glViewport(0, 0, width, height);	// Initialize viewport
-	glGetIntegerv(GL_VIEWPORT, viewport.data());
+	glGetIntegerv(GL_VIEWPORT, viewport->data());
 
 	aspect = static_cast<float>(width) / static_cast<float>(height);
 }
@@ -70,26 +73,28 @@ Viewport::~Viewport() {
 	// Cleanup
 	glfwDestroyWindow(window);
 	glfwTerminate();
+
+	SceneManager::cleanupScenes();
 }
 
 void Viewport::start() {
-	// Allocate RenderContext
-	context = std::make_shared<SceneManager>();
+	// Initialize Viewport pointers for SceneManager
+	SceneManager::viewport		= viewport;
+	SceneManager::activeCamera	= activeCamera;
+	SceneManager::mouseRay		= mouseRay;
 
 	// Create Scenes
-	Scene background(context);
-	Scene foreground(context);
-	ui = new UI(context);
+	const auto foreground = std::make_shared<Scene>();
+	const auto background = std::make_shared<Scene>();
+	const auto ui = std::make_shared<UI>(&SceneManager::viewport->at(2), &SceneManager::viewport->at(3));
 
-	scenes.push_back(&background);
-	scenes.push_back(&foreground);
-	scenes.push_back(ui);
-
-	// Set up render context
-	context->viewport	  = &viewport;
-	context->activeCamera = &activeCamera;
+	// Add Scenes to the SceneManager
+	SceneManager::addScene(foreground);
+	SceneManager::addScene(background);
+	SceneManager::addScene(ui);
 
 	// Set up UI afterwards
+	SceneManager::ui = ui;
 	ui->setup();
 
 	// Load Textures
@@ -106,7 +111,7 @@ void Viewport::start() {
 		Colors::WHITE,
 		thmTexture
 	);
-	background.addObject(cube);
+	foreground->addObject(cube);
 
 	// Add Earth to Scene
 	const auto earth = std::make_shared<Sphere>(
@@ -118,7 +123,7 @@ void Viewport::start() {
 		Colors::WHITE,
 		earthTexture
 	);
-	background.addObject(earth);
+	foreground->addObject(earth);
 
 	/*const auto skybox = std::make_shared<Skybox>(
 		"Skybox",
@@ -126,15 +131,15 @@ void Viewport::start() {
 		starsTexture
 	);
 	skybox->applyTransformation(OBJECT, SCALE, Matrix4::scale(Vector3(5.0f, 5.0f, 5.0f)));
-	foreground.addObject(skybox);*/
+	background->addObject(skybox);*/
 
 
 	clearColor(Colors::BG_COLOR);	// Background color
 	Scene::setLight(Colors::LIGHT_SUN, Colors::LIGHT_AMBIENT, Colors::WHITE);
 
 	// Get matrices
-	activeCamera.gluPerspective(aspect); // projection matrix
-	activeCamera.gluLookAt();			 // view matrix
+	activeCamera->gluPerspective(aspect); // projection matrix
+	activeCamera->gluLookAt();			  // view matrix
 
 	// Start rendering the Viewport
 	while (!glfwWindowShouldClose(window)) {
@@ -151,7 +156,7 @@ void Viewport::render() {
 	glfwGetFramebufferSize(window, &width, &height);
 
 	glViewport(0, 0, width, height);
-	glGetIntegerv(GL_VIEWPORT, viewport.data());
+	glGetIntegerv(GL_VIEWPORT, viewport->data());
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -160,16 +165,14 @@ void Viewport::render() {
 	drawGrid();
 
 	// Render Scenes
-	for (int i = 0; i < scenes.size() - 1; i++) {
-		scenes[i]->render();
-	}
+	SceneManager::renderScenes();
 
 	#ifdef DRAW_MOUSE_RAY
 		drawRay(rayStart, rayEnd);
 	#endif
 
 	// Render UI last
-	ui->render();
+	SceneManager::renderUI();
 }
 
 
@@ -185,7 +188,7 @@ void Viewport::getFPS() {
 void Viewport::windowResize(const int newW, const int newH) {
 	glViewport(0, 0, width = newW, height = newH);
 	aspect = static_cast<float>(width) / static_cast<float>(height);
-	activeCamera.gluPerspective(aspect);
+	activeCamera->gluPerspective(aspect);
 }
 
 /** Centers the application's window to the middle of the screen. */
@@ -197,12 +200,13 @@ void Viewport::centerWindow() const {
 	glfwSetWindowPos(window, windowPosX, windowPosY);
 }
 
-void Viewport::setMouseRay(const Vector2& mousePos) {
-	mouseRay.direction = unproject(mousePos, &viewport, activeCamera.viewMatrix, activeCamera.projMatrix).normalize();
-	const auto directionScaled = mouseRay.direction * MOUSE_RAY_LENGTH;
-	rayStart = mouseRay.origin = activeCamera.camPos;
-	rayEnd   = mouseRay.origin + directionScaled;
-	context->mouseRay = &mouseRay;
+void Viewport::setMouseRay(const Vector2& mousePos) const {
+	mouseRay->direction = unproject(mousePos, viewport.get(), activeCamera->viewMatrix, activeCamera->projMatrix).normalize();
+	const auto directionScaled = mouseRay->direction * MOUSE_RAY_LENGTH;
+	rayStart = mouseRay->origin = activeCamera->camPos;
+	rayEnd   = mouseRay->origin + directionScaled;
+
+	// sceneManager->mouseRay = mouseRay; // shouldn't be necessary anymore since it's a pointer now
 }
 
 

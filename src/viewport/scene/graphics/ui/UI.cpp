@@ -25,8 +25,8 @@ constexpr float tabPadding	= 1.5f;		// Upper and lower padding within the bar
 constexpr float buttonWidth	= 120.0f;
 
 
-UI::UI(const std::shared_ptr<SceneManager>& context): Scene(context) {
-	Text(); // Initialize FreeType for on-screen text
+UI::UI(const int* width, const int* height) : Scene(), width(width), height(height) {
+	Text();		// Initialize FreeType for on-screen text
 }
 
 UI::~UI() {
@@ -64,8 +64,8 @@ void UI::setup() {
 
 	int i = 0;
 	for (const auto& tab : std::vector{fileTab, editTab, addTab}) {
-		const auto windowW = static_cast<float>(context->viewport->at(2));
-		const auto windowH = static_cast<float>(context->viewport->at(3));
+		const auto windowW = static_cast<float>(*width);
+		const auto windowH = static_cast<float>(*height);
 
 		tab->x  = tab->button->x  = firstTabX + static_cast<float>(i) * buttonWidth;
 		tab->button->y = tabPadding;
@@ -112,8 +112,8 @@ void UI::update() const {
 	for (const auto& layer : elements) {
 		for (const auto& element : layer) {
 			element->setVertices(
-				static_cast<float>(context->viewport->at(2)),
-				static_cast<float>(context->viewport->at(3))
+				static_cast<float>(*width),
+				static_cast<float>(*height)
 			);
 		}
 	}
@@ -142,8 +142,8 @@ void UI::render() const {
 	glLoadIdentity();
 	glOrtho(
 		0,
-		context->viewport->at(2),
-		context->viewport->at(3),
+		*width,
+		*height,
 		0,
 		-1,
 		1
@@ -162,9 +162,9 @@ void UI::render() const {
 	}
 
 	#ifdef DEBUG
-		Debug::drawDebugText(this, context.get(), context->activeCamera);
+		Debug::drawDebugText();
 	#endif
-	Text::drawErrorText(context->viewport->at(3));
+	Text::drawErrorText(*height);
 
 	// Restore matrices
 	glPopMatrix();

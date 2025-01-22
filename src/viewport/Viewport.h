@@ -33,13 +33,6 @@ inline auto mouseY	= new double[1];
 
 class Viewport {
 public:
-	std::array<int, 4> viewport{};
-	std::shared_ptr<SceneManager> context{};
-
-	// Scenes (TODO shouldn't be public)
-	static std::vector<Scene*> scenes;
-	UI* ui{};
-
 	Viewport(const std::string& title, int width, int height);
 	~Viewport();
 
@@ -47,9 +40,13 @@ public:
 	void render();
 
 	void setCallbacks(GLFWwindow* window);
-	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
+	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods) const;
 
 private:
+	std::shared_ptr<std::array<int, 4>> viewport;
+	std::shared_ptr<SceneManager> sceneManager;
+	std::shared_ptr<Camera> activeCamera;
+
 	GLFWwindow* window = nullptr;
 	std::string title;
 	int width, height;
@@ -63,16 +60,13 @@ private:
 	Vector2 lastMousePos	 = Vector2(0.0, 0.0);
 	mutable Vector3 rayStart = Vector3::MINUS_ONE;
 	mutable Vector3 rayEnd   = Vector3::ONE;
-	Ray mouseRay			 = Ray(rayStart, rayEnd);
-
-	// Camera
-	Camera activeCamera = Camera();
+	std::shared_ptr<Ray> mouseRay;
 
 	// Functions
 	void centerWindow() const;
 	void windowResize(int newW, int newH);
 
-	void setMouseRay(const Vector2& mousePos);
+	void setMouseRay(const Vector2& mousePos) const;
 	static void drawRay(const Vector3& rayStart, const Vector3& rayEnd);
 
 	static void drawAxes();
