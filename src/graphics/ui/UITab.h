@@ -1,45 +1,73 @@
 #pragma once
 
-#include "UIElement.h"
+#include <utility>
+#include <math/Util.h>
+
+#include "UIButtonElement.h"
 #include "UIOption.h"
-#include "input/Button.h"
 
 
-class UITab final : public UIElement {
+class UITab final : public UIButtonElement {
 public:
-	std::shared_ptr<Button> button;				// Tab button
-	std::shared_ptr<UIOptionList> optionList;	// Root OptionList for the Tab
+	std::vector<std::shared_ptr<UIOptionVariant>> optionList;	// Option List for the Tab
+	bool isOpen;	// Tracks whether the user is currently selecting an Option from the Tab
 
-	explicit UITab(
-		const std::shared_ptr<Button>& button,
-		const std::shared_ptr<UIOptionList>& optionList,
-		const float x = 0.0f,
-		const float y = 0.0f,
-		const Dim sx = NODIM,
-		const Dim sy = NODIM
-	) :   UIElement(x, y, sx, sy),
-		  button(button),
-		  optionList(optionList) {
+	UITab(
+		std::vector<std::shared_ptr<UIOptionVariant>> optionList,
+		const std::string& label,
+		const float x,
+		const float y,
+		const Dim sx,
+		const Dim sy
+	) :   UIButtonElement(label, x, y, sx, sy),
+		  optionList(std::move(optionList)) {
 
-		button->x  = x;
-		button->y  = tabPadding;
-		button->sx = sx;
-		button->sy = Dim(sy.value - 2 * tabPadding, DimType::Pixels);
-
-		setVertices();
-		button->setVertices();
-		button->setActivated(true);
+		isOpen = false;
 	}
 
-	void render() const override;
-	void setVertices() override;
+	void render() override {
+		button->render();
+
+		if (button->belowMouse()) {
+			// Open the Tab on mouse hovering
+			if (!isOpen) changeSize = 1;	// remove gap between Tab and OptionList for the Option selection
+			isOpen = true;
+		} else if (!isMouseInOptionList()) {
+			// If the mouse is neither on the Tab nor in the Option List, the Tab closes
+			if (isOpen) changeSize = 2;		// put gap back
+			isOpen = false;
+		}
+		switch (changeSize) {
+			case 1: resizeY(tabAugment); break;
+			case 2: resizeY(-tabAugment); break;
+			default: ;	// Keep size
+		}
+
+		if (isOpen) {
+			// Render the Option List only if the Tab is open
+			for (const auto& option : optionList) {
+				UI::variantToElement(option)->render();
+			}
+		}
+
+		changeSize = 0;
+	}
+
+	void setVertices() override {}
+
+
+	[[nodiscard]] bool isMouseInOptionList() const {
+		bool isMouseInOptionList = false;
+		for (const auto& option : optionList) {
+			if (const auto buttonObj = dynamic_pointer_cast<UIButtonElement>(UI::variantToElement(option))) {
+				if (buttonObj->button->belowMouse()) {
+					isMouseInOptionList = true;
+				}
+			}
+		}
+		return isMouseInOptionList;
+	}
+
+private:
+	int changeSize = 0;
 };
-
-
-inline void UITab::render() const {
-
-}
-
-inline void UITab::setVertices() {
-
-}

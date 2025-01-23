@@ -1,10 +1,13 @@
 #pragma once
 
-#include "vector/Vector2.h"
+#include <objects/mesh/Mesh.h>
+#include <viewport/scene/Mode.h>
+
 #include "vector/Vector3.h"
 #include "vector/Vector4.h"
-#include "objects/mesh/Mesh.h"
-#include "viewport/scene/Mode.h"
+
+class Object;
+
 
 // Constants
 constexpr float EPSILON		= 1e-9f;					// Infinitesimal

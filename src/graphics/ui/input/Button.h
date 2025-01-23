@@ -5,18 +5,22 @@
 
 class Button final : public Input {
 public:
-	explicit Button(
-		const std::string& label = "",
-		const int textSize = 48,
-		const TextMode textMode = TextMode::LEFT,
-		const std::vector<Color>& colors = BUTTON_COLORS
-	) : Input(label, textSize, textMode, colors) {}
+	Button(
+		const std::string& label,
+		const int textSize,
+		const TextMode textMode,
+		const std::vector<Color>& colors,
+		const float x,
+		const float y,
+		const Dim sx,
+		const Dim sy
+	) : Input(label, textSize, textMode, colors, x, y, sx, sy) {}
 
-	void render() const override;
+	void render() override;
 };
 
 
-inline void Button::render() const {
+inline void Button::render() {
 	Input::render();
 
 	float adjustedX;

@@ -1,67 +1,79 @@
 #pragma once
 
-#include "UIElement.h"
+#include "UIButtonElement.h"
 
 #include <string>
 #include <variant>
-#include <vector>
 
 
-using UIOptionList = std::map<
-	std::string,
-	std::vector<std::string>
->;
-
-using UIOption = std::variant<
-	std::vector<std::string>,
-	UIOptionList
->;
-
-// Define the OptionList class
-/*
-class UIOptionList final : public UIElement {
+class UIOptionBase : public UIButtonElement {
 public:
-	// Variadic constructor to initialize with multiple options
-	template <typename... Args>
-	explicit UIOptionList(
-		Args... args
-	) {
-		addOptions(args...);	// Add options using variadic template
+	bool isTabBelowMouse;
+
+	explicit UIOptionBase(
+		const std::string& label,
+		const float x, const float y, const Dim sx, const Dim sy
+	) :	  UIButtonElement(label, x, y, sx, sy) {
+
+		isTabBelowMouse = false;
 	}
 
-	// Helper to add multiple options recursively (variadic template unpacking)
-	template <typename T, typename... Args>
-	void addOptions(T first, Args... rest) {
-		addOption(first);
-		addOptions(rest...);
+	// Optionally define a virtual destructor to support polymorphism
+	~UIOptionBase() override = default;
+
+	void render() override {
+		button->render();
 	}
 
-	// Base case for recursion (no arguments)
-	static void addOptions() {}
-
-	// Add an Option to the list
-	void addOption(const std::string& option) {
-		options.emplace_back(option);
-	}
-
-	// Add a nested OptionList
-	void addOption(const std::shared_ptr<UIOptionList>& optionList) {
-		options.emplace_back(optionList);
-	}
-
-	void render() const override;
-	void setVertices() override;
-
-private:
-	std::map<std::string, UIOption> options;
+	void setVertices() override {}
 };
 
 
-inline void UIOptionList::render() const {
+/** A UIOptionList is a list of UIOption variants */
+class UIOptionList final : public UIOptionBase {
+public:
+	std::vector<std::shared_ptr<UIOptionVariant>> options;
 
+	explicit UIOptionList(
+		const std::string& label,
+		const std::vector<std::shared_ptr<UIOptionVariant>>& options,
+		const float x, const float y, const Dim sx, const Dim sy
+	) :   UIOptionBase(label, x, y, sx, sy),
+		  options(options) {}
+
+	void addOption(const std::shared_ptr<UIOptionVariant>& option) {
+		options.emplace_back(option);
+	}
+
+	void render() override {
+		button->render();
+
+		// Draw an arrow to the right to signify Option List
+		glBegin(GL_TRIANGLES);
+		color3f(Colors::UI_ARROW_COLOR);
+		glVertex2f(x + sx.value - 25.0f, y + sy.value - 10.0f);
+		glVertex2f(x + sx.value - 25.0f, y + 10.0f);
+		glVertex2f(x + sx.value - 10.0f, y + sy.value / 2.0f);
+		glEnd();
+	}
+};
+
+
+/** A UIOption represents an element in a UIOptionList */
+class UIOption final : public UIOptionBase {
+public:
+	explicit UIOption(
+		const std::string& label,
+		const float x, const float y, const Dim sx, const Dim sy
+	) :   UIOptionBase(label, x, y, sx, sy) {}
+};
+
+
+inline std::string getLabel(const UIOptionVariant& optionVariant) {
+	return std::visit(
+		[](const UIOptionBase& option) -> std::string {
+			return option.label;
+		},
+		optionVariant
+	);
 }
-
-inline void UIOptionList::setVertices() {
-
-}
-*/

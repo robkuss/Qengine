@@ -29,9 +29,10 @@ namespace Colors {
 
 	const auto UI_COLOR					= Color( 70,  70,  70);
 	const auto BUTTON_REG_FILL		= UI_COLOR;
-	const auto BUTTON_REG_OUTLINE		= Color( 60,  60,  60);
+	const auto BUTTON_REG_OUTLINE		= Color( 50,  50,  50);
 	const auto BUTTON_HIGH_FILL			= Color( 60,  60,  60);
 	const auto BUTTON_HIGH_OUTLINE	= BUTTON_REG_OUTLINE;
 	const auto BUTTON_DEACT_FILL		= Color(110, 110, 110);
 	const auto BUTTON_TEXT_COLOR		= TEXT_COLOR;
+	const auto UI_ARROW_COLOR			= Color( 50,  50,  50);
 }

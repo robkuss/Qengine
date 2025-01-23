@@ -37,7 +37,6 @@ add_executable(Qengine
 	src/graphics/MeshRenderer.cpp
 	src/graphics/material/texture/Texture.cpp
 	src/graphics/ui/UI.cpp
-	src/graphics/ui/UIBar.cpp
 	src/graphics/text/Text.cpp
 
 	src/objects/mesh/Mesh.cpp

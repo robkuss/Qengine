@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../UI.h"
+#include <graphics/ui/UI.h>
 
 
 const auto BUTTON_COLORS = std::vector{
@@ -14,13 +14,18 @@ const auto BUTTON_COLORS = std::vector{
 
 class Input : public UIElement {
 public:
-	explicit Input(
-		std::string label = "",
-		const int textSize = 48,
-		const TextMode textMode = TextMode::LEFT,
-		const std::vector<Color>& colors = BUTTON_COLORS
-	) :   rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
-		  text(std::move(label)), textSize(textSize), textMode(textMode), activated(true) {}
+	Input(
+	 	const std::string& label,
+		const int textSize,
+		const TextMode textMode,
+		const std::vector<Color>& colors,
+		const float x,
+		const float y,
+		const Dim sx,
+		const Dim sy
+	) :   UIElement(label, x, y, sx, sy),
+		  rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
+	      text(label), textSize(textSize), textMode(textMode), activated(true) {}
 
 	~Input() override = default;
 
@@ -33,7 +38,7 @@ public:
 			&& *SceneManager::mouseY < y + sy.value;
 	}
 
-	void render() const override;
+	void render() override;
 	void setVertices() override;
 
 	[[nodiscard]] std::string getText() const {
@@ -53,7 +58,7 @@ protected:
 };
 
 
-inline void Input::render() const {
+inline void Input::render() {
 	glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT);	// Save line width and color state
 
 	const auto isBelowMouse = belowMouse();
