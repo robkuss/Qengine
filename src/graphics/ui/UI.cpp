@@ -1,7 +1,7 @@
 #include "UI.h"
 
 #include "UIBar.h"
-#include "text/Debug.h"
+#include "../text/Debug.h"
 
 #include <memory>
 #include <ranges>
@@ -36,11 +36,11 @@ void UI::setup() {
 	};
 
 	auto tabs = std::vector<std::shared_ptr<UITab>>();
-	int i = 0;
-	for (const auto& [key, value] : labels) {
-		const auto button = std::make_shared<Button>(key, tabFontSize);
+	for (const auto& [i, pair] : std::views::enumerate(labels)) {
+		const auto& [key, value] = pair;
+		const auto button	  = std::make_shared<Button>(key, tabFontSize);
 		const auto optionList = std::make_shared<UIOptionList>();
-		const auto tab = std::make_shared<UITab>(
+		const auto tab		  = std::make_shared<UITab>(
 			button,
 			optionList,
 			firstTabX + static_cast<float>(i) * buttonWidth,
@@ -51,7 +51,6 @@ void UI::setup() {
 		addElement(button, 2);
 		addElement(tab, 1);
 		tabs.emplace_back(tab);
-		i++;
 	}
 
 	// Create UIBar

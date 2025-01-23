@@ -8,8 +8,8 @@
 
 #include "math/vector/Vector3.h"
 #include "math/ray/Ray.h"
-#include "scene/Camera.h"
-#include "scene/graphics/ui/UI.h"
+#include "Camera.h"
+#include "graphics/ui/UI.h"
 
 #include <array>
 

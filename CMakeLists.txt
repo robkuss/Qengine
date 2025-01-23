@@ -27,18 +27,22 @@ add_subdirectory(libs/glfw-3.4 ${CMAKE_BINARY_DIR}/glfw-build)
 # Add the executable target
 add_executable(Qengine
 	src/Qengine.cpp
+
 	src/viewport/Viewport.cpp
 	src/viewport/Controls.cpp
+	src/viewport/Camera.cpp
 	src/viewport/scene/Scene.cpp
-	src/viewport/scene/Camera.cpp
-	src/viewport/scene/graphics/MeshRenderer.cpp
-	src/objects/mesh/Mesh.cpp
-	src/math/Util.cpp
-	src/material/texture/Texture.cpp
-	src/viewport/scene/graphics/ui/UI.cpp
-	src/viewport/scene/graphics/ui/UIBar.cpp
-	src/viewport/scene/graphics/ui/text/Text.cpp
 	src/viewport/scene/SceneManager.cpp
+
+	src/graphics/MeshRenderer.cpp
+	src/graphics/material/texture/Texture.cpp
+	src/graphics/ui/UI.cpp
+	src/graphics/ui/UIBar.cpp
+	src/graphics/text/Text.cpp
+
+	src/objects/mesh/Mesh.cpp
+
+	src/math/Util.cpp
 	src/math/matrix/Matrix4.cpp
 	src/math/geometry/Triangle.cpp
 )

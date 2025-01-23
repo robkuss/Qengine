@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include <viewport/Viewport.h>
-#include <viewport/scene/Camera.h>
+#include <viewport/Camera.h>
 #include <viewport/scene/Scene.h>
 
 // Options

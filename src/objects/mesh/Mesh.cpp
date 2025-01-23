@@ -4,7 +4,7 @@
 #include <ranges>
 
 #include <math/Util.h>
-#include <viewport/Mode.h>
+#include <viewport/scene/Mode.h>
 
 
 /** Mesh-side transformation

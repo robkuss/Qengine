@@ -6,7 +6,7 @@
 #include <memory>
 #include <math/ray/Ray.h>
 
-#include "Camera.h"
+#include "viewport/Camera.h"
 #include "graphics/MeshRenderer.h"
 
 

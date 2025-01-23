@@ -6,7 +6,7 @@
 
 #include <GL/gl.h>
 
-#include <viewport/Mode.h>
+#include <viewport/scene/Mode.h>
 #include "material/texture/Texture.h"
 #include "color/Colors.h"
 

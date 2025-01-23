@@ -1,6 +1,6 @@
 #include "Text.h"
 
-#include "../UI.h"
+#include "../ui/UI.h"
 
 #include <iostream>
 

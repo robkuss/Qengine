@@ -7,7 +7,7 @@
 #include "math/geometry/Edge.h"
 #include "math/geometry/Triangle.h"
 
-#include <viewport/scene/graphics/color/Colors.h>
+#include <graphics/color/Colors.h>
 
 
 class Texture;

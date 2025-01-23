@@ -8,10 +8,10 @@
 #include "objects/mesh/sphere/Sphere.cpp"
 #include "objects/mesh/skybox/Skybox.cpp"
 
-#include "material/texture/Texture.h"
+#include "graphics/material/texture/Texture.h"
+#include "graphics/ui/UI.h"
 
 #include "scene/Scene.h"
-#include "scene/graphics/ui/UI.h"
 
 
 Viewport::Viewport(const std::string& title, const int width, const int height)

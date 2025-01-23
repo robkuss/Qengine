@@ -3,7 +3,7 @@
 #include "UIElement.h"
 
 #include "viewport/scene/Scene.h"
-#include "text/Text.h"
+#include "../text/Text.h"
 
 #include <vector>
 #include <memory>

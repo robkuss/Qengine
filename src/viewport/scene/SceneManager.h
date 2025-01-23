@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include <viewport/Mode.h>
+#include <viewport/scene/Mode.h>
 #include "math/geometry/Vertex.h"
 
 class Scene;

@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "Scene.h"
-#include "Camera.h"
+#include "viewport/Camera.h"
 #include "graphics/ui/UI.h"
 
 // Constants
