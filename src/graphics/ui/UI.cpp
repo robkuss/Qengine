@@ -39,7 +39,7 @@ inline std::shared_ptr<UIElement> UI::variantToElement(const std::shared_ptr<UIO
 // Initialize labels for UIElements
 const auto uiStructure = std::vector{
 	cn("File", {
-		cn("New"), cn("Open"), cn("Save")
+		cn("New"), cn("Open"), cn("Save"), cn("Save As"), cn("Exit")
 	}),
 	cn("Edit", {
 		cn("Undo"), cn("Redo"), cn("Cut"), cn("Copy"), cn("Paste")
