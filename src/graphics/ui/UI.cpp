@@ -5,17 +5,7 @@
 
 #include "../text/Debug.h"
 
-#include <memory>
 #include <ranges>
-#include <utility>
-
-
-int *UI::width, *UI::height;
-
-int UI::boundLeft, UI::boundRight, UI::boundTop, UI::boundBottom;
-float UI::firstLineX;
-float UI::firstLineY;
-float UI::bottomLineY;
 
 
 // Node structure for holding labels
@@ -46,6 +36,34 @@ inline std::shared_ptr<UIElement> UI::variantToElement(const std::shared_ptr<UIO
 }
 
 
+// Initialize labels for UIElements
+const auto uiStructure = std::vector{
+	cn("File", {
+		cn("New"), cn("Open"), cn("Save")
+	}),
+	cn("Edit", {
+		cn("Undo"), cn("Redo"), cn("Cut"), cn("Copy"), cn("Paste")
+	}),
+	cn("Add", {
+		cn("Mesh", {
+			cn("Cube"), cn("Sphere")
+		}),
+		cn("Light", {
+			cn("Point"), cn("Sun")
+		})
+	})
+};
+
+
+
+int *UI::width, *UI::height;
+
+int UI::boundLeft, UI::boundRight, UI::boundTop, UI::boundBottom;
+float UI::firstLineX;
+float UI::firstLineY;
+float UI::bottomLineY;
+
+
 UI::UI(int* w, int* h) : Scene() {
 	width = w;
 	height = h;
@@ -60,66 +78,7 @@ UI::~UI() {
 }
 
 
-// ReSharper disable once CppNotAllPathsReturnValue
-UIOptionVariant UI::createOptionListRecursively(const long long index, const std::shared_ptr<LabelNode>& label, const float x, const float y, const Dim sx, const Dim sy) { // NOLINT(*-no-recursion)
-	// If the node has no children, it is a single UIOption
-	const auto newY = y + static_cast<float>(index + 1) * sy.value;
-	if (label->children.empty()) {
-		return *std::make_shared<UIOption>(
-			label->label,
-			x, newY, sx, sy
-		);
-	}
-
-	// If the node has children, it is a UIOptionList -> process each child recursively
-	auto options = std::vector<std::shared_ptr<UIOptionVariant>>();
-	for (const auto& [i, child] : std::views::enumerate(label->children)) {
-		const auto optionX  = x;
-		const auto optionY  = y + static_cast<float>(i + 1) * sy.value;
-		constexpr auto optionSX = Dim(optionWidth, DimType::Pixels);
-		constexpr auto optionSY = UNIT;
-
-		// Recursive call for each child
-		auto optionVariant = createOptionListRecursively(
-			i,
-			child,
-			optionX + optionWidth,
-			optionY,
-			optionSX,
-			optionSY
-		);
-
-		options.push_back(std::make_shared<UIOptionVariant>(optionVariant));
-	}
-
-	// Create and return a UIOptionList for this node
-	return *std::make_shared<UIOptionList>(
-		label->label,
-		options,
-		x, newY, sx, sy
-	);
-}
-
-
 void UI::setup() {
-	// Initialize labels for UIElements
-	const auto uiStructure = std::vector{
-		cn("File", {
-			cn("New"), cn("Open"), cn("Save")
-		}),
-		cn("Edit", {
-			cn("Undo"), cn("Redo"), cn("Cut"), cn("Copy"), cn("Paste")
-		}),
-		cn("Add", {
-			cn("Mesh", {
-				cn("Cube"), cn("Sphere")
-			}),
-			cn("Light", {
-				cn("Point"), cn("Sun")
-			})
-		})
-	};
-
 	// Initialize UITab and UIOptionList lists
 	auto tabs = std::vector<std::shared_ptr<UITab>>();
 	auto optionLists = std::vector<std::shared_ptr<UIOptionList>>();
@@ -174,6 +133,41 @@ void UI::setup() {
 	update();
 }
 
+// ReSharper disable once CppNotAllPathsReturnValue
+UIOptionVariant UI::createOptionListRecursively(const long long index, const std::shared_ptr<LabelNode>& label, const float x, const float y, const Dim sx, const Dim sy) { // NOLINT(*-no-recursion)
+	// If the node has no children, it is a single UIOption
+	const auto newY = y + static_cast<float>(index + 1) * sy.value;
+	if (label->children.empty()) {
+		return *std::make_shared<UIOption>(
+			label->label,
+			x, newY, sx, sy
+		);
+	}
+
+	// If the node has children, it is a UIOptionList -> process each child recursively
+	auto options = std::vector<std::shared_ptr<UIOptionVariant>>();
+	for (const auto& [i, child] : std::views::enumerate(label->children)) {
+		const auto optionX  = x + sx.value;
+		const auto optionY  = y + static_cast<float>(index) * sy.value;
+
+		// Recursive call for each child
+		auto optionVariant = createOptionListRecursively(
+			i,
+			child,
+			optionX, optionY, sx, sy
+		);
+
+		options.push_back(std::make_shared<UIOptionVariant>(optionVariant));
+	}
+
+	// Create and return a UIOptionList for this node
+	return *std::make_shared<UIOptionList>(
+		label->label,
+		options,
+		x, newY, sx, sy
+	);
+}
+
 void UI::addElement(const std::shared_ptr<UIElement>& element, const int layer) { // NOLINT(*-no-recursion)
 	for (const auto& vertex : element->vertices) {
 		vertexPointers.push_back(&vertex);
@@ -218,13 +212,11 @@ void UI::render() const {
 	glPushMatrix();
 	glLoadIdentity();
 
-
 	// Render text
 	#ifdef DEBUG
 		Debug::drawDebugText();
 	#endif
 	Text::drawErrorText(*height);
-
 
 	// Render elements
 	for (const auto &elementsOnLayer: layers | std::views::values) {
@@ -232,7 +224,6 @@ void UI::render() const {
 			element->render();
 		}
 	}
-
 
 	// Restore matrices
 	glPopMatrix();

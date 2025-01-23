@@ -32,7 +32,7 @@ public:
 			// Open the Tab on mouse hovering
 			if (!isOpen) changeSize = 1;	// remove gap between Tab and OptionList for the Option selection
 			isOpen = true;
-		} else if (!isMouseInOptionList()) {
+		} else if (!UIOptionList::isMouseInOptionList(optionList)) {
 			// If the mouse is neither on the Tab nor in the Option List, the Tab closes
 			if (isOpen) changeSize = 2;		// put gap back
 			isOpen = false;
@@ -55,18 +55,6 @@ public:
 
 	void setVertices() override {}
 
-
-	[[nodiscard]] bool isMouseInOptionList() const {
-		bool isMouseInOptionList = false;
-		for (const auto& option : optionList) {
-			if (const auto buttonObj = dynamic_pointer_cast<UIButtonElement>(UI::variantToElement(option))) {
-				if (buttonObj->button->belowMouse()) {
-					isMouseInOptionList = true;
-				}
-			}
-		}
-		return isMouseInOptionList;
-	}
 
 private:
 	int changeSize = 0;
