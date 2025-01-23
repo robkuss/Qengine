@@ -37,7 +37,7 @@ double* SceneManager::mouseY = new double[1];
 
 
 void SceneManager::addScene(const std::shared_ptr<Scene>& scene) {
-	scenes.emplace_back(scene); // Store as weak_ptr
+	scenes.emplace_back(scene);
 }
 
 void SceneManager::deleteScene(const std::shared_ptr<Scene>& scene) {

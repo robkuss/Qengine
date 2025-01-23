@@ -1,10 +1,14 @@
 #pragma once
 
+#include <functional>
+
 #include "Input.h"
 
 
 class Button final : public Input {
 public:
+	std::function<void()> onClickHandler;	// A callable object to store the click handler
+
 	Button(
 		const std::string& label,
 		const int textSize,
@@ -17,6 +21,10 @@ public:
 	) : Input(label, textSize, textMode, colors, x, y, sx, sy) {}
 
 	void render() override;
+
+	void onClick(const std::function<void()>& handler) {
+		onClickHandler = handler;
+	}
 };
 
 

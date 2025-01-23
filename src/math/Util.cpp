@@ -1,5 +1,8 @@
 #include "Util.h"
 
+#include <graphics/ui/UIOption.h>
+#include <graphics/ui/UITab.h>
+
 #include "math/matrix/Matrix4.h"
 
 Vector2 project(const Vector3& worldPoint, const std::array<int, 4>* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {

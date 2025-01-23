@@ -1,4 +1,5 @@
 
+
 #pragma once
 
 #include <memory>
@@ -47,4 +48,6 @@ public:
 		button->sy.value += value;
 		button->setVertices();
 	}
+
+	void checkButtonPressed() const {}
 };

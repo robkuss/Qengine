@@ -2,7 +2,6 @@
 
 #include <graphics/ui/UI.h>
 
-
 const auto BUTTON_COLORS = std::vector{
 	Colors::BUTTON_REG_FILL,
 	Colors::BUTTON_REG_OUTLINE,

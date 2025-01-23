@@ -46,6 +46,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 				const auto mousePos = Vector2(*SceneManager::mouseX, *SceneManager::mouseY);
 				vp->setMouseRay(mousePos);
 				SceneManager::select(mousePos, false);
+				SceneManager::ui->checkButtonPressed();
 			}
 
 			else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {

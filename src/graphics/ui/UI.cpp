@@ -234,3 +234,13 @@ void UI::render() const {
 
 	glEnable(GL_DEPTH_TEST);
 }
+
+void UI::checkButtonPressed() {
+	for (const auto &elementsOnLayer: layers | std::views::values) {
+		for (const auto& element : elementsOnLayer) {
+			if (const auto buttonElement = std::dynamic_pointer_cast<const UIButtonElement>(element)) {
+				buttonElement->checkButtonPressed();
+			}
+		}
+	}
+}

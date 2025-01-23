@@ -26,6 +26,8 @@ public:
 	void update() const;
 	void render() const override;
 
+	void checkButtonPressed();
+
 	void addElement(const std::shared_ptr<UIElement> &element, int layer);
 
 	static std::shared_ptr<UIElement> variantToElement(const std::shared_ptr<UIOptionVariant> &variant);

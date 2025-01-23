@@ -6,11 +6,14 @@
 #include "vector/Vector3.h"
 #include "vector/Vector4.h"
 
+class UIOptionBase;
+class UITab;
+
 class Object;
 
 
 // Constants
-constexpr float EPSILON		= 1e-9f;					// Infinitesimal
+constexpr float EPSILON		= 1e-12f;					// Infinitesimal
 constexpr double PI			= 3.14159265358979323846;	// Because for some reason there is no Pi in cmath
 
 /** Degrees to radians */

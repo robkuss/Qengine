@@ -44,6 +44,7 @@ add_executable(Qengine
 	src/math/Util.cpp
 	src/math/matrix/Matrix4.cpp
 	src/math/geometry/Triangle.cpp
+		src/graphics/ui/UIOptionVariant.h
 )
 
 # Define static linking
