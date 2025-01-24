@@ -39,7 +39,7 @@ void UI::setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
 	});
 
 	setOnClickForButton(tab, "Point", [] {
-
+		// TODO make Point lights
 	});
 
 	setOnClickForButton(tab, "Sun", [] {

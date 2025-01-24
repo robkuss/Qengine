@@ -19,7 +19,7 @@ void Scene::removeObject(const std::shared_ptr<Object>& obj) {
 }
 
 
-void Scene::render() const {
+void Scene::render() {
 	// Enable lighting
 	glEnable(GL_LIGHTING);
 

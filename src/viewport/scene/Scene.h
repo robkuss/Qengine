@@ -20,7 +20,7 @@ public:
 	Scene() = default;
 	virtual ~Scene() = default;
 
-	virtual void render() const;
+	virtual void render();
 
 	void addObject(const std::shared_ptr<Object>& obj);
 	void removeObject(const std::shared_ptr<Object>& obj);
@@ -28,7 +28,8 @@ public:
 	void addLight(const std::shared_ptr<Light> &light, const Color &diffuse, const Color &ambient, const Color &specular);
 
 private:
-	// Grant Debugger and SceneManager access to sceneObjects using the best keyword in C++
+	// Grant UI and SceneManager access to sceneObjects using the best keyword in C++
+	friend class UI;
 	friend class Debug;
 	friend class SceneManager;
 

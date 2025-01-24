@@ -31,7 +31,7 @@ inline void UIBar::render() {
 	}
 	glEnd();
 
-	color3f(Colors::BLACK);
+	color3f(Colors::UI_OUTLINE_COLOR);
 	glLineWidth(2.0f);
 	glBegin(GL_LINE_LOOP);
 	for (const auto vertex : vertices) {

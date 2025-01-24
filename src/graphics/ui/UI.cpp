@@ -5,6 +5,7 @@
 #include "UIBar.h"
 #include "UIOption.h"
 #include "Label.h"
+#include "UIWindow.h"
 #include "../text/Debug.h"
 
 
@@ -158,7 +159,7 @@ void UI::update() const {
 	bottomLineY = 10.0f + static_cast<float>(boundBottom);
 }
 
-void UI::render() const {
+void UI::render() {
 	glDisable(GL_DEPTH_TEST);	// Disable depth testing for 2D UI rendering
 	glEnable(GL_BLEND);			// Enable blending for transparency
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -187,6 +188,9 @@ void UI::render() const {
 		}
 	}
 
+	// Render SceneManager
+	renderSceneManager();
+
 	// Restore matrices
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
@@ -196,6 +200,67 @@ void UI::render() const {
 
 	glEnable(GL_DEPTH_TEST);
 }
+
+void UI::renderSceneManager() {
+	constexpr auto smWidth = 400.0f;
+	const auto x=	static_cast<float>(*width) - smWidth;
+	const auto y	  = static_cast<float>(boundTop);
+	constexpr auto sx = Dim(smWidth, DimType::Pixels);
+	constexpr auto sy = PC_100;
+
+	const auto window = std::make_shared<UIWindow>(
+		"Scene Manager",
+		x, y, sx, sy
+	);
+	window->render();
+
+	glLineWidth(1.0f);
+	color3f(Colors::UI_OUTLINE_COLOR);
+	glBegin(GL_LINES);
+	glVertex2f(x, y + 1.65f * unit);
+	glVertex2f(x + sx.value, y + 1.65f * unit);
+	glEnd();
+
+	Text::renderText(
+		"Scene Manager",
+		TextMode::LEFT,
+		x + 2.5f * unit,
+		static_cast<float>(boundTop) + unit,
+		24,
+		Colors::TEXT_COLOR
+	);
+
+	const float xLine = x + unit;
+	float yLine = y + 2.7f * unit;
+	int i = 0;
+	for (const auto& scene : SceneManager::scenes) {
+		glPointSize(5.0f);
+		color3f(Colors::TEXT_COLOR);
+		glBegin(GL_POINTS);
+		glVertex2f(xLine, yLine);
+		glEnd();
+		std::string sceneName;
+		switch (i) {
+			case 0:  sceneName = "Foreground"; break;
+			case 1:  sceneName = "Background"; break;
+			default: sceneName = "UI"; break;
+		}
+		Text::renderText(sceneName, TextMode::LEFT, xLine + 0.6f * unit, yLine + 0.2f * unit, 24, Colors::TEXT_COLOR);
+		yLine += unit;
+		for (const auto& object : scene->sceneObjects) {
+			glPointSize(5.0f);
+			color3f(Colors::TEXT_COLOR);
+			glBegin(GL_POINTS);
+			glVertex2f(xLine + unit, yLine);
+			glEnd();
+			Text::renderText(object->name, TextMode::LEFT, xLine + 1.6f * unit, yLine + 0.2f * unit, 24, Colors::TEXT_COLOR);
+			yLine += unit;
+		}
+		i++;
+	}
+}
+
+
 
 void UI::checkButtonPressed() {
 	for (const auto &elementsOnLayer: layers | std::views::values) {

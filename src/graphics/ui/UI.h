@@ -23,7 +23,9 @@ public:
 
 	void setup();
 	void update() const;
-	void render() const override;
+
+	void render() override;
+	void renderSceneManager();
 
 	void addElement(const std::shared_ptr<UIElement> &element, int layer);
 
@@ -34,6 +36,7 @@ public:
 protected:
 	friend class Text;
 	friend class Debug;
+	friend class Viewport;
 
 	static float firstLineX;
 	static float firstLineY;

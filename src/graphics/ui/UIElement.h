@@ -15,8 +15,8 @@
 constexpr float unit			= 40.0f;			// UI base unit (most other elements should depend on this)
 
 constexpr float firstTabX		= unit;
-constexpr float tabWidth		= 3 * unit;
-constexpr float optionWidth		= 4.5f * unit;
+constexpr float tabWidth		= 3.5f * unit;
+constexpr float optionWidth		= 5 * unit;
 
 constexpr float tabPadding		= 1.5f;				// Upper and lower padding within the bar
 constexpr float tabAugment		= 2 * tabPadding;	// For crossing the gap between Tab and OptionList
