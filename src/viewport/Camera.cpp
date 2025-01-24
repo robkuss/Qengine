@@ -9,11 +9,11 @@
 
 
 Camera::Camera()
-	: camPos(CAMERA_POSITION_INIT), center(LOOK_AT_POINT_INIT), up(UP_VECTOR_INIT) {
+	: camPos(CAMERA_POSITION_INIT), lookAt(LOOK_AT_POINT_INIT), up(UP_VECTOR_INIT) {
 }
 
-Camera::Camera(const Vector3& camPos, const Vector3& center, const Vector3& up)
-	: camPos(camPos), center(center), up(up) {
+Camera::Camera(const Vector3& camPos, const Vector3& lookAt, const Vector3& up)
+	: camPos(camPos), lookAt(lookAt), up(up) {
 }
 
 Camera::~Camera() = default;
@@ -23,7 +23,7 @@ Camera::~Camera() = default;
  * Function to set up a perspective projection matrix, which is essential for rendering 3D scenes
  * in a way that simulates human vision, where objects further away appear smaller than those closer.
  */
-void Camera::gluPerspective(const float aspect) {
+void Camera::loadProjectionMatrix(const float aspect) {
 	glMatrixMode(GL_PROJECTION);	// Subsequent matrix operations will affect the projection matrix
 	glLoadIdentity();
 
@@ -46,11 +46,11 @@ void Camera::gluPerspective(const float aspect) {
  * Defines a viewing transformation by specifying an eye point, a reference point indicating.
  * the center of the scene, and an up vector.
  */
-void Camera::lookAt() {
+void Camera::loadViewMatrix() {
 	glMatrixMode(GL_MODELVIEW);      // Subsequent matrix operations will affect the modelview matrix
 	glLoadIdentity();
 
-	const Vector3 forward = (center - camPos).normalize();	// Calculate the forward vector (direction from eye to center)
+	const Vector3 forward = (lookAt - camPos).normalize();	// Calculate the forward vector (direction from eye to center)
 	const Vector3 side = forward.cross(up).normalize();		// Calculate the side vector (perpendicular to both forward and up vectors)
 	const Vector3 zUp = side.cross(forward);				// Recalculate the actual up vector to ensure orthogonality
 
@@ -65,12 +65,12 @@ void Camera::lookAt() {
 	glMultMatrixf(viewMatrix.data());
 }
 
-void Camera::fixedLookAt() {
+void Camera::loadFixedViewMatrix() {
 	glMatrixMode(GL_MODELVIEW); // Set the matrix mode to modelview
 	glLoadIdentity();           // Reset the current modelview matrix
 
 	// Calculate the forward vector (camera's local negative Z-axis)
-	const Vector3 forward = (center - camPos).normalize();
+	const Vector3 forward = (lookAt - camPos).normalize();
 
 	// Calculate the side vector (perpendicular to the forward and up vectors)
 	const Vector3 side = forward.cross(up).normalize();
@@ -105,7 +105,7 @@ void Camera::updatePosition() {
 		camDist * sinV
 	);
 
-	lookAt();
+	loadViewMatrix();
 }
 
 void Camera::initRotation(const bool isRotating, const double mouseX, const double mouseY) {

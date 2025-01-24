@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "viewport/Camera.h"
 #include "graphics/ui/UI.h"
+#include "objects/mesh/skybox/Skybox.cpp"
 
 // Constants
 constexpr float SCALING_SENS		= 0.001;	// Scaling sensitivity
@@ -149,8 +150,10 @@ void SceneManager::select(const Vector2& mousePos, const bool preserve) {
     		for (const auto& obj : scene.get()->sceneObjects) {
     			// Attempt to cast Object to Mesh
     			if (const auto mesh = dynamic_cast<const Mesh*>(obj.get())) {
-    				if (ray->intersects(*mesh)) {
-    					intersectingObjects.emplace_back(obj);
+    				if (!dynamic_cast<const Skybox*>(obj.get())) {
+    					if (ray->intersects(*mesh)) {
+							intersectingObjects.emplace_back(obj);
+						}
     				}
     			} else {
     				// TODO Implement selection logic for Objects that aren't Meshes (e.g. Cameras, light sources, etc.)

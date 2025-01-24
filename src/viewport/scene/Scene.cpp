@@ -21,9 +21,9 @@ void Scene::removeObject(const std::shared_ptr<Object>& obj) {
 
 void Scene::render() {
 	if (fixedPosition) {
-		SceneManager::activeCamera->fixedLookAt();
+		SceneManager::activeCamera->loadFixedViewMatrix();
 	} else {
-		SceneManager::activeCamera->lookAt();
+		SceneManager::activeCamera->loadViewMatrix();
 	}
 
 	// Enable lighting

@@ -90,8 +90,8 @@ void Viewport::start() {
 	const auto ui = std::make_shared<UI>("UI", &SceneManager::viewport->at(2), &SceneManager::viewport->at(3));
 
 	// Add Scenes to the SceneManager
-	SceneManager::addScene(foreground);
 	SceneManager::addScene(background);
+	SceneManager::addScene(foreground);
 	SceneManager::addScene(ui);
 
 	// Set up UI afterwards
@@ -131,7 +131,6 @@ void Viewport::start() {
 		Colors::WHITE,
 		starsTexture
 	);
-	skybox->applyTransformation(OBJECT, SCALE, Matrix4::scale(Vector3(10000.0f, 10000.0f, 10000.0f)));
 	background->addObject(skybox);
 
 	background->enableDepthIsolation();
@@ -151,8 +150,8 @@ void Viewport::start() {
 	);
 
 	// Get matrices
-	activeCamera->gluPerspective(aspect); // projection matrix
-	activeCamera->lookAt();			  // view matrix
+	activeCamera->loadProjectionMatrix(aspect); // projection matrix
+	activeCamera->loadViewMatrix();			    // view matrix
 
 
 	// Start rendering the Viewport
@@ -172,14 +171,15 @@ void Viewport::render() {
 	glViewport(0, 0, width, height);
 	glGetIntegerv(GL_VIEWPORT, viewport->data());
 
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Render Scenes
+	SceneManager::renderScenes();
 
 	// Draw the coordinate system
 	drawAxes();
 	drawGrid();
-
-	// Render Scenes
-	SceneManager::renderScenes();
 
 	#ifdef DRAW_MOUSE_RAY
 		drawRay(rayStart, rayEnd);
@@ -202,7 +202,7 @@ void Viewport::getFPS() {
 void Viewport::windowResize(const int newW, const int newH) {
 	glViewport(0, 0, width = newW, height = newH);
 	aspect = static_cast<float>(width) / static_cast<float>(height);
-	activeCamera->gluPerspective(aspect);
+	activeCamera->loadProjectionMatrix(aspect);
 }
 
 /** Centers the application's window to the middle of the screen. */
