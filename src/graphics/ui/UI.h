@@ -1,16 +1,14 @@
 #pragma once
 
-#include "UIElement.h"
-
-#include "viewport/scene/Scene.h"
-#include "../text/Text.h"
-
 #include <vector>
 #include <memory>
 
+#include "UIElement.h"
+#include "viewport/scene/Scene.h"
+#include "../text/Text.h"
+
 
 class Vector2;
-
 struct LabelNode;
 
 

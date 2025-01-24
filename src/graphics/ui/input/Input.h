@@ -1,6 +1,7 @@
 #pragma once
 
-#include <graphics/ui/UI.h>
+#include "../UI.h"
+
 
 const auto BUTTON_COLORS = std::vector{
 	Colors::BUTTON_REG_FILL,

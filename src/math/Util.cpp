@@ -1,7 +1,6 @@
 #include "Util.h"
 
 #include <graphics/ui/UIOption.h>
-#include <graphics/ui/UITab.h>
 
 #include "math/matrix/Matrix4.h"
 

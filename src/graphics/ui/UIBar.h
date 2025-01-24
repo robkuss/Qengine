@@ -1,13 +1,12 @@
 #pragma once
 
 #include "UI.h"
-#include "UITab.h"
 
 class UIBar final : public UIElement {
 public:
 	// Constructor
 	UIBar(
-		std::vector<std::shared_ptr<UITab>> tabs,
+		std::vector<std::shared_ptr<UIOptionList>> tabs,
 		const std::string& label,
 		const float x,
 		const float y,
@@ -20,7 +19,7 @@ public:
 	void setVertices() override;
 
 private:
-	std::vector<std::shared_ptr<UITab>> tabs;
+	std::vector<std::shared_ptr<UIOptionList>> tabs;
 };
 
 
