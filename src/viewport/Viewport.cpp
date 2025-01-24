@@ -55,8 +55,9 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_NORMALIZE);
-	constexpr float noLight[4] = {0.0, 0.0, 0.0, 1.0};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
+
+	//constexpr float noLight[4] = {0.0, 0.0, 0.0, 1.0};
+	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
 
 	// Other setup
 	viewport	 = std::make_shared<std::array<int, 4>>();
@@ -106,7 +107,7 @@ void Viewport::start() {
 	// Add Default Cube to Scene
 	const auto cube = std::make_shared<Cube>(
 		"Cube",
-		Vector3(0.0f, 1.0f, 0.0f),
+		Vector3(0.0f, 1.5f, 0.0f),
 		1.0f,
 		Colors::WHITE,
 		thmTexture
@@ -116,7 +117,7 @@ void Viewport::start() {
 	// Add Earth to Scene
 	const auto earth = std::make_shared<Sphere>(
 		"Earth",
-		Vector3(0.0f, -1.0f, 0.0f),
+		Vector3(0.0f, -1.5f, 0.0f),
 		0.5f,
 		64,
 		32,
@@ -134,12 +135,22 @@ void Viewport::start() {
 	background->addObject(skybox);*/
 
 
+	// Set up graphics
 	clearColor(Colors::BG_COLOR);	// Background color
-	Scene::setLight(Colors::LIGHT_SUN, Colors::LIGHT_AMBIENT, Colors::WHITE);
+
+	// Initialize lighting
+	std::array lightPos = {2.0f, 3.0f, 6.0f, 0.0f};
+	foreground->addLight(
+		std::make_shared<Light>(GL_LIGHT1, lightPos),
+		Colors::LIGHT_SUN,
+		Colors::LIGHT_AMBIENT,
+		Colors::WHITE
+	);
 
 	// Get matrices
 	activeCamera->gluPerspective(aspect); // projection matrix
 	activeCamera->gluLookAt();			  // view matrix
+
 
 	// Start rendering the Viewport
 	while (!glfwWindowShouldClose(window)) {

@@ -15,19 +15,6 @@ inline std::shared_ptr<LabelNode> cn(const std::string& label, const std::initia
 	return node;
 }
 
-inline std::shared_ptr<UIElement> UI::variantToElement(const std::shared_ptr<UIOptionVariant>& variant) {
-	std::shared_ptr<UIElement> element;
-	std::visit(
-		[&]<typename T0>(const T0& actualOption) {
-			// Create a shared_ptr<UIElement> from the extracted object
-			element = std::make_shared<std::decay_t<T0>>(actualOption);
-		},
-		*variant // Dereference the shared_ptr to access the variant
-	);
-	return element;
-}
-
-
 
 // Initialize labels for UIElements
 const auto uiStructure = std::vector{

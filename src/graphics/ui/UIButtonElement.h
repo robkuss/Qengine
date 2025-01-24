@@ -46,5 +46,5 @@ public:
 		button->setVertices();
 	}
 
-	void checkButtonPressed() const {}
+	virtual void checkButtonPressed() const {}
 };

@@ -7,7 +7,8 @@
 
 class Button final : public Input {
 public:
-	std::function<void()> onClickHandler;	// A callable object to store the click handler
+	// The function that is called when the button is clicked
+	std::function<void()> onClick;
 
 	Button(
 		const std::string& label,
@@ -22,9 +23,15 @@ public:
 
 	void render() override;
 
-	void onClick(const std::function<void()>& handler) {
-		onClickHandler = handler;
+	void click() const {
+		onClick();
 	}
+
+	bool setOnClickForButton(
+		std::shared_ptr<UIOptionList> list,
+		const std::string& label,
+		const std::function<void()>& onClickAction
+	);
 };
 
 

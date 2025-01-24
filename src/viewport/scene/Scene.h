@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "SceneManager.h"
+#include "objects/light/Light.h"
 
 
 class Color;
@@ -24,7 +25,7 @@ public:
 	void addObject(const std::shared_ptr<Object>& obj);
 	void removeObject(const std::shared_ptr<Object>& obj);
 
-	static void setLight(const Color& diffuse, const Color& ambient, const Color& specular);
+	void addLight(const std::shared_ptr<Light> &light, const Color &diffuse, const Color &ambient, const Color &specular);
 
 private:
 	// Grant Debugger and SceneManager access to sceneObjects using the best keyword in C++
@@ -32,9 +33,6 @@ private:
 	friend class SceneManager;
 
 	// Objects
-	std::vector<std::shared_ptr<Object>> sceneObjects;		// Scene Objects as shared pointers to prevent object slicing
-
-	// Lighting
-	float light1Pos[4] = {2, 3, 6, 0};
-	float light2Pos[4] = {-2, -3, -6, 0};
+	std::vector<std::shared_ptr<Object>> sceneObjects;	// Scene Objects (as shared pointers to prevent object slicing)
+	std::vector<std::shared_ptr<Light>> lights;			// Scene Lights
 };

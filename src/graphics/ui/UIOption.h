@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <iostream>
 #include <string>
 
 #include "UIButtonElement.h"
@@ -17,6 +16,12 @@ public:
 
 	void render() override {
 		button->render();
+	}
+
+	void checkButtonPressed() const override {
+		if (button->belowMouse()) {
+			if (button->onClick) button->onClick();
+		}
 	}
 };
 
@@ -40,7 +45,7 @@ public:
 		isOpen = false;
 	}
 
-	void render() override {
+	void render() override {	// NOLINT(*-no-recursion)
 		button->render();
 
 		if (!isTabRoot) {
@@ -77,7 +82,11 @@ public:
 		if (isOpen) {
 			// Render each Option in the List recursively
 			for (const auto& option : options) {
-				UI::variantToElement(option)->render();
+				if (std::holds_alternative<UIOption>(*option))
+					std::get<UIOption>(*option).render();
+
+				if (std::holds_alternative<UIOptionList>(*option))
+					std::get<UIOptionList>(*option).render();
 			}
 		}
 	}
@@ -98,6 +107,8 @@ public:
 
 			if (std::holds_alternative<UIOptionList>(*option))
 				return isMouseHere(std::get<UIOptionList>(*option));
+
+			return false;
 		});
 	}
 
@@ -106,6 +117,22 @@ public:
 			isOpen = true;
 		} else if (!isMouseInOptionList(options)) {
 			isOpen = false;
+		}
+	}
+
+	void checkButtonPressed() const override { // NOLINT(*-no-recursion)
+		if (!isOpen) return;
+
+		if (button->belowMouse()) {
+			if (button->onClick) button->onClick();
+		}
+
+		for (const auto& option : options) {
+			if (std::holds_alternative<UIOption>(*option))
+				std::get<UIOption>(*option).checkButtonPressed();
+
+			if (std::holds_alternative<UIOptionList>(*option))
+				std::get<UIOptionList>(*option).checkButtonPressed();
 		}
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <vector>
 #include <memory>
 
@@ -24,11 +25,11 @@ public:
 	void update() const;
 	void render() const override;
 
-	void checkButtonPressed();
-
 	void addElement(const std::shared_ptr<UIElement> &element, int layer);
 
-	static std::shared_ptr<UIElement> variantToElement(const std::shared_ptr<UIOptionVariant> &variant);
+	void checkButtonPressed();
+	static void setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab);
+	static bool setOnClickForButton(const std::shared_ptr<UIOptionList> &list, const std::string &label, const std::function<void()> &onClickAction);
 
 protected:
 	friend class Text;

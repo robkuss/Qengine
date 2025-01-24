@@ -31,7 +31,7 @@ UI::~UI() {
 
 
 void UI::setup() {
-	// Initialize UITab and UIOptionList lists
+	// Initialize highest-level UIOptionLists
 	auto tabs = std::vector<std::shared_ptr<UIOptionList>>();
 
 	// Iterate through labels for each UITab and create elements
@@ -48,7 +48,6 @@ void UI::setup() {
 		// Dynamically and recursively create UIOptionList from the labels
 		auto options = std::vector<std::shared_ptr<UIOptionVariant>>();
 		for (const auto& [j, label] : std::views::enumerate(labelList->children)) {
-
 			const auto optionVariant = createOptionListRecursively(
 				j,
 				label,
@@ -69,6 +68,9 @@ void UI::setup() {
 		// Add UITabs to the UI Scene
 		addElement(tab, 1);
 
+		// Initialite Button onClick() events
+		setButtonOnClickEvents(tab);
+
 		tabs.emplace_back(tab);
 	}
 
@@ -86,7 +88,14 @@ void UI::setup() {
 }
 
 // ReSharper disable once CppNotAllPathsReturnValue
-UIOptionVariant UI::createOptionListRecursively(const long long index, const std::shared_ptr<LabelNode>& label, const float x, const float y, const Dim sx, const Dim sy) { // NOLINT(*-no-recursion)
+UIOptionVariant UI::createOptionListRecursively(	 // NOLINT(*-no-recursion)
+	const long long index,
+	const std::shared_ptr<LabelNode>& label,
+	const float x,
+	const float y,
+	const Dim sx,
+	const Dim sy
+) {
 	// If the node has no children, it is a single UIOption
 	const auto newY = y + static_cast<float>(index + 1) * sy.value;
 	if (label->children.empty()) {
@@ -197,3 +206,45 @@ void UI::checkButtonPressed() {
 		}
 	}
 }
+
+
+bool UI::setOnClickForButton(	// NOLINT(*-no-recursion)
+	const std::shared_ptr<UIOptionList>& list,
+	const std::string& label,
+	const std::function<void()>& onClickAction
+) {
+	if (!list) return false;
+
+	// Check the button of the current UIOptionList
+	if (list->button && list->button->label == label) {
+		list->button->onClick = onClickAction;
+		return true;
+	}
+
+	// Check buttons in all UIOptions in the current list
+	for (const auto& innerOption : list->options) {
+		if (!innerOption) continue;
+		const auto button =
+			  std::holds_alternative<UIOption>(*innerOption)
+			? std::get<UIOption>(*innerOption).button
+			: std::get<UIOptionList>(*innerOption).button;
+
+		if (button && button->label == label) {
+			button->onClick = onClickAction;
+			return true;
+		}
+	}
+
+	// Recursively check all nested UIOptionLists
+	if (std::ranges::any_of(list->options, [&](const auto& nestedList) {
+		if (std::holds_alternative<UIOptionList>(*nestedList)) {
+			const auto nestedOptionList = std::make_shared<UIOptionList>(std::get<UIOptionList>(*nestedList));
+			return setOnClickForButton(nestedOptionList, label, onClickAction);
+		}
+		return false;
+	})) return true;
+
+	return false;	// Return false if no matching button was found
+}
+
+
