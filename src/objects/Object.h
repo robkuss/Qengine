@@ -12,10 +12,10 @@ class Object {
 public:
 	std::string name;
 
-	Vector3 position = Vector3::ZERO;
-	Vector3 scale	 = Vector3::ONE;
-	Vector3 rotation = Vector3::ZERO;
-	Vector3 rotationEuler = Vector3::ZERO;	// Euler Angles for debug output
+	Vector3 position		= Vector3::ZERO;
+	Vector3 scale			= Vector3::ONE;
+	Vector3 rotation		= Vector3::ZERO;
+	Vector3 rotationEuler	= Vector3::ZERO;	// Euler angles for debug output
 
 	// Constructor & Destructor
 	explicit Object(std::string name) : name(std::move(name)), id(nextID++) {}
@@ -33,12 +33,4 @@ private:
 // Initialize Object ID
 inline int Object::nextID = 0;
 
-inline void Object::applyTransformation(const Mode &selectionMode, const Mode &transformMode, const Matrix4 &transformation) {
-	// Update Object transformation TODO
-	/*switch (transformMode.mode) {
-		case Mode::GRAB:   position = vector3(transformation * vector4(position, 1.0f)); break;
-		case Mode::SCALE:  scale	= vector3(transformation * vector4(scale, 1.0f));	 break;
-		case Mode::ROTATE: rotation = vector3(transformation * vector4(rotation, 0.0f)); break;
-		default: throw std::invalid_argument("Invalid transformation: Wrong Mode");
-	}*/
-}
+inline void Object::applyTransformation(const Mode &selectionMode, const Mode &transformMode, const Matrix4 &transformation) {}

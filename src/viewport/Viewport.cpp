@@ -85,9 +85,9 @@ void Viewport::start() {
 	SceneManager::mouseRay		= mouseRay;
 
 	// Create Scenes
-	const auto foreground = std::make_shared<Scene>();
-	const auto background = std::make_shared<Scene>();
-	const auto ui = std::make_shared<UI>(&SceneManager::viewport->at(2), &SceneManager::viewport->at(3));
+	const auto foreground = std::make_shared<Scene>("Foreground");
+	const auto background = std::make_shared<Scene>("Background");
+	const auto ui = std::make_shared<UI>("UI", &SceneManager::viewport->at(2), &SceneManager::viewport->at(3));
 
 	// Add Scenes to the SceneManager
 	SceneManager::addScene(foreground);
@@ -102,11 +102,11 @@ void Viewport::start() {
 	const auto noTexture	 = std::shared_ptr<Texture>{};
 	const auto& thmTexture	 = std::make_shared<Texture>("../resources/textures/thm2k.png");
 	const auto& earthTexture = std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
-	const auto& starsTexture = noTexture; //std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
+	const auto& starsTexture = std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
 
 	// Add Default Cube to Scene
 	const auto cube = std::make_shared<Cube>(
-		"Cube",
+		"THM Cube",
 		Vector3(0.0f, 1.5f, 0.0f),
 		1.0f,
 		Colors::WHITE,
@@ -117,8 +117,8 @@ void Viewport::start() {
 	// Add Earth to Scene
 	const auto earth = std::make_shared<Sphere>(
 		"Earth",
-		Vector3(0.0f, -1.5f, 0.0f),
-		0.5f,
+		Vector3(0.0f, -2.0f, 0.0f),
+		1.0f,
 		64,
 		32,
 		Colors::WHITE,
@@ -126,13 +126,16 @@ void Viewport::start() {
 	);
 	foreground->addObject(earth);
 
-	/*const auto skybox = std::make_shared<Skybox>(
+	const auto skybox = std::make_shared<Skybox>(
 		"Skybox",
 		Colors::WHITE,
 		starsTexture
 	);
-	skybox->applyTransformation(OBJECT, SCALE, Matrix4::scale(Vector3(5.0f, 5.0f, 5.0f)));
-	background->addObject(skybox);*/
+	skybox->applyTransformation(OBJECT, SCALE, Matrix4::scale(Vector3(10000.0f, 10000.0f, 10000.0f)));
+	background->addObject(skybox);
+
+	background->enableDepthIsolation();
+	background->enableFixedPosition();
 
 
 	// Set up graphics
@@ -141,7 +144,7 @@ void Viewport::start() {
 	// Initialize lighting
 	std::array lightPos = {2.0f, 3.0f, 6.0f, 0.0f};
 	foreground->addLight(
-		std::make_shared<Light>(GL_LIGHT1, lightPos),
+		std::make_shared<Light>("Sun", GL_LIGHT1, lightPos),
 		Colors::LIGHT_SUN,
 		Colors::LIGHT_AMBIENT,
 		Colors::WHITE
@@ -149,7 +152,7 @@ void Viewport::start() {
 
 	// Get matrices
 	activeCamera->gluPerspective(aspect); // projection matrix
-	activeCamera->gluLookAt();			  // view matrix
+	activeCamera->lookAt();			  // view matrix
 
 
 	// Start rendering the Viewport
@@ -216,8 +219,6 @@ void Viewport::setMouseRay(const Vector2& mousePos) const {
 	const auto directionScaled = mouseRay->direction * MOUSE_RAY_LENGTH;
 	rayStart = mouseRay->origin = activeCamera->camPos;
 	rayEnd   = mouseRay->origin + directionScaled;
-
-	// sceneManager->mouseRay = mouseRay; // shouldn't be necessary anymore since it's a pointer now
 }
 
 

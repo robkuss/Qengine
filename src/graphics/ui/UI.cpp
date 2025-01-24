@@ -17,7 +17,7 @@ float UI::firstLineY;
 float UI::bottomLineY;
 
 
-UI::UI(int* w, int* h) : Scene() {
+UI::UI(const std::string& name, int* w, int* h) : Scene(name) {
 	width = w;
 	height = h;
 
@@ -203,7 +203,7 @@ void UI::render() {
 
 void UI::renderSceneManager() {
 	constexpr auto smWidth = 400.0f;
-	const auto x=	static_cast<float>(*width) - smWidth;
+	const auto x  =	static_cast<float>(*width) - smWidth;
 	const auto y	  = static_cast<float>(boundTop);
 	constexpr auto sx = Dim(smWidth, DimType::Pixels);
 	constexpr auto sy = PC_100;
@@ -239,13 +239,7 @@ void UI::renderSceneManager() {
 		glBegin(GL_POINTS);
 		glVertex2f(xLine, yLine);
 		glEnd();
-		std::string sceneName;
-		switch (i) {
-			case 0:  sceneName = "Foreground"; break;
-			case 1:  sceneName = "Background"; break;
-			default: sceneName = "UI"; break;
-		}
-		Text::renderText(sceneName, TextMode::LEFT, xLine + 0.6f * unit, yLine + 0.2f * unit, 24, Colors::TEXT_COLOR);
+		Text::renderText(scene->name, TextMode::LEFT, xLine + 0.6f * unit, yLine + 0.2f * unit, 24, Colors::TEXT_COLOR);
 		yLine += unit;
 		for (const auto& object : scene->sceneObjects) {
 			glPointSize(5.0f);
@@ -254,6 +248,15 @@ void UI::renderSceneManager() {
 			glVertex2f(xLine + unit, yLine);
 			glEnd();
 			Text::renderText(object->name, TextMode::LEFT, xLine + 1.6f * unit, yLine + 0.2f * unit, 24, Colors::TEXT_COLOR);
+			yLine += unit;
+		}
+		for (const auto& light : scene->lights) {
+			glPointSize(5.0f);
+			color3f(Colors::TEXT_COLOR);
+			glBegin(GL_POINTS);
+			glVertex2f(xLine + unit, yLine);
+			glEnd();
+			Text::renderText(light->name, TextMode::LEFT, xLine + 1.6f * unit, yLine + 0.2f * unit, 24, Colors::TEXT_COLOR);
 			yLine += unit;
 		}
 		i++;

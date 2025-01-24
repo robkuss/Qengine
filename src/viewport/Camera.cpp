@@ -9,11 +9,11 @@
 
 
 Camera::Camera()
-	: camPos(CAMERA_POSITION_INIT), lookAt(LOOK_AT_POINT_INIT), up(UP_VECTOR_INIT) {
+	: camPos(CAMERA_POSITION_INIT), center(LOOK_AT_POINT_INIT), up(UP_VECTOR_INIT) {
 }
 
-Camera::Camera(const Vector3& camPos, const Vector3& lookAt, const Vector3& up)
-	: camPos(camPos), lookAt(lookAt), up(up) {
+Camera::Camera(const Vector3& camPos, const Vector3& center, const Vector3& up)
+	: camPos(camPos), center(center), up(up) {
 }
 
 Camera::~Camera() = default;
@@ -25,6 +25,7 @@ Camera::~Camera() = default;
  */
 void Camera::gluPerspective(const float aspect) {
 	glMatrixMode(GL_PROJECTION);	// Subsequent matrix operations will affect the projection matrix
+	glLoadIdentity();
 
 	const auto fh = static_cast<float>(tan(radians(FOV_Y)) / 2 * Z_NEAR);	// Height of the Near Clipping Plane
 	const auto fw = fh * aspect;											//  Width of the Near Clipping Plane
@@ -38,7 +39,6 @@ void Camera::gluPerspective(const float aspect) {
 		0.0f,        0.0f,		  -(2.0f * Z_FAR * Z_NEAR) / dz,  0.0f
 	};
 
-	glLoadIdentity();
 	glMultMatrixf(projMatrix.data());
 }
 
@@ -46,10 +46,11 @@ void Camera::gluPerspective(const float aspect) {
  * Defines a viewing transformation by specifying an eye point, a reference point indicating.
  * the center of the scene, and an up vector.
  */
-void Camera::gluLookAt() {
+void Camera::lookAt() {
 	glMatrixMode(GL_MODELVIEW);      // Subsequent matrix operations will affect the modelview matrix
+	glLoadIdentity();
 
-	const Vector3 forward = (lookAt - camPos).normalize();	// Calculate the forward vector (direction from eye to center)
+	const Vector3 forward = (center - camPos).normalize();	// Calculate the forward vector (direction from eye to center)
 	const Vector3 side = forward.cross(up).normalize();		// Calculate the side vector (perpendicular to both forward and up vectors)
 	const Vector3 zUp = side.cross(forward);				// Recalculate the actual up vector to ensure orthogonality
 
@@ -61,44 +62,32 @@ void Camera::gluLookAt() {
 		-side.dot(camPos), -zUp.dot(camPos), forward.dot(camPos), 1.0f
 	};
 
-	glLoadIdentity();
 	glMultMatrixf(viewMatrix.data());
 }
 
-/*void Camera::loadViewMatrix() const {
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+void Camera::fixedLookAt() {
+	glMatrixMode(GL_MODELVIEW); // Set the matrix mode to modelview
+	glLoadIdentity();           // Reset the current modelview matrix
 
-	const Matrix4 translation = Matrix4::translate(Vector3(0, 0, -camDist));
-	float translationF[16];
-	translation.toColumnMajor(translationF);
-	glMultMatrixf(translationF);
+	// Calculate the forward vector (camera's local negative Z-axis)
+	const Vector3 forward = (center - camPos).normalize();
 
-	const Matrix4 pitchRotation = Matrix4::rotateX(static_cast<float>(radians(-rotH)));
-	float pitchRotationF[16];
-	pitchRotation.toColumnMajor(pitchRotationF);
-	glMultMatrixf(pitchRotationF);
+	// Calculate the side vector (perpendicular to the forward and up vectors)
+	const Vector3 side = forward.cross(up).normalize();
 
-	const Matrix4 yawRotation = Matrix4::rotateY(static_cast<float>(radians(-rotV)));
-	float yawRotationF[16];
-	yawRotation.toColumnMajor(yawRotationF);
-	glMultMatrixf(yawRotationF);
+	// Recalculate the actual up vector to ensure orthogonality
+	const Vector3 zUp = side.cross(forward);
+
+	// Create the fixed view matrix without applying camera position translation
+	viewMatrix = {
+		side.x,   zUp.x,   -forward.x,   0.0f,
+		side.y,   zUp.y,   -forward.y,   0.0f,
+		side.z,   zUp.z,   -forward.z,   0.0f,
+		0.0f,     0.0f,    0.0f,         1.0f // No translation, fixed view
+	};
+
+	glMultMatrixf(viewMatrix.data());
 }
-
-void Camera::loadFixedViewMatrix() const {
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	const Matrix4 pitchRotation = Matrix4::rotateX(static_cast<float>(radians(-rotH)));
-	float pitchRotationF[16];
-	pitchRotation.toColumnMajor(pitchRotationF);
-	glMultMatrixf(pitchRotationF);
-
-	const Matrix4 yawRotation = Matrix4::rotateY(static_cast<float>(radians(-rotV)));
-	float yawRotationF[16];
-	yawRotation.toColumnMajor(yawRotationF);
-	glMultMatrixf(yawRotationF);
-}*/
 
 /** Update camera position based on spherical coordinates. */
 void Camera::updatePosition() {
@@ -116,7 +105,7 @@ void Camera::updatePosition() {
 		camDist * sinV
 	);
 
-	gluLookAt();
+	lookAt();
 }
 
 void Camera::initRotation(const bool isRotating, const double mouseX, const double mouseY) {

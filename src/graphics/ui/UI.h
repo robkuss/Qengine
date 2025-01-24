@@ -18,14 +18,14 @@ public:
 	static int *width, *height;
 
 	// Constructor & Destructor
-	UI(int *w, int *h);
+	UI(const std::string &name, int *w, int *h);
 	~UI() override;
 
 	void setup();
 	void update() const;
 
 	void render() override;
-	void renderSceneManager();
+	static void renderSceneManager();
 
 	void addElement(const std::shared_ptr<UIElement> &element, int layer);
 

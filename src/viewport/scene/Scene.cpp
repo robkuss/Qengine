@@ -20,6 +20,12 @@ void Scene::removeObject(const std::shared_ptr<Object>& obj) {
 
 
 void Scene::render() {
+	if (fixedPosition) {
+		SceneManager::activeCamera->fixedLookAt();
+	} else {
+		SceneManager::activeCamera->lookAt();
+	}
+
 	// Enable lighting
 	glEnable(GL_LIGHTING);
 
@@ -45,6 +51,10 @@ void Scene::render() {
 	for (const auto& mesh : sceneMeshes) {
 		MeshRenderer::renderSilhouette(*mesh, selectionMode, camPos, SceneManager::isMeshSelected(mesh));
 	}
+
+	if (depthIsolation) {
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
 }
 
 void Scene::addLight(
@@ -59,8 +69,6 @@ void Scene::addLight(
 		return;
 	}
 
-	lights.emplace_back(light);
-
 	constexpr float noLight[4] = {0, 0, 0, 1};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
 
@@ -71,4 +79,14 @@ void Scene::addLight(
 	glLightfv(light->macro, GL_DIFFUSE, diffuseF);
 	glLightfv(light->macro, GL_AMBIENT, ambientF);
 	glLightfv(light->macro, GL_SPECULAR, specularF);
+
+	lights.emplace_back(light);
+}
+
+void Scene::enableDepthIsolation() {
+	depthIsolation = true;
+}
+
+void Scene::enableFixedPosition() {
+	fixedPosition = true;
 }

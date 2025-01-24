@@ -20,14 +20,14 @@ constexpr float ZOOM_SENSITIVITY		= 2.0f;
 class Camera {
 public:
 	Camera();
-	Camera(const Vector3 &camPos, const Vector3 &lookAt, const Vector3 &up);
+	Camera(const Vector3 &camPos, const Vector3 &center, const Vector3 &up);
 	~Camera();
 
 	std::array<GLfloat, 16> viewMatrix{};
 	std::array<GLfloat, 16> projMatrix{};
 
 	Vector3 camPos		= CAMERA_POSITION_INIT;
-	Vector3 lookAt		= LOOK_AT_POINT_INIT;
+	Vector3 center		= LOOK_AT_POINT_INIT;
 	Vector3 up			= UP_VECTOR_INIT;
 	float camDist		= CAMERA_DISTANCE_INIT;
 
@@ -36,10 +36,8 @@ public:
 	double rotV			= 0.0;
 
 	void gluPerspective(float aspect);
-	void gluLookAt();
-	/*static void loadProjectionMatrix(double aspect) ;
-	void loadViewMatrix() const;
-	void loadFixedViewMatrix() const;*/
+	void lookAt();
+	void fixedLookAt();
 
 	void updatePosition();
 	void initRotation(bool isRotating, double mouseX, double mouseY);

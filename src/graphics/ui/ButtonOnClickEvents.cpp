@@ -15,7 +15,7 @@ void UI::setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
 	setOnClickForButton(tab, "Cube", [] {
 		SceneManager::scenes[0]->addObject(
 			std::make_shared<Cube>(
-				"Demo Cube",
+				"Cube",
 				Vector3(0.0f, 0.0f, 0.0f),
 				1.0f,
 				Colors::WHITE,
@@ -27,7 +27,7 @@ void UI::setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
 	setOnClickForButton(tab, "Sphere", [] {
 		SceneManager::scenes[0]->addObject(
 			std::make_shared<Sphere>(
-				"Demo Sphere",
+				"Sphere",
 				Vector3(0.0f, 0.0f, 0.0f),
 				0.5f,
 				64,
@@ -46,6 +46,7 @@ void UI::setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
 		std::array lightPos = {-2.0f, -3.0f, -6.0f, 0.0f};
 		SceneManager::scenes[0]->addLight(
 			std::make_shared<Sun>(
+				"Sun",
 				GL_LIGHT2,
 				lightPos
 			),
