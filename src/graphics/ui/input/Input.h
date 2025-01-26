@@ -33,9 +33,9 @@ public:
 		if (!activated) return false;
 		// >= and < to avoid selecting two neighbors at the same time
 		return *SceneManager::mouseX >= x
-			&& *SceneManager::mouseX < x + sx.value
+			&& *SceneManager::mouseX <  x + sx.value
 			&& *SceneManager::mouseY >= y
-			&& *SceneManager::mouseY < y + sy.value;
+			&& *SceneManager::mouseY <  y + sy.value;
 	}
 
 	void render() override;

@@ -91,7 +91,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 }
 
 /** Key callbacks */
-void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) const {
+void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int scancode, const int action, const int mods) {
 	if (action != GLFW_PRESS) return;
 
 	switch (key) {
@@ -116,6 +116,8 @@ void Viewport::onKeyboardInput(GLFWwindow *cbWindow, const int key, const int sc
 		case GLFW_KEY_E: SceneManager::setTransformMode(EXTRUDE); break;				// E -> Extrude
 		case GLFW_KEY_F: SceneManager::setTransformMode(FILL); break;					// F -> Fill
 		case GLFW_KEY_M: SceneManager::setTransformMode(MERGE); break;					// M -> Merge
+
+		case GLFW_KEY_C: drawCoordinateSystem = !drawCoordinateSystem; break;			// C -> Toggle coordinate system visibility
 
 		// Set Transform SubMode
 		case GLFW_KEY_X || GLFW_KEY_Y || GLFW_KEY_Z: {

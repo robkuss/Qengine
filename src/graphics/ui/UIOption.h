@@ -11,7 +11,10 @@ class UIOption final : public UIButtonElement {
 public:
 	explicit UIOption(
 		const std::string& label,
-		const float x, const float y, const Dim sx, const Dim sy
+		const float x,
+		const float y,
+		const Dim sx,
+		const Dim sy
 	) :   UIButtonElement(label, x, y, sx, sy) {}
 
 	void render() override {
@@ -37,7 +40,10 @@ public:
 		const std::string& label,
 		const bool isTabRoot,
 		const std::vector<std::shared_ptr<UIOptionVariant>>& options,
-		const float x, const float y, const Dim sx, const Dim sy
+		const float x,
+		const float y,
+		const Dim sx,
+		const Dim sy
 	) :   UIButtonElement(label, x, y, sx, sy),
 		  options(options),
 		  isTabRoot(isTabRoot) {

@@ -15,7 +15,12 @@ const Color debugTextColor		= Colors::TEXT_COLOR;
 class Debug {
 public:
 	static void drawDebugText() {
-		const auto& foreground = SceneManager::scenes[0];
+		std::shared_ptr<Scene> foreground;
+		for (const auto& scene : SceneManager::scenes) {
+			if (scene->name == "Foreground") foreground = scene;
+		}
+		if (!foreground) std::cerr << "Foreground Scene not found" << std::endl;
+
 		const auto camera = SceneManager::activeCamera;
 		const auto cube = foreground->sceneObjects[0];
 		const auto mouseWorld = SceneManager::mouseWorld();

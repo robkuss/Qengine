@@ -16,7 +16,7 @@ public:
 		const float y,
 		const Dim sx,
 		const Dim sy
-	) :   UIElement(label, x, y, sx, sy) {
+	) : UIElement(label, x, y, sx, sy) {
 
 		// Make the associated Button
 		button = std::make_shared<Button>(

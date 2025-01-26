@@ -92,17 +92,16 @@ void Viewport::start() {
 	// Add Scenes to the SceneManager
 	SceneManager::addScene(background);
 	SceneManager::addScene(foreground);
-	SceneManager::addScene(ui);
 
 	// Set up UI afterwards
 	SceneManager::ui = ui;
 	ui->setup();
 
 	// Load Textures
-	const auto noTexture	 = std::shared_ptr<Texture>{};
-	const auto& thmTexture	 = std::make_shared<Texture>("../resources/textures/thm2k.png");
-	const auto& earthTexture = std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
-	const auto& starsTexture = std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
+	const auto noTexture	= std::shared_ptr<Texture>{};
+	const auto thmTexture	= std::make_shared<Texture>("../resources/textures/thm2k.png");
+	const auto earthTexture = std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
+	const auto starsTexture = std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
 
 	// Add Default Cube to Scene
 	const auto cube = std::make_shared<Cube>(
@@ -150,8 +149,8 @@ void Viewport::start() {
 	);
 
 	// Get matrices
-	activeCamera->loadProjectionMatrix(aspect); // projection matrix
-	activeCamera->loadViewMatrix();			    // view matrix
+	activeCamera->loadProjectionMatrix(aspect);
+	activeCamera->loadViewMatrix();
 
 
 	// Start rendering the Viewport
@@ -171,15 +170,16 @@ void Viewport::render() {
 	glViewport(0, 0, width, height);
 	glGetIntegerv(GL_VIEWPORT, viewport->data());
 
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Render Scenes
 	SceneManager::renderScenes();
 
 	// Draw the coordinate system
-	drawAxes();
-	drawGrid();
+	if (drawCoordinateSystem) {
+		drawAxes();
+		drawGrid();
+	}
 
 	#ifdef DRAW_MOUSE_RAY
 		drawRay(rayStart, rayEnd);

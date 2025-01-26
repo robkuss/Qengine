@@ -5,7 +5,7 @@
 #include "UIBar.h"
 #include "UIOption.h"
 #include "Label.h"
-#include "UIWindow.h"
+#include "UISceneManager.h"
 #include "../text/Debug.h"
 
 
@@ -175,11 +175,22 @@ void UI::render() {
 	glPushMatrix();
 	glLoadIdentity();
 
+
 	// Render text
 	#ifdef DEBUG
 		Debug::drawDebugText();
 	#endif
 	Text::drawErrorText(*height);
+
+
+	// Render SceneManager
+	constexpr auto smWidth = 400.0f;
+	const auto x  =	static_cast<float>(*width) - smWidth;
+	const auto y	  = static_cast<float>(boundTop);
+	constexpr auto sx = Dim(smWidth, DimType::Pixels);
+	constexpr auto sy = PC_100;
+	UISceneManager("Scene Manager", x, y, sx, sy).render();
+
 
 	// Render elements
 	for (const auto &elementsOnLayer: layers | std::views::values) {
@@ -188,8 +199,6 @@ void UI::render() {
 		}
 	}
 
-	// Render SceneManager
-	renderSceneManager();
 
 	// Restore matrices
 	glPopMatrix();
@@ -201,69 +210,6 @@ void UI::render() {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void UI::renderSceneManager() {
-	constexpr auto smWidth = 400.0f;
-	const auto x  =	static_cast<float>(*width) - smWidth;
-	const auto y	  = static_cast<float>(boundTop);
-	constexpr auto sx = Dim(smWidth, DimType::Pixels);
-	constexpr auto sy = PC_100;
-
-	const auto window = std::make_shared<UIWindow>(
-		"Scene Manager",
-		x, y, sx, sy
-	);
-	window->render();
-
-	glLineWidth(1.0f);
-	color3f(Colors::UI_OUTLINE_COLOR);
-	glBegin(GL_LINES);
-	glVertex2f(x, y + 1.65f * unit);
-	glVertex2f(x + sx.value, y + 1.65f * unit);
-	glEnd();
-
-	Text::renderText(
-		"Scene Manager",
-		TextMode::LEFT,
-		x + 2.5f * unit,
-		static_cast<float>(boundTop) + unit,
-		24,
-		Colors::TEXT_COLOR
-	);
-
-	const float xLine = x + unit;
-	float yLine = y + 2.7f * unit;
-	int i = 0;
-	for (const auto& scene : SceneManager::scenes) {
-		glPointSize(5.0f);
-		color3f(Colors::TEXT_COLOR);
-		glBegin(GL_POINTS);
-		glVertex2f(xLine, yLine);
-		glEnd();
-		Text::renderText(scene->name, TextMode::LEFT, xLine + 0.6f * unit, yLine + 0.2f * unit, 24, Colors::TEXT_COLOR);
-		yLine += unit;
-		for (const auto& object : scene->sceneObjects) {
-			glPointSize(5.0f);
-			color3f(Colors::TEXT_COLOR);
-			glBegin(GL_POINTS);
-			glVertex2f(xLine + unit, yLine);
-			glEnd();
-			Text::renderText(object->name, TextMode::LEFT, xLine + 1.6f * unit, yLine + 0.2f * unit, 24, Colors::TEXT_COLOR);
-			yLine += unit;
-		}
-		for (const auto& light : scene->lights) {
-			glPointSize(5.0f);
-			color3f(Colors::TEXT_COLOR);
-			glBegin(GL_POINTS);
-			glVertex2f(xLine + unit, yLine);
-			glEnd();
-			Text::renderText(light->name, TextMode::LEFT, xLine + 1.6f * unit, yLine + 0.2f * unit, 24, Colors::TEXT_COLOR);
-			yLine += unit;
-		}
-		i++;
-	}
-}
-
-
 
 void UI::checkButtonPressed() {
 	for (const auto &elementsOnLayer: layers | std::views::values) {
@@ -274,45 +220,3 @@ void UI::checkButtonPressed() {
 		}
 	}
 }
-
-
-bool UI::setOnClickForButton(	// NOLINT(*-no-recursion)
-	const std::shared_ptr<UIOptionList>& list,
-	const std::string& label,
-	const std::function<void()>& onClickAction
-) {
-	if (!list) return false;
-
-	// Check the button of the current UIOptionList
-	if (list->button && list->button->label == label) {
-		list->button->onClick = onClickAction;
-		return true;
-	}
-
-	// Check buttons in all UIOptions in the current list
-	for (const auto& innerOption : list->options) {
-		if (!innerOption) continue;
-		const auto button =
-			  std::holds_alternative<UIOption>(*innerOption)
-			? std::get<UIOption>(*innerOption).button
-			: std::get<UIOptionList>(*innerOption).button;
-
-		if (button && button->label == label) {
-			button->onClick = onClickAction;
-			return true;
-		}
-	}
-
-	// Recursively check all nested UIOptionLists
-	if (std::ranges::any_of(list->options, [&](const auto& nestedList) {
-		if (std::holds_alternative<UIOptionList>(*nestedList)) {
-			const auto nestedOptionList = std::make_shared<UIOptionList>(std::get<UIOptionList>(*nestedList));
-			return setOnClickForButton(nestedOptionList, label, onClickAction);
-		}
-		return false;
-	})) return true;
-
-	return false;	// Return false if no matching button was found
-}
-
-

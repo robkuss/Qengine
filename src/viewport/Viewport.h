@@ -37,7 +37,7 @@ public:
 	void render();
 
 	void setCallbacks(GLFWwindow* window);
-	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods) const;
+	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
 
 private:
 	std::shared_ptr<std::array<int, 4>> viewport;
@@ -57,6 +57,8 @@ private:
 	mutable Vector3 rayStart = Vector3::MINUS_ONE;
 	mutable Vector3 rayEnd   = Vector3::ONE;
 	std::shared_ptr<Ray> mouseRay;
+
+	bool drawCoordinateSystem = true;
 
 	// Functions
 	void centerWindow() const;

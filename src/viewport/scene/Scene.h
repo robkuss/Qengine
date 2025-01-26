@@ -38,6 +38,7 @@ private:
 	friend class UI;
 	friend class Debug;
 	friend class SceneManager;
+	friend class UISceneManager;
 
 	// Objects
 	std::vector<std::shared_ptr<Object>> sceneObjects;	// Scene Objects (as shared pointers to prevent object slicing)

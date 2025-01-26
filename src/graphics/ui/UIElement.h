@@ -4,6 +4,8 @@
 #include <variant>
 #include <vector>
 
+#include "math/vector/Vector2.h"
+
 
 #define PC_100 (Dim(1.0f, DimType::Percent))		// 100%
 #define PC_50  (Dim(0.5f, DimType::Percent))		// 50%
@@ -23,8 +25,6 @@ constexpr float tabAugment		= 2 * tabPadding;	// For crossing the gap between Ta
 
 constexpr int uiFontSize		= unit / 2;
 
-
-class Vector2;
 
 class UIOption;
 class UIOptionList;
