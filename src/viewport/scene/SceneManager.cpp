@@ -245,10 +245,40 @@ void SceneManager::deselectAllVertices() {
 }
 
 void SceneManager::selectObject(const std::shared_ptr<Object>& obj) {
+	// Check if the object is already selected
 	if (std::ranges::find(selectedObjects, obj) == selectedObjects.end()) {
+		// Add the object to selectedObjects and stop searching
 		selectedObjects.emplace_back(obj);
 	} else {
+		// If the object is already selected, deselect it
 		deselectObject(obj);
+	}
+}
+
+void SceneManager::selectObject(const std::string& label) {
+	std::cout << "WORKS" << std::endl;
+
+	// Check if the object is already selected
+	const auto it = std::ranges::find_if(selectedObjects, [&label](const auto& obj) {
+		return obj->name == label;
+	});
+
+	if (it == selectedObjects.end()) {
+		// If not already selected, search through all scenes for the object with the given label
+		for (const auto& scene : scenes) {
+			auto objIt = std::ranges::find_if(scene->sceneObjects, [&label](const auto& obj) {
+				return obj->name == label;
+			});
+
+			if (objIt != scene->sceneObjects.end()) {
+				// Add the object to selectedObjects and stop searching
+				selectedObjects.emplace_back(*objIt);
+				return;
+			}
+		}
+	} else {
+		// If the object is already selected, deselect it
+		deselectObject(*it);
 	}
 }
 

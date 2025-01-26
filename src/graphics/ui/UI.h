@@ -1,5 +1,6 @@
 #pragma once
 
+#include <complex>
 #include <functional>
 #include <vector>
 #include <memory>
@@ -8,7 +9,7 @@
 #include "viewport/scene/Scene.h"
 #include "../text/Text.h"
 
-
+class UIBulletPoint;
 class Vector2;
 struct LabelNode;
 
@@ -29,8 +30,11 @@ public:
 	void addElement(const std::shared_ptr<UIElement> &element, int layer);
 
 	void checkButtonPressed();
-	static void setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab);
-	static bool setOnClickForButton(const std::shared_ptr<UIOptionList> &list, const std::string &label, const std::function<void()> &onClickAction);
+
+	static void setBulletPointButtonOnClickEvents();
+	static void setOptionButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab);
+	static void setOnClickForBulletPointButton(const std::shared_ptr<UIBulletPoint> &bulletPoint, const std::function<void()> &onClickAction);
+	static bool setOnClickForOptionButton(const std::shared_ptr<UIOptionList> &list, const std::string &label, const std::function<void()> &onClickAction);
 
 protected:
 	friend class Text;
@@ -48,7 +52,7 @@ private:
 	std::map<int, std::vector<std::shared_ptr<UIElement>>> layers;
 	std::vector<const Vector2*> vertexPointers;
 
-	//std::shared_ptr<UISceneManager> uiSceneManager;
+	std::shared_ptr<UISceneManager> uiSceneManager;
 
 	static UIOptionVariant createOptionListRecursively(long long index, const std::shared_ptr<LabelNode> &label, float x, float y, Dim sx, Dim sy);
 };

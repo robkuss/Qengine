@@ -2,10 +2,12 @@
 
 #include <ranges>
 
+#include "Labels.h"
+
 #include "UIBar.h"
 #include "UIOption.h"
-#include "Label.h"
 #include "UISceneManager.h"
+
 #include "../text/Debug.h"
 
 
@@ -70,7 +72,7 @@ void UI::setup() {
 		addElement(tab, 1);
 
 		// Initialite Button onClick() events
-		setButtonOnClickEvents(tab);
+		setOptionButtonOnClickEvents(tab);
 
 		tabs.emplace_back(tab);
 	}
@@ -79,7 +81,8 @@ void UI::setup() {
 	const auto bar = std::make_shared<UIBar>(
 		tabs,
 		"UIBar",
-		0.0f, 0.0f, PC_100, UNIT
+		PC_100,
+		UNIT
 	);
 
 	// Add UIBar to the UI Scene
@@ -140,11 +143,11 @@ void UI::addElement(const std::shared_ptr<UIElement>& element, const int layer) 
 }
 
 void UI::update() const {
-	for (const auto &elementsOnLayer: layers | std::views::values) {
+	/*for (const auto &elementsOnLayer: layers | std::views::values) {
 		for (const auto& element : elementsOnLayer) {
 			element->setVertices();
 		}
-	}
+	}*/
 
 	for (const auto& vertex : vertexPointers) {
 		// Check if the vertex coordinates (x and y) confine the bounds more
@@ -189,13 +192,14 @@ void UI::render() {
 	const auto y	  = static_cast<float>(boundTop);
 	constexpr auto sx = Dim(smWidth, DimType::Pixels);
 	constexpr auto sy = PC_100;
-	UISceneManager("Scene Manager", x, y, sx, sy).render();
+	uiSceneManager = std::make_shared<UISceneManager>("Scene Manager", sx, sy);
+	uiSceneManager->render(x, y);
 
 
 	// Render elements
 	for (const auto &elementsOnLayer: layers | std::views::values) {
 		for (const auto& element : elementsOnLayer) {
-			element->render();
+			element->render(0.0f, 0.0f);
 		}
 	}
 

@@ -15,10 +15,14 @@ public:
 		const float y,
 		const Dim sx,
 		const Dim sy
-	) :   UIButtonElement(label, x, y, sx, sy) {}
+	) :   UIButtonElement(label, sx, sy) {
 
-	void render() override {
-		button->render();
+		this->x = x;
+		this->y = y;
+	}
+
+	void render(const float xpos, const float ypos) override {
+		button->render(xpos, ypos);
 	}
 
 	void checkButtonPressed() const override {
@@ -44,23 +48,26 @@ public:
 		const float y,
 		const Dim sx,
 		const Dim sy
-	) :   UIButtonElement(label, x, y, sx, sy),
+	) :   UIButtonElement(label, sx, sy),
 		  options(options),
 		  isTabRoot(isTabRoot) {
+
+		this->x = x;
+		this->y = y;
 
 		isOpen = false;
 	}
 
-	void render() override {	// NOLINT(*-no-recursion)
-		button->render();
+	void render(const float xpos, const float ypos) override {	// NOLINT(*-no-recursion)
+		button->render(x + xpos, y + ypos);
 
 		if (!isTabRoot) {
 			// Draw an arrow to the right to signify Option List
 			glBegin(GL_TRIANGLES);
 			color3f(Colors::UI_ARROW_COLOR);
-			glVertex2f(x + sx.value - 25.0f, y + sy.value - 10.0f);
-			glVertex2f(x + sx.value - 25.0f, y + 10.0f);
-			glVertex2f(x + sx.value - 10.0f, y + sy.value / 2.0f);
+			glVertex2f(x + xpos + sx.value - 25.0f, y + ypos + sy.value - 10.0f);
+			glVertex2f(x + xpos + sx.value - 25.0f, y + ypos + 10.0f);
+			glVertex2f(x + xpos + sx.value - 10.0f, y + ypos + sy.value / 2.0f);
 			glEnd();
 		}
 
@@ -88,11 +95,13 @@ public:
 		if (isOpen) {
 			// Render each Option in the List recursively
 			for (const auto& option : options) {
-				if (std::holds_alternative<UIOption>(*option))
-					std::get<UIOption>(*option).render();
+				if (std::holds_alternative<UIOption>(*option)) {
+					auto isOption = std::get<UIOption>(*option);
+					isOption.render(isOption.x + xpos, isOption.y + ypos);
+				}
 
 				if (std::holds_alternative<UIOptionList>(*option))
-					std::get<UIOptionList>(*option).render();
+					std::get<UIOptionList>(*option).render(xpos, ypos);
 			}
 		}
 	}
@@ -143,5 +152,5 @@ public:
 	}
 
 private:
-	int changeSize = 0;
+	int changeSize = 0;		// Increases sy slightly to allow for mouse transition between UIBar and UIOptionList
 };

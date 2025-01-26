@@ -12,11 +12,9 @@ public:
 
 	UIButtonElement(
 		const std::string& label,
-		const float x,
-		const float y,
 		const Dim sx,
 		const Dim sy
-	) : UIElement(label, x, y, sx, sy) {
+	) : UIElement(label, sx, sy) {
 
 		// Make the associated Button
 		button = std::make_shared<Button>(
@@ -24,26 +22,32 @@ public:
 			uiFontSize,
 			TextMode::LEFT,
 			BUTTON_COLORS,
-			x, y, sx, sy
+			sx,
+			sy
 		);
 
-		button->vertices.resize(vertexCount);
-		button->setVertices();
 		button->setActivated(true);
 	}
 
-	void render() override {
-		button->render();
+	UIButtonElement(
+		const std::string& label,
+		const Dim sx,
+		const Dim sy,
+		const std::shared_ptr<Button>& button
+	) : UIElement(label, sx, sy),
+		button(button) {
+
+		button->setActivated(true);
 	}
 
-	void setVertices() override {}
 
-	void resizeY(const float value) {
+	void render(const float xpos, const float ypos) override {
+		button->render(xpos, ypos);
+	}
+
+	void resizeY(const float value) const {
 		sy.value += value;
-		setVertices();
-
 		button->sy.value += value;
-		button->setVertices();
 	}
 
 	virtual void checkButtonPressed() const {}

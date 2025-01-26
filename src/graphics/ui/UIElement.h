@@ -37,40 +37,43 @@ enum class DimType {
 	Percent
 };
 
-typedef struct {
-	mutable float value;
+struct Dim {
+	mutable float value; // Mutable to allow modification in const methods
 	DimType type;
-} Dim;
+
+	Dim operator+(const float other) const {
+		return Dim(this->value + other, this->type);
+	}
+
+	Dim operator-(const float other) const {
+		return Dim(this->value - other, this->type);
+	}
+};
 
 
 class UIElement {
 public:
 	std::string label;	// Name of (or text on) the element
-	const float x;			// x pos
-	const float y;			// y pos
-	const Dim sx;			// Width
-	const Dim sy;			// Height
+	Dim sx;				// Width
+	Dim sy;				// Height
 
-	int vertexCount;
+	float x = 0.0f;
+	float y = 0.0f;
+
 	std::vector<Vector2> vertices{};
 
 	UIElement(
 		std::string label,
-		const float x,
-		const float y,
 		const Dim sx,
-		const Dim sy,
-		const int vertexCount = 4
-	) :   label(std::move(label)),
-		  x(x), y(y), sx(sx), sy(sy),
-		  vertexCount(vertexCount) {
+		const Dim sy
+	) : label(std::move(label)),
+		sx(sx),
+		sy(sy) {
 
-		// Ensure vertices has the required number of elements
-		vertices.resize(vertexCount);
+		vertices.resize(4);
 	}
 
 	virtual ~UIElement() = default;
 
-	virtual void render() = 0;
-	virtual void setVertices() = 0;
+	virtual void render(float xpos, float ypos) = 0;
 };

@@ -9,10 +9,19 @@
 #include "objects/mesh/sphere/Sphere.cpp"
 #include <objects/light/Sun.h>
 
+#include "UIBulletPoint.h"
 #include "UIOption.h"
+#include "UISceneManager.h"
 
 
-bool UI::setOnClickForButton(	// NOLINT(*-no-recursion)
+void UI::setOnClickForBulletPointButton(
+	const std::shared_ptr<UIBulletPoint>& bulletPoint,
+	const std::function<void()>& onClickAction
+) {
+	bulletPoint->button->onClick = onClickAction;
+}
+
+bool UI::setOnClickForOptionButton(	// NOLINT(*-no-recursion)
 	const std::shared_ptr<UIOptionList>& list,
 	const std::string& label,
 	const std::function<void()>& onClickAction
@@ -43,7 +52,7 @@ bool UI::setOnClickForButton(	// NOLINT(*-no-recursion)
 	if (std::ranges::any_of(list->options, [&](const auto& nestedList) {
 		if (std::holds_alternative<UIOptionList>(*nestedList)) {
 			const auto nestedOptionList = std::make_shared<UIOptionList>(std::get<UIOptionList>(*nestedList));
-			return setOnClickForButton(nestedOptionList, label, onClickAction);
+			return setOnClickForOptionButton(nestedOptionList, label, onClickAction);
 		}
 		return false;
 	})) return true;
@@ -52,18 +61,19 @@ bool UI::setOnClickForButton(	// NOLINT(*-no-recursion)
 }
 
 
-void UI::setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
+void UI::setOptionButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
 	std::shared_ptr<Scene> foreground;
 	for (const auto& scene : SceneManager::scenes) {
 		if (scene->name == "Foreground") foreground = scene;
 	}
 	if (!foreground) std::cerr << "Foreground Scene not found" << std::endl;
 
-	setOnClickForButton(tab, "Exit", [] {
+
+	setOnClickForOptionButton(tab, "Exit", [] {
 		exit(0);
 	});
 
-	setOnClickForButton(tab, "Cube", [foreground] {
+	setOnClickForOptionButton(tab, "Cube", [foreground] {
 		foreground->addObject(
 			std::make_shared<Cube>(
 				"Cube",
@@ -73,9 +83,10 @@ void UI::setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
 				std::shared_ptr<Texture>{}
 			)
 		);
+		UISceneManager::addBulletPoint("Cube", "Foreground");
 	});
 
-	setOnClickForButton(tab, "Sphere", [foreground] {
+	setOnClickForOptionButton(tab, "Sphere", [foreground] {
 		foreground->addObject(
 			std::make_shared<Sphere>(
 				"Sphere",
@@ -89,11 +100,11 @@ void UI::setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
 		);
 	});
 
-	setOnClickForButton(tab, "Point", [] {
+	setOnClickForOptionButton(tab, "Point", [] {
 		// TODO make Point lights
 	});
 
-	setOnClickForButton(tab, "Sun", [foreground] {
+	setOnClickForOptionButton(tab, "Sun", [foreground] {
 		std::array lightPos = {-2.0f, -3.0f, -6.0f, 0.0f};
 		foreground->addLight(
 			std::make_shared<Sun>(
@@ -106,4 +117,14 @@ void UI::setButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
 			Colors::WHITE
 		);
 	});
+}
+
+void UI::setBulletPointButtonOnClickEvents() {
+	for (const auto&[layer, bpsOnLayer] : UISceneManager::bulletPoints) {
+		for (const auto& bp : bpsOnLayer) {
+			setOnClickForBulletPointButton(bp, [bp] {
+				SceneManager::selectObject(bp->label);
+			});
+		}
+	}
 }

@@ -7,16 +7,30 @@ class UIWindow final : public UIElement {
 public:
 	UIWindow(
 		const std::string& label,
-		const float x,
-		const float y,
 		const Dim sx,
 		const Dim sy
-	) :	  UIElement(label, x, y, sx, sy) {
+	) :	  UIElement(label, sx, sy) {}
 
-		setVertices();
-	}
 
-	void render() override {
+	void render(const float xpos, const float ypos) override {
+		auto absDim = [this](const Dim dim, const int dir) {
+			return dim.type == DimType::Percent
+				? static_cast<float>(dir == 0 ? *UI::width : *UI::height) * dim.value
+				: dim.value;
+		};
+
+		vertices[0].x = xpos;
+		vertices[0].y = ypos;
+
+		vertices[1].x = xpos + absDim(sx, 0);
+		vertices[1].y = ypos;
+
+		vertices[2].x = xpos + absDim(sx, 0);
+		vertices[2].y = ypos + absDim(sy, 1);
+
+		vertices[3].x = xpos;
+		vertices[3].y = ypos + absDim(sy, 1);
+
 		glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT);	// Save line width and color state
 
 		// Draw the filled rectangle
@@ -38,25 +52,5 @@ public:
 		glEnd();
 
 		glPopAttrib();	// Restore line width and color state
-	}
-
-	void setVertices() override {
-		auto absDim = [this](const Dim dim, const int dir) {
-			return dim.type == DimType::Percent
-				? static_cast<float>(dir == 0 ? *UI::width : *UI::height) * dim.value
-				: dim.value;
-		};
-
-		vertices[0].x = x;
-		vertices[0].y = y;
-
-		vertices[1].x = x + absDim(sx, 0);
-		vertices[1].y = y;
-
-		vertices[2].x = x + absDim(sx, 0);
-		vertices[2].y = y + absDim(sy, 1);
-
-		vertices[3].x = x;
-		vertices[3].y = y + absDim(sy, 1);
 	}
 };

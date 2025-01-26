@@ -8,22 +8,37 @@ public:
 	UIBar(
 		std::vector<std::shared_ptr<UIOptionList>> tabs,
 		const std::string& label,
-		const float x,
-		const float y,
 		const Dim sx,
 		const Dim sy
-	) :   UIElement(label, x, y, sx, sy),
+	) :   UIElement(label, sx, sy),
 		  tabs(std::move(tabs)) {}
 
-	void render() override;
-	void setVertices() override;
+	void render(float xpos, float ypos) override;
 
 private:
 	std::vector<std::shared_ptr<UIOptionList>> tabs;
 };
 
 
-inline void UIBar::render() {
+inline void UIBar::render(const float xpos, const float ypos) {
+	auto absDim = [this](const Dim dim, const int dir) {
+		return dim.type == DimType::Percent
+			? static_cast<float>(dir == 0 ? *UI::width : *UI::height) * dim.value
+			: dim.value;
+	};
+
+	vertices[0].x = xpos;
+	vertices[0].y = ypos;
+
+	vertices[1].x = xpos + absDim(sx, 0);
+	vertices[1].y = ypos;
+
+	vertices[2].x = xpos + absDim(sx, 0);
+	vertices[2].y = ypos + absDim(sy, 1);
+
+	vertices[3].x = xpos;
+	vertices[3].y = ypos + absDim(sy, 1);
+
 	color3f(Colors::UI_COLOR);
 	glBegin(GL_QUADS);
 	for (const auto vertex : vertices) {
@@ -39,24 +54,4 @@ inline void UIBar::render() {
 	}
 	glLineWidth(1.0f);
 	glEnd();
-}
-
-inline void UIBar::setVertices() {
-	auto absDim = [this](const Dim dim, const int dir) {
-		return dim.type == DimType::Percent
-			? static_cast<float>(dir == 0 ? *UI::width : *UI::height) * dim.value
-			: dim.value;
-	};
-
-	vertices[0].x = x;
-	vertices[0].y = y;
-
-	vertices[1].x = x + absDim(sx, 0);
-	vertices[1].y = y;
-
-	vertices[2].x = x + absDim(sx, 0);
-	vertices[2].y = y + absDim(sy, 1);
-
-	vertices[3].x = x;
-	vertices[3].y = y + absDim(sy, 1);
 }

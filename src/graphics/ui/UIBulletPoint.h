@@ -2,32 +2,47 @@
 
 #include "UIButtonElement.h"
 
-class UIBulletPoint final : UIButtonElement {
+class UIBulletPoint final : public UIButtonElement {
 public:
 	UIBulletPoint(
 		const std::string& label,
-		const float x,
-		const float y,
 		const Dim sx,
 		const Dim sy,
-		const float textX,
-		const float textY
-	) : UIButtonElement(label, x, y, sx, sy),
-		textX(textX),
-		textY(textY) {}
+		const float textXScalar,
+		const float textYScalar
+	) : UIButtonElement(label, sx, sy/*,
+		std::make_shared<Button>(
+			BUTTON_COLORS,
+			x + 15.0f,
+			y - unit/2.0f,
+			sx - 30.0f,
+			sy
+		)*/),
+		textXScalar(textXScalar),
+		textYScalar(textYScalar) {}
 
-	void render() override;
+	void render(float xpos, float ypos) override;
 
 private:
-	const float textX;
-	const float textY;
+	const float textXScalar;
+	const float textYScalar;
 };
 
-inline void UIBulletPoint::render() {
+inline void UIBulletPoint::render(const float xpos, const float ypos) {
+	button->render(xpos, ypos);
+
 	glPointSize(5.0f);
 	color3f(Colors::TEXT_COLOR);
 	glBegin(GL_POINTS);
-	glVertex2f(x, y);
+	glVertex2f(xpos, ypos);
 	glEnd();
-	Text::renderText(label, TextMode::LEFT, textX, textY, 24, Colors::TEXT_COLOR);
+
+	Text::renderText(
+		label,
+		TextMode::LEFT,
+		xpos + textXScalar * unit,
+		ypos + textYScalar,
+		24,
+		Colors::TEXT_COLOR
+	);
 }

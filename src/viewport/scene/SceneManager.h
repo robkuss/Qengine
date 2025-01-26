@@ -58,6 +58,7 @@ private:
 	static void deselectAllVertices();
 
 	static void selectObject(const std::shared_ptr<Object>& obj);
+	static void selectObject(const std::string &label);
 	static void deselectObject(const std::shared_ptr<Object> &obj);
 	static void selectVertex(const Vertex &v);
 	static void deselectVertex(const Vertex &v);
