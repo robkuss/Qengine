@@ -26,7 +26,6 @@ public:
 
 	// Store scenes as weak pointers to avoid circular dependencies
 	static std::vector<std::shared_ptr<Scene>> scenes;
-	static std::shared_ptr<UI> ui;
 
 	static Mode selectionMode;
 	static Mode transformMode;
@@ -45,10 +44,7 @@ private:
 	static void addScene(const std::shared_ptr<Scene> &scene);
 	static void deleteScene(const std::shared_ptr<Scene> &scene);
 	static void cleanupScenes();
-
-	// Rendering
 	static void renderScenes();
-	static void renderUI();
 
 	// Selection
 	static void select(const Vector2 &mousePos, bool preserve);

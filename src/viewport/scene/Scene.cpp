@@ -4,11 +4,11 @@
 
 #include <iostream>
 #include <memory>
+
+#include <graphics/MeshRenderer.h>
 #include <graphics/ui/UISceneManager.h>
 #include <math/ray/Ray.h>
-
-#include "viewport/Camera.h"
-#include "graphics/MeshRenderer.h"
+#include <viewport/Camera.h>
 
 
 void Scene::addObject(const std::shared_ptr<Object>& obj) {

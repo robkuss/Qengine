@@ -24,7 +24,6 @@ std::shared_ptr<Ray> SceneManager::mouseRay					= nullptr;
 
 // Scene Management
 std::vector<std::shared_ptr<Scene>> SceneManager::scenes			= std::vector<std::shared_ptr<Scene>>();
-std::shared_ptr<UI> SceneManager::ui{};
 std::vector<std::shared_ptr<Object>> SceneManager::selectedObjects	= std::vector<std::shared_ptr<Object>>();
 std::vector<Vertex> SceneManager::selectedVertices					= std::vector<Vertex>();
 
@@ -62,6 +61,9 @@ void SceneManager::cleanupScenes() {
 		).begin(),
 		scenes.end()
 	);
+
+	// Also cleanup Text TODO should probably be somewhere else
+	Text::destruct();
 }
 
 
@@ -120,10 +122,6 @@ void SceneManager::renderScenes() {
 	for (const auto& scene : scenes) {
 		scene->render(); // Call the render method on the scene
 	}
-}
-
-void SceneManager::renderUI() {
-	ui->render();
 }
 
 

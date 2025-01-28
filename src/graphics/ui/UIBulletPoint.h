@@ -20,8 +20,8 @@ public:
 		Text::renderText(
 			label,
 			TextMode::LEFT,
-			xpos,		// TODO text scalars
-			ypos,		// TODO
+			xpos + unit / 2.0f,
+			ypos + 6.5f,
 			24,
 			Colors::TEXT_COLOR
 		);

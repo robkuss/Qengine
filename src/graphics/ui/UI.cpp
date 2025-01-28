@@ -24,21 +24,13 @@ std::vector<const Vector2*> UI::vertexPointers = std::vector<const Vector2*>();
 std::map<int, std::vector<std::shared_ptr<UIElement>>> UI::layers = std::map<int, std::vector<std::shared_ptr<UIElement>>>();
 
 
-UI::UI(const std::string& name, int* w, int* h) : Scene(name) {
+void UI::setup(int* w, int* h) {
 	width = w;
 	height = h;
 
 	// Initialize FreeType for on-screen text
 	Text();
-}
 
-UI::~UI() {
-	// Cleanup
-	Text::destruct();
-}
-
-
-void UI::setup() {
 	// Initialize highest-level UIOptionLists
 	auto tabs = std::vector<std::shared_ptr<UIOptionList>>();
 

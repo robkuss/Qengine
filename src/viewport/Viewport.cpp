@@ -87,21 +87,16 @@ void Viewport::start() {
 	// Create Scenes
 	const auto foreground = std::make_shared<Scene>("Foreground");
 	const auto background = std::make_shared<Scene>("Background");
-	const auto ui = std::make_shared<UI>("UI", &SceneManager::viewport->at(2), &SceneManager::viewport->at(3));
 
 	// Add Scenes to the SceneManager
 	SceneManager::addScene(background);
 	SceneManager::addScene(foreground);
 
-	// Set up UI afterwards
-	SceneManager::ui = ui;
-	ui->setup();
-
 	// Load Textures
 	const auto noTexture	= std::shared_ptr<Texture>{};
 	const auto thmTexture	= std::make_shared<Texture>("../resources/textures/thm2k.png");
 	const auto earthTexture = std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
-	const auto starsTexture = std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
+	//const auto starsTexture = std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
 
 	// Add Default Cube to Scene
 	const auto cube = std::make_shared<Cube>(
@@ -128,13 +123,16 @@ void Viewport::start() {
 	const auto skybox = std::make_shared<Skybox>(
 		"Skybox",
 		Colors::WHITE,
-		starsTexture
+		noTexture
 	);
 	background->addObject(skybox);
 
 	background->enableDepthIsolation();
 	background->enableFixedPosition();
 
+
+	// Set up UI afterwards
+	UI::setup(&SceneManager::viewport->at(2), &SceneManager::viewport->at(3));
 
 	// Set up graphics
 	clearColor(Colors::BG_COLOR);	// Background color
@@ -186,7 +184,7 @@ void Viewport::render() {
 	#endif
 
 	// Render UI last
-	SceneManager::renderUI();
+	UI::render();
 }
 
 

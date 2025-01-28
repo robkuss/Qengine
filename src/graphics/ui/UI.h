@@ -14,19 +14,15 @@ class Vector2;
 struct LabelNode;
 
 
-class UI final : public Scene {
+class UI final {
 public:
 	static int *width, *height;
 	static bool unsavedChanges;
 
-	// Constructor & Destructor
-	UI(const std::string &name, int *w, int *h);
-	~UI() override;
+	static void setup(int *w, int *h);
+	static void update();
 
-	static void setup();
-	static void update() ;
-
-	void render() override;
+	static void render();
 
 	static void addElement(const std::shared_ptr<UIElement> &element, int layer);
 
