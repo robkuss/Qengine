@@ -18,6 +18,11 @@ float UI::firstLineX;
 float UI::firstLineY;
 float UI::bottomLineY;
 
+bool UI::unsavedChanges = false;
+
+std::vector<const Vector2*> UI::vertexPointers = std::vector<const Vector2*>();
+std::map<int, std::vector<std::shared_ptr<UIElement>>> UI::layers = std::map<int, std::vector<std::shared_ptr<UIElement>>>();
+
 
 UI::UI(const std::string& name, int* w, int* h) : Scene(name) {
 	width = w;
@@ -39,7 +44,6 @@ void UI::setup() {
 
 	// Iterate through labels for each UITab and create elements
 	for (const auto& [i, labelList] : std::views::enumerate(uiStructure)) {
-
 		// Initialize dimensions
 		const auto tabX  = firstTabX + static_cast<float>(i) * tabWidth;
 		constexpr auto tabY  = tabPadding;
@@ -51,21 +55,14 @@ void UI::setup() {
 		// Dynamically and recursively create UIOptionList from the labels
 		auto options = std::vector<std::shared_ptr<UIOptionVariant>>();
 		for (const auto& [j, label] : std::views::enumerate(labelList->children)) {
-			const auto optionVariant = createOptionListRecursively(
-				j,
-				label,
-				tabX, tabY, optSX, optSY
-			);
-
-			options.emplace_back(std::make_shared<UIOptionVariant>(optionVariant));
+			options.push_back(std::make_shared<UIOptionVariant>(
+				createOptionListRecursively(j, label, tabX, tabY, optSX, optSY)
+			));
 		}
 
 		// Dynamically create UITab from the UIOptionList
 		const auto tab = std::make_shared<UIOptionList>(
-			labelList->label,
-			true,
-			options,
-			tabX, tabY, tabSX, tabSY
+			labelList->label, true, options, tabX, tabY, tabSX, tabSY
 		);
 
 		// Add UITabs to the UI Scene
@@ -87,12 +84,9 @@ void UI::setup() {
 
 	// Add UIBar to the UI Scene
 	addElement(bar, 0);
-
-	update();
 }
 
-// ReSharper disable once CppNotAllPathsReturnValue
-UIOptionVariant UI::createOptionListRecursively(	 // NOLINT(*-no-recursion)
+UIOptionVariant UI::createOptionListRecursively(	// NOLINT(*-no-recursion)
 	const long long index,
 	const std::shared_ptr<LabelNode>& label,
 	const float x,
@@ -100,55 +94,42 @@ UIOptionVariant UI::createOptionListRecursively(	 // NOLINT(*-no-recursion)
 	const Dim sx,
 	const Dim sy
 ) {
-	// If the node has no children, it is a single UIOption
+	// Calculate new Y position for the current node
 	const auto newY = y + static_cast<float>(index + 1) * sy.value;
+
+	// Base case: leaf node (single UIOption)
 	if (label->children.empty()) {
-		return *std::make_shared<UIOption>(
-			label->label,
-			x, newY, sx, sy
-		);
+		return *std::make_shared<UIOption>(label->label, x, newY, sx, sy);
 	}
 
-	// If the node has children, it is a UIOptionList -> process each child recursively
+	// Recursive case: parent node (UIOptionList)
 	auto options = std::vector<std::shared_ptr<UIOptionVariant>>();
 	for (const auto& [i, child] : std::views::enumerate(label->children)) {
-		const auto optionX  = x + sx.value;
-		const auto optionY  = y + static_cast<float>(index) * sy.value;
+		const auto optionX = x + sx.value;
+		const auto optionY = y + static_cast<float>(index) * sy.value;
 
-		// Recursive call for each child
-		auto optionVariant = createOptionListRecursively(
-			i,
-			child,
-			optionX, optionY, sx, sy
-		);
-
-		options.push_back(std::make_shared<UIOptionVariant>(optionVariant));
+		// Recursive call for child
+		options.push_back(std::make_shared<UIOptionVariant>(
+			createOptionListRecursively(i, child, optionX, optionY, sx, sy)
+		));
 	}
 
-	// Create and return a UIOptionList for this node
+	// Create and return a UIOptionList
 	return *std::make_shared<UIOptionList>(
-		label->label,
-		false,
-		options,
-		x, newY, sx, sy
+		label->label, false, options, x, newY, sx, sy
 	);
 }
 
-void UI::addElement(const std::shared_ptr<UIElement>& element, const int layer) { // NOLINT(*-no-recursion)
+void UI::addElement(const std::shared_ptr<UIElement>& element, const int layer) {
 	for (const auto& vertex : element->vertices) {
 		vertexPointers.push_back(&vertex);
 	}
-
 	layers[layer].push_back(element);
+
+	unsavedChanges = true;
 }
 
-void UI::update() const {
-	/*for (const auto &elementsOnLayer: layers | std::views::values) {
-		for (const auto& element : elementsOnLayer) {
-			element->setVertices();
-		}
-	}*/
-
+void UI::update() {
 	for (const auto& vertex : vertexPointers) {
 		// Check if the vertex coordinates (x and y) confine the bounds more
 		if (vertex->x < boundLeft)   boundLeft   = static_cast<int>(vertex->x);
@@ -185,15 +166,10 @@ void UI::render() {
 	#endif
 	Text::drawErrorText(*height);
 
-
 	// Render SceneManager
-	constexpr auto smWidth = 400.0f;
-	const auto x  =	static_cast<float>(*width) - smWidth;
+	const auto x  =	static_cast<float>(*width) - 400.0f;
 	const auto y	  = static_cast<float>(boundTop);
-	constexpr auto sx = Dim(smWidth, DimType::Pixels);
-	constexpr auto sy = PC_100;
-	uiSceneManager = std::make_shared<UISceneManager>("Scene Manager", sx, sy);
-	uiSceneManager->render(x, y);
+	UISceneManager::render(x, y);
 
 
 	// Render elements
@@ -201,6 +177,12 @@ void UI::render() {
 		for (const auto& element : elementsOnLayer) {
 			element->render(0.0f, 0.0f);
 		}
+	}
+
+	// Resize UI if necessary
+	if (unsavedChanges) {
+		update();
+		unsavedChanges = false;
 	}
 
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -53,14 +54,21 @@ struct Dim {
 
 class UIElement {
 public:
-	std::string label;	// Name of (or text on) the element
-	Dim sx;				// Width
-	Dim sy;				// Height
+	std::string label;		// Name of (or text on) the element
+	Dim sx{};				// Width
+	Dim sy{};				// Height
 
 	float x = 0.0f;
 	float y = 0.0f;
 
 	std::vector<Vector2> vertices{};
+
+	explicit UIElement(
+		std::string label
+	) : label(std::move(label)) {
+
+		vertices.resize(4);
+	}
 
 	UIElement(
 		std::string label,

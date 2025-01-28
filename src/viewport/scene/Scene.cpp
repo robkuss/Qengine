@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <memory>
+#include <graphics/ui/UISceneManager.h>
 #include <math/ray/Ray.h>
 
 #include "viewport/Camera.h"
@@ -12,22 +13,26 @@
 
 void Scene::addObject(const std::shared_ptr<Object>& obj) {
 	sceneObjects.emplace_back(obj);
+	UISceneManager::update();
 }
 
 void Scene::removeObject(const std::shared_ptr<Object>& obj) {
 	sceneObjects.erase(std::ranges::find(sceneObjects, obj));
+	UISceneManager::update();
 }
 
 
 void Scene::render() {
 	if (fixedPosition) {
+		// Load view matrix for background
 		SceneManager::activeCamera->loadFixedViewMatrix();
 	} else {
+		// Load view matrix for foreground
 		SceneManager::activeCamera->loadViewMatrix();
-	}
 
-	// Enable lighting
-	glEnable(GL_LIGHTING);
+		// Enable lighting
+		glEnable(GL_LIGHTING);
+	}
 
 	for (const auto& light : lights) {
 		glEnable(light->macro);
@@ -45,7 +50,7 @@ void Scene::render() {
 	}
 
 	// Disable lighting after rendering
-	glDisable(GL_LIGHTING);
+	if (!fixedPosition) glDisable(GL_LIGHTING);
 
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& mesh : sceneMeshes) {
@@ -81,6 +86,8 @@ void Scene::addLight(
 	glLightfv(light->macro, GL_SPECULAR, specularF);
 
 	lights.emplace_back(light);
+
+	UISceneManager::update();
 }
 
 void Scene::enableDepthIsolation() {

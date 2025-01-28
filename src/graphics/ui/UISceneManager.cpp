@@ -1,19 +1,23 @@
 #include "UISceneManager.h"
 
+#include <iostream>
 #include <memory>
+#include <ranges>
 
 #include <objects/Object.h>
 
-#include "UIBulletPoint.h"
+#include "UIBulletTree.h"
 #include "UIWindow.h"
 
 
-std::map<std::string, std::vector<std::shared_ptr<UIBulletPoint>>> UISceneManager::bulletPoints = std::map<std::string, std::vector<std::shared_ptr<UIBulletPoint>>>();
+Dim UISceneManager::sx = Dim(400.0f, DimType::Pixels);
+Dim UISceneManager::sy = PC_100;
+
+std::shared_ptr<UIWindow> UISceneManager::window = std::make_shared<UIWindow>("Scene Manager", sx, sy);
+std::shared_ptr<UIBulletTreeNode> UISceneManager::bpTree = std::make_shared<UIBulletTreeNode>(std::make_shared<UIBulletPoint>("Scene Manager"));
+
 
 void UISceneManager::render(const float xpos, const float ypos) {
-	bulletPoints.clear();
-
-	const auto window = std::make_shared<UIWindow>(label, sx, sy);
 	window->render(xpos, ypos);
 
 	glLineWidth(1.0f);
@@ -24,7 +28,7 @@ void UISceneManager::render(const float xpos, const float ypos) {
 	glEnd();
 
 	Text::renderText(
-		label,
+		window->label,
 		TextMode::LEFT,
 		xpos + 2.5f * unit,
 		ypos + unit,
@@ -33,39 +37,46 @@ void UISceneManager::render(const float xpos, const float ypos) {
 	);
 
 	float yline = ypos + 2.7f * unit;
-	constexpr float textYScalar = 0.2f * unit;
 
-	int i = 0;
-	for (const auto& scene : SceneManager::scenes) {
-		float xline = xpos + unit;
-		constexpr auto textXScalar = 0.6f;
+	// Recursive lambda for rendering tree nodes
+	std::function<void(const UIBulletTreeNode&, float, int)> renderNode =
+		[&](const UIBulletTreeNode& node, const float xline, const int depth) {
+			// Render the current node's bullet point
+			if (node.bp) {
+				node.bp->sx = sx - (xline - xpos) - unit;
+				node.bp->sy = UNIT;
+				node.bp->render(
+					xline,
+					yline
+				);
+			}
 
-		//bulletPoints["Scene Manager"].push_back(std::make_shared<UIBulletPoint>(scene->name, xline, yline, sx - (xline - xpos) - unit, UNIT, textXScalar, textYScalar));
-		xline += unit;
+			// Recursively render the children of the current node
+			for (const auto& child : node.children) {
+				// Update yline for the next row
+				yline += unit;
+
+				renderNode(*child, xline + unit, depth + 1);
+			}
+	};
+
+	// Start rendering
+	for (const auto& child : bpTree->children) {
+		renderNode(*child, xpos + unit, 0);
 		yline += unit;
-		for (const auto& object : scene->sceneObjects) {
-			//bulletPoints[scene->name].push_back(std::make_shared<UIBulletPoint>(object->name, xline, yline, sx - (xline - xpos) - unit, UNIT, textXScalar, textYScalar));
-			yline += unit;
-		}
-		for (const auto& light : scene->lights) {
-			//bulletPoints[scene->name].push_back(std::make_shared<UIBulletPoint>(light->name, xline, yline, sx - (xline - xpos) - unit, UNIT, textXScalar, textYScalar));
-			yline += unit;
-		}
-		i++;
 	}
-
-	for (const auto&[label, bpOnLevel] : bulletPoints) {
-		for (const auto& bp : bpOnLevel) {
-			bp->render(xpos, ypos);
-		}
-	}
-
-	UI::setBulletPointButtonOnClickEvents();	// TODO make all of this better with pointers
 }
 
-void UISceneManager::addBulletPoint(
-	const std::string& label,
-	const std::string& parentLabel
-) {
-	//bulletPoints[parentLabel].push_back(std::make_shared<UIBulletPoint>(label, sx, sy, textXScalar, textYScalar));
+void UISceneManager::update() {
+	for (const auto& scene : SceneManager::scenes) {
+		bpTree->addBulletPoint(scene->name, bpTree->bp->label, []{});
+
+		for (const auto& object : scene->sceneObjects) {
+			bpTree->addBulletPoint(object->name, scene->name, [object]{ SceneManager::selectObject(object); });
+		}
+
+		for (const auto& light : scene->lights) {
+			bpTree->addBulletPoint(light->name, scene->name, [light]{ SceneManager::selectObject(light); });
+		}
+	}
 }

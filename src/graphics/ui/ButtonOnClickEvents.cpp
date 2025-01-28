@@ -9,17 +9,9 @@
 #include "objects/mesh/sphere/Sphere.cpp"
 #include <objects/light/Sun.h>
 
-#include "UIBulletPoint.h"
 #include "UIOption.h"
 #include "UISceneManager.h"
 
-
-void UI::setOnClickForBulletPointButton(
-	const std::shared_ptr<UIBulletPoint>& bulletPoint,
-	const std::function<void()>& onClickAction
-) {
-	bulletPoint->button->onClick = onClickAction;
-}
 
 bool UI::setOnClickForOptionButton(	// NOLINT(*-no-recursion)
 	const std::shared_ptr<UIOptionList>& list,
@@ -83,7 +75,6 @@ void UI::setOptionButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) 
 				std::shared_ptr<Texture>{}
 			)
 		);
-		UISceneManager::addBulletPoint("Cube", "Foreground");
 	});
 
 	setOnClickForOptionButton(tab, "Sphere", [foreground] {
@@ -117,14 +108,4 @@ void UI::setOptionButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) 
 			Colors::WHITE
 		);
 	});
-}
-
-void UI::setBulletPointButtonOnClickEvents() {
-	for (const auto&[layer, bpsOnLayer] : UISceneManager::bulletPoints) {
-		for (const auto& bp : bpsOnLayer) {
-			setOnClickForBulletPointButton(bp, [bp] {
-				SceneManager::selectObject(bp->label);
-			});
-		}
-	}
 }

@@ -10,7 +10,7 @@ public:
 	// The function that is called when the button is clicked
 	std::function<void()> onClick;
 
-	// Button with text
+	// Button with text label
 	Button(
 		const std::string& label,
 		const int textSize,
@@ -20,12 +20,16 @@ public:
 		const Dim sy
 	) : Input(label, textSize, textMode, colors, sx, sy) {}
 
-	// Button with no text
+	// Button with no text label
 	Button(
 		const std::vector<Color>& colors,
 		const Dim sx,
 		const Dim sy
 	) : Input(colors, sx, sy) {}
+
+	// Default
+	Button() : Input(BUTTON_COLORS) {}
+
 
 	void render(float xpos, float ypos) override;
 

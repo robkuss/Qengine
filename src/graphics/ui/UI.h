@@ -17,23 +17,22 @@ struct LabelNode;
 class UI final : public Scene {
 public:
 	static int *width, *height;
+	static bool unsavedChanges;
 
 	// Constructor & Destructor
 	UI(const std::string &name, int *w, int *h);
 	~UI() override;
 
-	void setup();
-	void update() const;
+	static void setup();
+	static void update() ;
 
 	void render() override;
 
-	void addElement(const std::shared_ptr<UIElement> &element, int layer);
+	static void addElement(const std::shared_ptr<UIElement> &element, int layer);
 
-	void checkButtonPressed();
+	static void checkButtonPressed();
 
-	static void setBulletPointButtonOnClickEvents();
 	static void setOptionButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab);
-	static void setOnClickForBulletPointButton(const std::shared_ptr<UIBulletPoint> &bulletPoint, const std::function<void()> &onClickAction);
 	static bool setOnClickForOptionButton(const std::shared_ptr<UIOptionList> &list, const std::string &label, const std::function<void()> &onClickAction);
 
 protected:
@@ -49,10 +48,8 @@ protected:
 
 private:
 	// Elements are stored as pointers, sorted by layer (lowest layer first)
-	std::map<int, std::vector<std::shared_ptr<UIElement>>> layers;
-	std::vector<const Vector2*> vertexPointers;
-
-	std::shared_ptr<UISceneManager> uiSceneManager;
+	static std::map<int, std::vector<std::shared_ptr<UIElement>>> layers;
+	static std::vector<const Vector2*> vertexPointers;
 
 	static UIOptionVariant createOptionListRecursively(long long index, const std::shared_ptr<LabelNode> &label, float x, float y, Dim sx, Dim sy);
 };

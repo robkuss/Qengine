@@ -10,6 +10,7 @@ class UIButtonElement : public UIElement {
 public:
 	std::shared_ptr<Button> button;	// Button field associated with this element
 
+	// UIButtonElement with default button and dimensions
 	UIButtonElement(
 		const std::string& label,
 		const Dim sx,
@@ -25,20 +26,22 @@ public:
 			sx,
 			sy
 		);
-
-		button->setActivated(true);
 	}
 
+	// UIButtonElement with explicit button and dimensions
 	UIButtonElement(
 		const std::string& label,
 		const Dim sx,
 		const Dim sy,
 		const std::shared_ptr<Button>& button
 	) : UIElement(label, sx, sy),
-		button(button) {
+		button(button) {}
 
-		button->setActivated(true);
-	}
+	// UIButtonElement without explicit button or dimensions
+	explicit UIButtonElement(
+		const std::string& label
+	) : UIElement(label),
+		button(std::make_shared<Button>()) {}
 
 
 	void render(const float xpos, const float ypos) override {

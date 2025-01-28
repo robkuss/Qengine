@@ -2,7 +2,7 @@
 
 #include "Light.h"
 
-class Sun : public Light {
+class Sun final : public Light {
 public:
 	explicit Sun(
 		const std::string& name,

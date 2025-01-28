@@ -14,6 +14,7 @@ const auto BUTTON_COLORS = std::vector{
 
 class Input : public UIElement {
 public:
+	// Input with text label
 	Input(
 	 	const std::string& label,
 		const int textSize,
@@ -28,11 +29,22 @@ public:
 		setActivated(true);
 	}
 
+	// Input with no text label
 	Input(
 		const std::vector<Color>& colors,
 		const Dim sx,
 		const Dim sy
 	) :   UIElement("", sx, sy),
+		  rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
+		  activated(true) {
+
+		setActivated(true);
+	}
+
+	// Default
+	explicit Input(
+		const std::vector<Color>& colors
+	) :   UIElement(""),
 		  rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
 		  activated(true) {
 

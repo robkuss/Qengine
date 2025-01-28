@@ -38,6 +38,7 @@ private:
 	friend class Viewport;
 	friend class Scene;
 	friend class UI;
+	friend class UISceneManager;
 	friend class Debug;
 
 	// General

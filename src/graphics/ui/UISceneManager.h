@@ -1,27 +1,26 @@
 #pragma once
 
-#include <map>
 #include <memory>
 
-#include "UIElement.h"
+#include "UIWindow.h"
 
-class UIBulletPoint;
+struct UIBulletTreeNode;
+class UIWindow;
 
 
-class UISceneManager final : public UIElement {
+class UISceneManager {
 public:
-	UISceneManager(
-		const std::string& label,
-		const Dim sx,
-		const Dim sy
-	) : UIElement(label, sx, sy) {}
+	static void render(float xpos, float ypos);
+	static void update();
 
-	void render(float xpos, float ypos) override;
-
-	static void addBulletPoint(const std::string &label, const std::string &parentLabel);
+	void addBulletPoint(const std::string &label, const std::string &parentLabel);
 
 private:
 	friend class UI;
 
-	static std::map<std::string, std::vector<std::shared_ptr<UIBulletPoint>>> bulletPoints;
+	static Dim sx;
+	static Dim sy;
+
+	static std::shared_ptr<UIWindow> window;
+	static std::shared_ptr<UIBulletTreeNode> bpTree;
 };

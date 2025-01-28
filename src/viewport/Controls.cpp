@@ -30,10 +30,8 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* cbWindow, const int width, const int height) {
 		if (const auto vp = static_cast<Viewport*>(glfwGetWindowUserPointer(cbWindow))) {
 			vp->windowResize(width, height);
-			vp->render();		// Force a re-render during resizing
-
-			// Resize UI
-			SceneManager::ui->update();
+			vp->render();				// Force a re-render during resizing
+			UI::unsavedChanges = true;	// Trigger UI resize
 
 			glfwSwapBuffers(cbWindow);
 		}
@@ -46,7 +44,7 @@ void Viewport::setCallbacks(GLFWwindow* window) {
 				const auto mousePos = Vector2(*SceneManager::mouseX, *SceneManager::mouseY);
 				vp->setMouseRay(mousePos);
 				SceneManager::select(mousePos, false);
-				SceneManager::ui->checkButtonPressed();
+				UI::checkButtonPressed();
 			}
 
 			else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
