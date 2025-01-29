@@ -18,27 +18,23 @@ void vertex3fv(const Vertex& v) {
 }
 
 void MeshRenderer::renderVertex(const Vertex& v) {
-	glBegin(GL_POINTS);
 	vertex3fv(v);
-	glEnd();
 }
 
-void MeshRenderer::renderEdge(const Edge& e, const Color& firstColor, const Color& secondColor) {
-	glBegin(GL_LINES);
-	color3f(firstColor);
+void MeshRenderer::renderEdge(const Edge& e, const Color& c1, const Color& c2) {
+	color3f(c1);
 	vertex3fv(*e.v0);
-	color3f(secondColor);
+	color3f(c2);
 	vertex3fv(*e.v1);
-	glEnd();
 }
 
 
-void MeshRenderer::renderVertices(const Mesh& mesh, const std::vector<Vertex>& selectedVertices) {
+void MeshRenderer::renderVertices(const Mesh& mesh) {
 	glPointSize(4.0f);
 
 	for (const auto& v : mesh.vertices) {
 		// Highlight if the Vertex is currently selected
-		const auto color = std::ranges::find(selectedVertices, *v) != selectedVertices.end()
+		const auto color = v->isSelected
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_VERT_COLOR;
 		color3f(color);
@@ -46,24 +42,22 @@ void MeshRenderer::renderVertices(const Mesh& mesh, const std::vector<Vertex>& s
 	}
 }
 
-void MeshRenderer::renderEdges(const Mesh& mesh, const std::vector<Vertex>& selectedVertices) {
+void MeshRenderer::renderEdges(const Mesh& mesh) {
 	glLineWidth(2.0f);
 
 	for (const auto& edge : mesh.edgeToFaceMap | std::views::keys) {
 		// Highlight if either of the 2 Vertices of the Edge are currently selected
-		const auto firstColor = std::ranges::find(selectedVertices, *edge.v0)
-				!= selectedVertices.end()
+		const auto firstColor = edge.v0->isSelected
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_EDGE_COLOR;
-		const auto secondColor = std::ranges::find(selectedVertices, *edge.v1)
-				!= selectedVertices.end()
+		const auto secondColor = edge.v1->isSelected
 			? Colors::MESH_SELECT_COLOR
 			: Colors::MESH_EDGE_COLOR;
 		renderEdge(edge, firstColor, secondColor);
 	}
 }
 
-void MeshRenderer::renderTriangles(const Mesh& mesh, const std::vector<Vertex>& selectedVertices) {
+void MeshRenderer::renderTriangles(const Mesh& mesh) {
 	// Function to draw a triangle with a specified color and transparency
 	auto renderTriangle = [&mesh](const Triangle& t) {
 		glBegin(GL_TRIANGLES);
@@ -87,15 +81,9 @@ void MeshRenderer::renderTriangles(const Mesh& mesh, const std::vector<Vertex>& 
 
 	for (const auto& t : mesh.triangles) {
 		// Highlight if all 3 Vertices of the Triangle are currently selected
-		const auto vertices = {*t->v0, *t->v1, *t->v2};
-		const auto isSelected = std::ranges::all_of(vertices,
-		    [selectedVertices](const auto& vertex) {
-			    return std::ranges::find(selectedVertices, vertex)
-		    		!= selectedVertices.end();
-		    });
+		const auto isSelected = t->v0->isSelected && t->v1->isSelected && t->v2->isSelected;
 
 		// Draw the mesh with the base color
-		glBegin(GL_TRIANGLES);
 		renderTriangle(*t);
 
 		if (isSelected) {
@@ -121,7 +109,7 @@ void MeshRenderer::renderTriangles(const Mesh& mesh, const std::vector<Vertex>& 
 }
 
 
-void MeshRenderer::render(const Mesh& mesh, const std::vector<Vertex>& selectedVertices, const Mode& selectionMode, const bool isMeshSelected) {
+void MeshRenderer::render(const Mesh& mesh, const Mode& selectionMode, const bool isMeshSelected) {
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 	if (mesh.texture) glBindTexture(GL_TEXTURE_2D, mesh.texture->id);
@@ -135,16 +123,20 @@ void MeshRenderer::render(const Mesh& mesh, const std::vector<Vertex>& selectedV
 
 
 	// Draw the faces
-	renderTriangles(mesh, selectedVertices);
+	renderTriangles(mesh);
 
 	if (isMeshSelected && selectionMode == EDIT) {
 		glDisable(GL_LIGHTING);
 
 		// Draw the edges
-		renderEdges(mesh, selectedVertices);
+		glBegin(GL_LINES);
+		renderEdges(mesh);
+		glEnd();
 
 		// Draw the vertices
-		renderVertices(mesh, selectedVertices);
+		glBegin(GL_POINTS);
+		renderVertices(mesh);
+		glEnd();
 
 		glEnable(GL_LIGHTING);
 	}
@@ -166,11 +158,15 @@ void MeshRenderer::renderSilhouette(const Mesh& mesh, const Mode& selectionMode,
 
 		for (const auto&[first, second]: mesh.edgeToFaceMap) {
 			if (isSilhouetteEdge(second, camPos)) {
+				glBegin(GL_LINES);
 				renderEdge(first, color, color);
+				glEnd();
 
 				// Highlight the vertices of the silhouette edges
+				glBegin(GL_POINTS);
 				renderVertex(*first.v0);
 				renderVertex(*first.v1);
+				glEnd();
 			}
 		}
 

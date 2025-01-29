@@ -42,13 +42,12 @@ void Scene::render() {
 	}
 
 	const auto& sceneMeshes = filterMeshes(sceneObjects);
-	const auto& selectedVertices = SceneManager::selectedVertices;
 	const auto selectionMode = SceneManager::selectionMode;
 	const auto camPos = SceneManager::activeCamera->camPos;
 
 	// Loop through the sceneObjects and render Mesh instances
 	for (const auto& mesh : sceneMeshes) {
-		MeshRenderer::render(*mesh, selectedVertices, selectionMode, SceneManager::isMeshSelected(mesh));
+		MeshRenderer::render(*mesh, selectionMode, SceneManager::isMeshSelected(mesh));
 	}
 
 	// Disable lighting for outline rendering

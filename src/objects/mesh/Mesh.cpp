@@ -31,14 +31,12 @@ void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformM
 }
 
 void Mesh::initializeTriangles() {
-	triangles.clear();
-
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) {
-		const auto v0 = vertices[faceIndices[i]];
-		const auto v1 = vertices[faceIndices[i + 1]];
-		const auto v2 = vertices[faceIndices[i + 2]];
-
-		triangles.emplace_back(std::make_shared<Triangle>(v0, v1, v2));
+		triangles.push_back(std::make_shared<Triangle>(
+			vertices[faceIndices[i]],
+			vertices[faceIndices[i + 1]],
+			vertices[faceIndices[i + 2]]
+		));
 	}
 }
 

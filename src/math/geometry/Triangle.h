@@ -6,6 +6,7 @@
 
 struct Triangle {
 	std::shared_ptr<Vertex> v0, v1, v2;
+
 	mutable Vector3 normal;	   // Face normal
 	mutable Vector3 centroid;  // Center point
 

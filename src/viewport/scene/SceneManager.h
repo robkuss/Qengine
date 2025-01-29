@@ -31,7 +31,6 @@ public:
 	static Mode transformMode;
 
 	static std::vector<std::shared_ptr<Object>> selectedObjects;
-	static std::vector<Vertex> selectedVertices;
 
 private:
 	friend class Viewport;
@@ -57,8 +56,7 @@ private:
 	static void selectObject(const std::shared_ptr<Object>& obj);
 	static void selectObject(const std::string &label);
 	static void deselectObject(const std::shared_ptr<Object> &obj);
-	static void selectVertex(const Vertex &v);
-	static void deselectVertex(const Vertex &v);
+	static void selectVertex(const std::shared_ptr<Vertex> &v);
 
 	static void toggleSelectionMode();
 

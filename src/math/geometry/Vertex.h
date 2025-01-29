@@ -10,10 +10,12 @@ struct Vertex {
 	Vector3 normal;		// Vertex normal
 	Vector2 texCoords;	// Texture coordinates
 
+	mutable bool isSelected;
+
 	// Constructors
-	explicit Vertex(const Vector3& position, const Vector2& texCoords) : position(position), normal(Vector3::ZERO), texCoords(texCoords) {}
-	explicit Vertex(const Vector3& position, const Vector3& normal, const Vector2& texCoords) : position(position), normal(normal), texCoords(texCoords) {}
-	explicit Vertex(const float x, const float y, const float z, const Vector2& texCoords) : position(Vector3(x, y, z)), normal(Vector3::ZERO), texCoords(texCoords) {}
+	explicit Vertex(const Vector3& position, const Vector2& texCoords) : position(position), normal(Vector3::ZERO), texCoords(texCoords), isSelected(false) {}
+	explicit Vertex(const Vector3& position, const Vector3& normal, const Vector2& texCoords) : position(position), normal(normal), texCoords(texCoords), isSelected(false) {}
+	explicit Vertex(const float x, const float y, const float z, const Vector2& texCoords) : position(Vector3(x, y, z)), normal(Vector3::ZERO), texCoords(texCoords), isSelected(false) {}
 
 	// Equality operator without floating-point tolerance
 	bool operator==(const Vertex& other) const {
