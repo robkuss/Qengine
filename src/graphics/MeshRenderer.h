@@ -13,11 +13,13 @@ public:
 private:
 	static void renderVertex(const Vertex& v);
 	static void renderEdge(const Edge& e, const Color& firstColor, const Color& secondColor);
-	static void renderTriangle(const Mesh& mesh, const Triangle& t, bool isSelected);
+	// static void renderTriangle(const Mesh& mesh, const Triangle& t, bool isSelected);
 
 	static void renderVertices(const Mesh &mesh, const std::vector<Vertex> &selectedVertices);
 	static void renderEdges(const Mesh &mesh, const std::vector<Vertex> &selectedVertices);
 	static void renderTriangles(const Mesh &mesh, const std::vector<Vertex> &selectedVertices);
 
 	static bool isSilhouetteEdge(const std::vector<std::shared_ptr<Triangle>> &edgeAdjFaces, const Vector3 &camPos);
+
+	static bool toggleDiffuse;
 };

@@ -10,6 +10,8 @@
 #include "material/texture/Texture.h"
 #include "color/Colors.h"
 
+bool MeshRenderer::toggleDiffuse = false;
+
 /** Reinterpret Vertex as GLfloat* */
 void vertex3fv(const Vertex& v) {
 	glVertex3fv(reinterpret_cast<const float *>(&v));
@@ -30,41 +32,6 @@ void MeshRenderer::renderEdge(const Edge& e, const Color& firstColor, const Colo
 	glEnd();
 }
 
-void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const bool isSelected) {
-	// Function to draw a triangle with a specified color and transparency
-	auto drawWithColor = [&mesh, &t](const Color& color) {
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color.toGLfloat());
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mesh.ambient.toGLfloat());
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mesh.specular.toGLfloat());
-		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mesh.emission.toGLfloat());
-		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mesh.shininess);
-
-		glBegin(GL_TRIANGLES);
-		for (const auto& v : {t.v0, t.v1, t.v2}) {
-			// Choose the shading mode
-			const auto normal = mesh.shadingMode == ShadingMode::FLAT
-				? t.normal		// Flat shading
-				: v->normal;	// Smooth shading
-			glNormal3f(normal.x, normal.y, normal.z);
-			glTexCoord2f(static_cast<float>(v->texCoords.x), static_cast<float>(v->texCoords.y));
-			vertex3fv(*v);
-		}
-		glEnd();
-	};
-
-	// Draw the mesh with the base color
-	drawWithColor(mesh.color);
-
-	if (isSelected) {
-		// Disable depth testing to ensure selection color overlays correctly
-		glDisable(GL_DEPTH_TEST);
-
-		// Draw the selection color
-		drawWithColor(Colors::MESH_SELECT_COLOR.transparent(0.4f));
-
-		glEnable(GL_DEPTH_TEST);  // Re-enable depth testing
-	}
-}
 
 void MeshRenderer::renderVertices(const Mesh& mesh, const std::vector<Vertex>& selectedVertices) {
 	glPointSize(4.0f);
@@ -97,16 +64,59 @@ void MeshRenderer::renderEdges(const Mesh& mesh, const std::vector<Vertex>& sele
 }
 
 void MeshRenderer::renderTriangles(const Mesh& mesh, const std::vector<Vertex>& selectedVertices) {
-	for (const auto& triangle : mesh.triangles) {
+	// Function to draw a triangle with a specified color and transparency
+	auto renderTriangle = [&mesh](const Triangle& t) {
+		glBegin(GL_TRIANGLES);
+		for (const auto& v : {t.v0, t.v1, t.v2}) {
+			// Choose the shading mode
+			const auto normal = mesh.shadingMode == ShadingMode::FLAT
+				? t.normal		// Flat shading
+				: v->normal;	// Smooth shading
+			glNormal3f(normal.x, normal.y, normal.z);
+			glTexCoord2f(static_cast<float>(v->texCoords.x), static_cast<float>(v->texCoords.y));
+			vertex3fv(*v);
+		}
+		glEnd();
+	};
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mesh.diffuse.toGLfloat());
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mesh.ambient.toGLfloat());
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mesh.specular.toGLfloat());
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mesh.emission.toGLfloat());
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mesh.shininess);
+
+	for (const auto& t : mesh.triangles) {
 		// Highlight if all 3 Vertices of the Triangle are currently selected
-		const auto vertices = {*triangle->v0, *triangle->v1, *triangle->v2};
+		const auto vertices = {*t->v0, *t->v1, *t->v2};
 		const auto isSelected = std::ranges::all_of(vertices,
 		    [selectedVertices](const auto& vertex) {
 			    return std::ranges::find(selectedVertices, vertex)
 		    		!= selectedVertices.end();
 		    });
 
-		renderTriangle(mesh, *triangle, isSelected);
+		// Draw the mesh with the base color
+		glBegin(GL_TRIANGLES);
+		renderTriangle(*t);
+
+		if (isSelected) {
+			// Disable depth testing to ensure selection color overlays correctly
+			glDisable(GL_DEPTH_TEST);
+
+			// Draw the selection color
+			if (!toggleDiffuse) {
+				toggleDiffuse = true;
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Colors::MESH_SELECT_COLOR.transparent(0.4f).toGLfloat());
+			}
+
+			renderTriangle(*t);
+
+			if (toggleDiffuse) {
+				toggleDiffuse = false;
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mesh.diffuse.toGLfloat());
+			}
+
+			glEnable(GL_DEPTH_TEST);  // Re-enable depth testing
+		}
 	}
 }
 
