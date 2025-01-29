@@ -21,7 +21,7 @@ public:
 		};
 	}
 
-	[[nodiscard]] GLfloat* toGLfloat() const { return new GLfloat[4]{red(), green(), blue(), alpha()}; }
+	[[nodiscard]] GLfloat* toGLfloat() const { return new GLfloat[4]{ red(), green(), blue(), alpha() }; }
 
 	static Color blendColors(const Color& color1, const Color& color2) {
 		int alpha = static_cast<int>(255 - (255 - color2.alpha()) * (255 - color1.alpha()));

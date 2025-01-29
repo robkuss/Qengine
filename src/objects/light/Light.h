@@ -16,4 +16,8 @@ public:
 
 	const int macro;
 	const std::array<float, 4> pos;
+
+	float ambient[3]  = {0.0f, 0.0f, 0.0f};
+	float diffuse[3]  = {0.0f, 0.0f, 0.0f};
+	float specular[3] = {0.0f, 0.0f, 0.0f};
 };

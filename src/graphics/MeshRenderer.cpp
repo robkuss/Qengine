@@ -31,37 +31,39 @@ void MeshRenderer::renderEdge(const Edge& e, const Color& firstColor, const Colo
 }
 
 void MeshRenderer::renderTriangle(const Mesh& mesh, const Triangle& t, const bool isSelected) {
-    // Function to draw a triangle with a specified color and transparency
-    auto drawWithColor = [&mesh, &t](const Color& color) {
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color.toGLfloat());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, color.toGLfloat());
-        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0f);
+	// Function to draw a triangle with a specified color and transparency
+	auto drawWithColor = [&mesh, &t](const Color& color) {
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color.toGLfloat());
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mesh.ambient.toGLfloat());
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mesh.specular.toGLfloat());
+		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mesh.emission.toGLfloat());
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mesh.shininess);
 
-        glBegin(GL_TRIANGLES);
-    	for (const auto& v : {t.v0, t.v1, t.v2}) {
-    		// Choose the shading mode
-    		const auto normal = mesh.shadingMode == ShadingMode::FLAT
-    			? t.normal		// Flat shading
-    			: v->normal;	// Smooth shading
-    		glNormal3f(normal.x, normal.y, normal.z);
-    		glTexCoord2f(static_cast<float>(v->texCoords.x), static_cast<float>(v->texCoords.y));
-    		vertex3fv(*v);
-    	}
-        glEnd();
-    };
+		glBegin(GL_TRIANGLES);
+		for (const auto& v : {t.v0, t.v1, t.v2}) {
+			// Choose the shading mode
+			const auto normal = mesh.shadingMode == ShadingMode::FLAT
+				? t.normal		// Flat shading
+				: v->normal;	// Smooth shading
+			glNormal3f(normal.x, normal.y, normal.z);
+			glTexCoord2f(static_cast<float>(v->texCoords.x), static_cast<float>(v->texCoords.y));
+			vertex3fv(*v);
+		}
+		glEnd();
+	};
 
-    // Draw the mesh with the base color
-    drawWithColor(mesh.color);
+	// Draw the mesh with the base color
+	drawWithColor(mesh.color);
 
-    if (isSelected) {
-    	// Disable depth testing to ensure selection color overlays correctly
-    	glDisable(GL_DEPTH_TEST);
+	if (isSelected) {
+		// Disable depth testing to ensure selection color overlays correctly
+		glDisable(GL_DEPTH_TEST);
 
-        // Draw the selection color
-        drawWithColor(Colors::MESH_SELECT_COLOR.transparent(0.4f));
+		// Draw the selection color
+		drawWithColor(Colors::MESH_SELECT_COLOR.transparent(0.4f));
 
-    	glEnable(GL_DEPTH_TEST);  // Re-enable depth testing
-    }
+		glEnable(GL_DEPTH_TEST);  // Re-enable depth testing
+	}
 }
 
 void MeshRenderer::renderVertices(const Mesh& mesh, const std::vector<Vertex>& selectedVertices) {
@@ -103,6 +105,7 @@ void MeshRenderer::renderTriangles(const Mesh& mesh, const std::vector<Vertex>& 
 			    return std::ranges::find(selectedVertices, vertex)
 		    		!= selectedVertices.end();
 		    });
+
 		renderTriangle(mesh, *triangle, isSelected);
 	}
 }

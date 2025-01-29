@@ -24,10 +24,8 @@ public:
 		const Dim sy
 	) :   UIElement(label, sx, sy),
 		  rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
-	      text(label), textSize(textSize), textMode(textMode), activated(true) {
-
-		setActivated(true);
-	}
+	      text(label), textSize(textSize), textMode(textMode),
+		  activated(true) {}
 
 	// Input with no text label
 	Input(
@@ -36,20 +34,14 @@ public:
 		const Dim sy
 	) :   UIElement("", sx, sy),
 		  rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
-		  activated(true) {
-
-		setActivated(true);
-	}
+		  activated(true) {}
 
 	// Default
 	explicit Input(
 		const std::vector<Color>& colors
 	) :   UIElement(""),
 		  rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
-		  activated(true) {
-
-		setActivated(true);
-	}
+		  activated(true) {}
 
 	~Input() override = default;
 

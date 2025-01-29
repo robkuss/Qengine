@@ -14,7 +14,7 @@ class Vector2;
 struct LabelNode;
 
 
-class UI final {
+class UI {
 public:
 	static int *width, *height;
 	static bool unsavedChanges;

@@ -40,6 +40,14 @@ public:
 	void updateNormals() const;
 
 	void setShadingMode(ShadingMode shadingMode);
+	void setMaterial(const Color &diffuse, const Color &specular, const Color &emission, const Color &ambient, const float shininess);
+
+protected:
+	Color diffuse  = Colors::WHITE;
+	Color specular = Colors::WHITE;
+	Color emission = Colors::BLACK;
+	Color ambient  = Colors::WHITE;
+	float shininess   = 30.0f;
 
 private:
 	friend class MeshRenderer;

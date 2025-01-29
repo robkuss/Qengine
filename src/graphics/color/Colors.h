@@ -25,7 +25,7 @@ namespace Colors {
 	const auto TEXT_COLOR				= Color(192, 192, 192);
 	const auto LIGHT_SUN				= Color(230, 230, 230);
 	const auto LIGHT_AMBIENT			= Color( 13,  13,  13);
-	const auto SKY					= GREY;
+	const auto SKY						= Color(192, 192, 192);
 
 	const auto UI_COLOR					= Color( 70,  70,  70);
 	const auto UI_COLOR_2				= Color( 60,  60,  60);

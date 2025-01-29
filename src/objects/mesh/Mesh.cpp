@@ -102,3 +102,11 @@ void Mesh::updateNormals() const {
 void Mesh::setShadingMode(const ShadingMode shadingMode) {
 	this->shadingMode = shadingMode;
 }
+
+void Mesh::setMaterial(const Color &diffuse, const Color &specular, const Color &emission, const Color &ambient, const float shininess) {
+	this->diffuse   = diffuse;
+	this->specular  = specular;
+	this->emission  = emission;
+	this->ambient   = ambient;
+	this->shininess = shininess;
+}

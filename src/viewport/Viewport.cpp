@@ -51,13 +51,17 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 	// OpenGL setup
 	glEnable(GL_MULTISAMPLE);	// Enable multi-sampling (antialiasing)
 	glEnable(GL_DEPTH_TEST);	// Enable depth testing
+	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_RESCALE_NORMAL);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_NORMALIZE);
 
-	//constexpr float noLight[4] = {0.0, 0.0, 0.0, 1.0};
-	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
+	constexpr float noLight[4] = {0.0, 0.0, 0.0, 1.0};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, noLight);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ZERO);
 
 	// Other setup
 	viewport	 = std::make_shared<std::array<int, 4>>();
@@ -96,7 +100,7 @@ void Viewport::start() {
 	const auto noTexture	= std::shared_ptr<Texture>{};
 	const auto thmTexture	= std::make_shared<Texture>("../resources/textures/thm2k.png");
 	const auto earthTexture = std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
-	//const auto starsTexture = std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
+	const auto starsTexture = std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
 
 	// Add Default Cube to Scene
 	const auto cube = std::make_shared<Cube>(
@@ -123,7 +127,7 @@ void Viewport::start() {
 	const auto skybox = std::make_shared<Skybox>(
 		"Skybox",
 		Colors::WHITE,
-		noTexture
+		starsTexture
 	);
 	background->addObject(skybox);
 
@@ -144,6 +148,13 @@ void Viewport::start() {
 		Colors::LIGHT_SUN,
 		Colors::LIGHT_AMBIENT,
 		Colors::WHITE
+	);
+
+	background->addLight(
+		std::make_shared<Light>("Sky Light", GL_LIGHT1, lightPos),
+		Colors::BLACK,
+		Colors::SKY,
+		Colors::BLACK
 	);
 
 	// Get matrices
