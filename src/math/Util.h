@@ -13,7 +13,7 @@ class Object;
 
 
 // Constants
-constexpr float EPSILON		= 1e-12f;					// Infinitesimal
+constexpr float EPSILON		= 1e-15f;					// Infinitesimal
 constexpr double PI			= 3.14159265358979323846;	// Because for some reason there is no Pi in cmath
 
 /** Degrees to radians */

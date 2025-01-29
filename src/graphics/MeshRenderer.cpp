@@ -179,17 +179,18 @@ bool MeshRenderer::isSilhouetteEdge(
 	const std::vector<std::shared_ptr<Triangle>>& edgeAdjFaces,
 	const Vector3& camPos
 ) {
-	// Retrieve the triangles adjacent to the edge
 	const auto& t1 = *edgeAdjFaces[0];
 	const auto& t2 = *edgeAdjFaces[1];
 
-	// Check for degenerate triangles
-	if (t1.isDegenerate() || t2.isDegenerate()) return false; // Ignore edges where one or both adjacent triangles are degenerate
+	const bool t1degen = t1.isDegenerate();
+	const bool t2degen = t2.isDegenerate();
 
-	// Check if triangles are front-facing or back-facing
-	const bool t1ff = t1.normal.dot(camPos - t1.centroid) > 0;
-	const bool t2ff = t2.normal.dot(camPos - t2.centroid) > 0;
+	if (t1degen && t2degen) return false; // Ignore edges fully enclosed by degenerate triangles
 
-	// Edge is a silhouette edge if one triangle is front-facing and the other is back-facing
-	return t1ff != t2ff;
+	const bool t1ff = !t1degen && t1.normal.dot(camPos - t1.centroid) > 0.0f;
+	const bool t2ff = !t2degen && t2.normal.dot(camPos - t2.centroid) > 0.0f;
+
+	return t1degen || t2degen	// If only one triangle is degenerate...
+		? !(t1ff || t2ff)		// ...Edge is silhouette if the non-degenerate Triangle is back-facing
+		:   t1ff != t2ff;		// ...otherwise, Edge is silhouette if one Triangle is front-facing and the other is back-facing
 }
