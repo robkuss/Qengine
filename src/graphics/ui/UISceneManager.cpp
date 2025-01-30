@@ -5,6 +5,7 @@
 #include <ranges>
 
 #include <objects/Object.h>
+#include <viewport/scene/SceneManager.h>
 
 #include "UIBulletTree.h"
 #include "UIWindow.h"
@@ -13,8 +14,8 @@
 Dim UISceneManager::sx = Dim(400.0f, DimType::Pixels);
 Dim UISceneManager::sy = PC_100;
 
-std::shared_ptr<UIWindow> UISceneManager::window = std::make_shared<UIWindow>("Scene Manager", sx, sy);
-std::shared_ptr<UIBulletTreeNode> UISceneManager::bpTree = std::make_shared<UIBulletTreeNode>(std::make_shared<UIBulletPoint>("Scene Manager"));
+shared_ptr<UIWindow> UISceneManager::window = make_shared<UIWindow>("Scene Manager", sx, sy);
+shared_ptr<UIBulletTreeNode> UISceneManager::bpTree = make_shared<UIBulletTreeNode>(make_shared<UIBulletPoint>("Scene Manager"));
 
 
 void UISceneManager::render(const float xpos, const float ypos) {
@@ -39,7 +40,7 @@ void UISceneManager::render(const float xpos, const float ypos) {
 	float yline = ypos + 2.7f * unit;
 
 	// Recursive lambda for rendering tree nodes
-	std::function<void(const UIBulletTreeNode&, float, int)> renderNode =
+	function<void(const UIBulletTreeNode&, float, int)> renderNode =
 		[&](const UIBulletTreeNode& node, const float xline, const int depth) {
 			// Render the current node's bullet point
 			if (node.bp) {
@@ -72,11 +73,11 @@ void UISceneManager::update() {
 		bpTree->addBulletPoint(scene->name, bpTree->bp->label, []{});
 
 		for (const auto& object : scene->sceneObjects) {
-			bpTree->addBulletPoint(object->name, scene->name, [object]{ SceneManager::selectObject(object); });
+			bpTree->addBulletPoint(object->name, scene->name, [object]{  });
 		}
 
 		for (const auto& light : scene->lights) {
-			bpTree->addBulletPoint(light->name, scene->name, [light]{ SceneManager::selectObject(light); });
+			bpTree->addBulletPoint(light->name, scene->name, [light]{ /*SceneManager::selectObject(light);*/ });
 		}
 	}
 }

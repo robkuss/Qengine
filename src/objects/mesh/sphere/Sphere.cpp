@@ -5,8 +5,8 @@
 class Sphere final : public Mesh {
 public:
     /** Construct a Sphere Mesh with given radius, position, and segment count */
-    explicit Sphere(const std::string& name, const Vector3& position, const float radius, const int segments, const int rings,
-        const Color& color, const std::shared_ptr<Texture>& texture)
+    explicit Sphere(const string& name, const Vector3& position, const float radius, const int segments, const int rings,
+        const Color& color, const shared_ptr<Texture>& texture)
             : Mesh{name, color, texture}, radius(radius), segments(segments), rings(rings) {
         initializeVertices();
         initializeFaceIndices();
@@ -29,7 +29,7 @@ private:
     /** Initialize the Sphere's Vertices based on radius, segments, and rings */
     void initializeVertices() override {
         // Top pole (north pole)
-        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, radius, Vector2{0.5f, 1.0f}));
+        vertices.emplace_back(make_shared<Vertex>(0.0f, 0.0f, radius, Vector2{0.5f, 1.0f}));
 
         // Latitude rings
         for (int ring = 1; ring < rings; ++ring) {
@@ -49,12 +49,12 @@ private:
                 const float u = static_cast<float>(seg) / static_cast<float>(segments);
                 const float v = 1.0f - static_cast<float>(ring) / static_cast<float>(rings); // Invert v to fix upside-down texture
 
-                vertices.emplace_back(std::make_shared<Vertex>(x, y, z, Vector2{u, v}));
+                vertices.emplace_back(make_shared<Vertex>(x, y, z, Vector2{u, v}));
             }
         }
 
         // Bottom pole (south pole)
-        vertices.emplace_back(std::make_shared<Vertex>(0.0f, 0.0f, -radius, Vector2{0.5f, 0.0f}));
+        vertices.emplace_back(make_shared<Vertex>(0.0f, 0.0f, -radius, Vector2{0.5f, 0.0f}));
     }
 
     /** Initialize the Sphere's face indices to form the Mesh */

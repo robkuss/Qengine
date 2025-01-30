@@ -1,5 +1,7 @@
 #pragma once
 
+using namespace std;
+
 #include <string>
 #include <atomic>
 #include <map>
@@ -9,7 +11,8 @@
 
 #include FT_FREETYPE_H
 
-#include <graphics/color/Colors.h>
+class Color;
+
 
 // Struct to represent each character glyph
 struct Character {
@@ -28,9 +31,9 @@ enum class TextMode {
 inline FT_Library library;
 inline FT_Face font;
 inline GLuint fontTexture;
-inline std::map<char, Character> characters;
+inline map<char, Character> characters;
 
-inline std::string nonFatalErrorText;
+inline string nonFatalErrorText;
 
 
 class Text {
@@ -42,8 +45,8 @@ public:
 	Text();
 	static void destruct();
 
-	static void renderText(const std::string& text, TextMode textMode, float x, float y, int textSize, Color color);
-	void setErrorText(const std::string& text);
+	static void renderText(const string& text, TextMode textMode, float x, float y, int textSize, Color color);
+	void setErrorText(const string& text);
 	static void drawErrorText(int windowH);
 
 	static float line(int lineNumber, int textSize);
@@ -52,5 +55,5 @@ private:
 	constexpr static auto fontPath = "../resources/fonts/cour.ttf";
 
 	double errorTime = 0.0;
-	std::atomic<bool> errorTimerRunning = false;
+	atomic<bool> errorTimerRunning = false;
 };

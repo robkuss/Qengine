@@ -18,7 +18,7 @@ private:
 	static void renderEdges(const Mesh &mesh);
 	static void renderTriangles(const Mesh &mesh);
 
-	static bool isSilhouetteEdge(const std::vector<std::shared_ptr<Triangle>> &edgeAdjFaces, const Vector3 &camPos);
+	static bool isSilhouetteEdge(const vector<shared_ptr<Triangle>> &edgeAdjFaces, const Vector3 &camPos);
 
 	static bool toggleDiffuse;
 };

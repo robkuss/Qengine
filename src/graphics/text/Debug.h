@@ -5,6 +5,7 @@
 #include <viewport/Viewport.h>
 #include <viewport/Camera.h>
 #include <viewport/scene/Scene.h>
+#include <viewport/scene/SceneManager.h>
 
 // Options
 #define DEBUG	// For on-screen debug text

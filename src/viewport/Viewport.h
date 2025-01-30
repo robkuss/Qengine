@@ -16,21 +16,24 @@
 
 // #define DRAW_MOUSE_RAY
 
+using namespace std;
+
 class Vector2;
 class SceneManager;	// Forward declaration for friend
 
 // Constants
-constexpr int ANTIALIASING_SAMPLES		= 25;
+constexpr int ANTIALIASING_SAMPLES	= 25;
 
-constexpr float AXES_LENGTH				= 100.0f;
-constexpr float MOUSE_RAY_LENGTH		= 1000.0f;
+constexpr float AXES_LENGTH			= 100.0f;
+constexpr float MOUSE_RAY_LENGTH	= 1000.0f;
 
 // These really shouldn't be here
-inline int  fps		= 0;
+inline int fps = 0;
+
 
 class Viewport {
 public:
-	Viewport(const std::string& title, int width, int height);
+	Viewport(const string& title, int width, int height);
 	~Viewport();
 
 	void start();
@@ -40,11 +43,11 @@ public:
 	void onKeyboardInput(GLFWwindow* cbWindow, int key, int scancode, int action, int mods);
 
 private:
-	std::shared_ptr<std::array<int, 4>> viewport;
-	std::shared_ptr<Camera> activeCamera;
+	shared_ptr<array<int, 4>> viewport;
+	shared_ptr<Camera> activeCamera;
 
 	GLFWwindow* window = nullptr;
-	std::string title;
+	string title;
 	int width, height;
 	float aspect;
 
@@ -56,7 +59,7 @@ private:
 	//Vector2 lastMousePos	 = Vector2(0.0, 0.0);
 	mutable Vector3 rayStart = Vector3::MINUS_ONE;
 	mutable Vector3 rayEnd   = Vector3::ONE;
-	std::shared_ptr<Ray> mouseRay;
+	shared_ptr<Ray> mouseRay;
 
 	bool drawCoordinateSystem = true;
 

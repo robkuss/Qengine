@@ -24,12 +24,12 @@ public:
 
 	static void render();
 
-	static void addElement(const std::shared_ptr<UIElement> &element, int layer);
+	static void addElement(const shared_ptr<UIElement> &element, int layer);
 
 	static void checkButtonPressed();
 
-	static void setOptionButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab);
-	static bool setOnClickForOptionButton(const std::shared_ptr<UIOptionList> &list, const std::string &label, const std::function<void()> &onClickAction);
+	static void setOptionButtonOnClickEvents(const shared_ptr<UIOptionList>& tab);
+	static bool setOnClickForOptionButton(const shared_ptr<UIOptionList> &list, const string &label, const function<void()> &onClickAction);
 
 protected:
 	friend class Text;
@@ -44,8 +44,8 @@ protected:
 
 private:
 	// Elements are stored as pointers, sorted by layer (lowest layer first)
-	static std::map<int, std::vector<std::shared_ptr<UIElement>>> layers;
-	static std::vector<const Vector2*> vertexPointers;
+	static map<int, vector<shared_ptr<UIElement>>> layers;
+	static vector<const Vector2*> vertexPointers;
 
-	static UIOptionVariant createOptionListRecursively(long long index, const std::shared_ptr<LabelNode> &label, float x, float y, Dim sx, Dim sy);
+	static UIOptionVariant createOptionListRecursively(long long index, const shared_ptr<LabelNode> &label, float x, float y, Dim sx, Dim sy);
 };

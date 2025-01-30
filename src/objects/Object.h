@@ -6,11 +6,13 @@
 #include <math/vector/Vector3.h>
 #include <math/matrix/Matrix4.h>
 
+using namespace std;
+
 class Mode;
 
 class Object {
 public:
-	std::string name;
+	string name;
 
 	Vector3 position		= Vector3::ZERO;
 	Vector3 scale			= Vector3::ONE;
@@ -18,7 +20,7 @@ public:
 	Vector3 rotationEuler	= Vector3::ZERO;	// Euler angles for debug output
 
 	// Constructor & Destructor
-	explicit Object(std::string name) : name(std::move(name)), id(nextID++) {}
+	explicit Object(string name) : name(move(name)), id(nextID++) {}
 	virtual ~Object() = default;	// Virtual destructor to enable dynamic_cast
 
 	virtual void applyTransformation(const Mode &selectionMode, const Mode &transformMode, const Matrix4 &transformation);

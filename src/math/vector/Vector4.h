@@ -17,7 +17,7 @@ public:
 			case 1: return y;
 			case 2: return z;
 			case 3: return w;
-			default: throw std::out_of_range("Index out of bounds for Vector4");
+			default: throw out_of_range("Index out of bounds for Vector4");
 		}
 	}
 
@@ -52,7 +52,7 @@ public:
 
 	// Utility functions
 	[[nodiscard]] float length() const {
-		return std::sqrt(x * x + y * y + z * z + w * w);
+		return sqrt(x * x + y * y + z * z + w * w);
 	}
 
 	[[nodiscard]] Vector4 normalize() const {
@@ -60,7 +60,7 @@ public:
 	}
 
 	[[nodiscard]] float distance(const Vector4& other) const {
-		return std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) + (z - other.z) * (z - other.z) + (w - other.w) * (w - other.w));
+		return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) + (z - other.z) * (z - other.z) + (w - other.w) * (w - other.w));
 	}
 
 	[[nodiscard]] float dot(const Vector4& other) const {

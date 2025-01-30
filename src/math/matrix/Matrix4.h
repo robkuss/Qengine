@@ -8,8 +8,8 @@ class Matrix4 {
 public:
 	Matrix4() = default;								// Default Constructor
 	explicit Matrix4(const float* arr);					// Constructor with array
-	explicit Matrix4(const std::array<float, 16>& arr);	// Constructor with std::array
-	Matrix4(std::initializer_list<float> list);			// Constructor with initializer list
+	explicit Matrix4(const array<float, 16>& arr);	// Constructor with array
+	Matrix4(initializer_list<float> list);			// Constructor with initializer list
 
 	void toFloatArray(float out[16]) const;
 

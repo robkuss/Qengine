@@ -22,7 +22,7 @@ public:
 
 
 inline bool Ray::intersects(const Mesh& mesh) const {
-	return std::ranges::any_of(mesh.triangles, [this](const std::shared_ptr<Triangle>& triangle) {
+	return ranges::any_of(mesh.triangles, [this](const shared_ptr<Triangle>& triangle) {
 		return intersects(*triangle);
 	});
 }

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <string>
-#include <stdexcept>
-#include <cmath>
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
+#include <cmath>
+
+using namespace std;
 
 
 class Vector3 {
@@ -31,7 +32,7 @@ public:
 			case 0: return x;
 			case 1: return y;
 			case 2: return z;
-			default: throw std::out_of_range("Index out of bounds for Vector3");
+			default: throw out_of_range("Index out of bounds for Vector3");
 		}
 	}
 
@@ -66,7 +67,7 @@ public:
 
 	// Utility functions
 	[[nodiscard]] float length() const {
-		return std::sqrt(x * x + y * y + z * z);
+		return sqrt(x * x + y * y + z * z);
 	}
 
 	[[nodiscard]] Vector3 normalize() const {
@@ -74,7 +75,7 @@ public:
 	}
 
 	[[nodiscard]] float distance(const Vector3& other) const {
-		return std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) + (z - other.z) * (z - other.z));
+		return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) + (z - other.z) * (z - other.z));
 	}
 
 	[[nodiscard]] float dot(const Vector3& other) const {
@@ -85,9 +86,9 @@ public:
 		return {y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x};
 	}
 
-	[[nodiscard]] std::string toString() const {
-		std::ostringstream out;
-		out << std::fixed << std::setprecision(3) << x << ", " << y << ", " << z;
+	[[nodiscard]] string toString() const {
+		ostringstream out;
+		out << fixed << setprecision(3) << x << ", " << y << ", " << z;
 		return out.str();
 	}
 };
@@ -100,9 +101,9 @@ template <>
 struct std::hash<Vector3> {
 	size_t operator()(const Vector3& v) const noexcept {
 		// Combine the hashes of the three components (x, y, z)
-		const size_t h1 = hash<float>()(v.x);
-		const size_t h2 = hash<float>()(v.y);
-		const size_t h3 = hash<float>()(v.z);
+		const size_t h1 = std::hash<float>()(v.x);
+		const size_t h2 = std::hash<float>()(v.y);
+		const size_t h3 = std::hash<float>()(v.z);
 
 		// Combine the three hash values using XOR and bit shifting
 		return h1 ^ h2 << 1 ^ h3 << 2;

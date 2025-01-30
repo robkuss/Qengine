@@ -4,7 +4,7 @@
 
 class Skybox final : public Mesh {
 public:
-	explicit Skybox(const std::string& name, const Color& color, const std::shared_ptr<Texture> &texture) : Mesh{name, color, texture} {
+	explicit Skybox(const string& name, const Color& color, const shared_ptr<Texture> &texture) : Mesh{name, color, texture} {
 		initializeVertices();
 		initializeFaceIndices();
 
@@ -23,40 +23,40 @@ private:
 		vertices.reserve(24);
 
 		// +y
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, 1, -1}, {0, -1, 0}, {2 / 3.f, 1 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, 1, 1}, {0, -1, 0}, {2 / 3.f, 2 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, 1, 1}, {0, -1, 0}, {1 / 3.f, 2 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, 1, -1}, {0, -1, 0}, {1 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, 1, -1}, {0, -1, 0}, {2 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, 1, 1}, {0, -1, 0}, {2 / 3.f, 2 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, 1, 1}, {0, -1, 0}, {1 / 3.f, 2 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, 1, -1}, {0, -1, 0}, {1 / 3.f, 1 / 2.f})));
 
 		// +z
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, -1, 1}, {0, 0, -1}, {2 / 3.f, 1 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, -1, 1}, {0, 0, -1}, {3 / 3.f, 1 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, 1, 1}, {0, 0, -1}, {3 / 3.f, 2 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, 1, 1}, {0, 0, -1}, {2 / 3.f, 2 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, -1, 1}, {0, 0, -1}, {2 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, -1, 1}, {0, 0, -1}, {3 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, 1, 1}, {0, 0, -1}, {3 / 3.f, 2 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, 1, 1}, {0, 0, -1}, {2 / 3.f, 2 / 2.f})));
 
 		// -x
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, -1, 1}, {1, 0, 0}, {0 / 3.f, 0 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, -1, -1}, {1, 0, 0}, {1 / 3.f, 0 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, 1, -1}, {1, 0, 0}, {1 / 3.f, 1 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, 1, 1}, {1, 0, 0}, {0 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, -1, 1}, {1, 0, 0}, {0 / 3.f, 0 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, -1, -1}, {1, 0, 0}, {1 / 3.f, 0 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, 1, -1}, {1, 0, 0}, {1 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, 1, 1}, {1, 0, 0}, {0 / 3.f, 1 / 2.f})));
 
 		// -y
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, -1, -1}, {0, 1, 0}, {1 / 3.f, 1 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, -1, 1}, {0, 1, 0}, {1 / 3.f, 0 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, -1, 1}, {0, 1, 0}, {2 / 3.f, 0 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, -1, -1}, {0, 1, 0}, {2 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, -1, -1}, {0, 1, 0}, {1 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, -1, 1}, {0, 1, 0}, {1 / 3.f, 0 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, -1, 1}, {0, 1, 0}, {2 / 3.f, 0 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, -1, -1}, {0, 1, 0}, {2 / 3.f, 1 / 2.f})));
 
 		// +x
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, -1, -1}, {-1, 0, 0}, {0 / 3.f, 1 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, -1, 1}, {-1, 0, 0}, {1 / 3.f, 1 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, 1, 1}, {-1, 0, 0}, {1 / 3.f, 2 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, 1, -1}, {-1, 0, 0}, {0 / 3.f, 2 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, -1, -1}, {-1, 0, 0}, {0 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, -1, 1}, {-1, 0, 0}, {1 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, 1, 1}, {-1, 0, 0}, {1 / 3.f, 2 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, 1, -1}, {-1, 0, 0}, {0 / 3.f, 2 / 2.f})));
 
 		// -z
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, -1, -1}, {0, 0, 1}, {2 / 3.f, 0 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, -1, -1}, {0, 0, 1}, {3 / 3.f, 0 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({1, 1, -1}, {0, 0, 1}, {3 / 3.f, 1 / 2.f})));
-		vertices.emplace_back(std::make_shared<Vertex>(Vertex({-1, 1, -1}, {0, 0, 1}, {2 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, -1, -1}, {0, 0, 1}, {2 / 3.f, 0 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, -1, -1}, {0, 0, 1}, {3 / 3.f, 0 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({1, 1, -1}, {0, 0, 1}, {3 / 3.f, 1 / 2.f})));
+		vertices.emplace_back(make_shared<Vertex>(Vertex({-1, 1, -1}, {0, 0, 1}, {2 / 3.f, 1 / 2.f})));
 	}
 
 	void initializeFaceIndices() override {

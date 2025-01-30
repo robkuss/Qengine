@@ -16,7 +16,7 @@ public:
 		switch (index) {
 			case 0: return x;
 			case 1: return y;
-			default: throw std::out_of_range("Index out of bounds for Vector2");
+			default: throw out_of_range("Index out of bounds for Vector2");
 		}
 	}
 
@@ -51,7 +51,7 @@ public:
 
 	// Utility functions
 	[[nodiscard]] double length() const {
-		return std::sqrt(x * x + y * y);
+		return sqrt(x * x + y * y);
 	}
 
 	[[nodiscard]] Vector2 normalize() const {
@@ -59,7 +59,7 @@ public:
 	}
 
 	[[nodiscard]] double distance(const Vector2& other) const {
-		return std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+		return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
 	}
 
 	[[nodiscard]] double dot(const Vector2& other) const {

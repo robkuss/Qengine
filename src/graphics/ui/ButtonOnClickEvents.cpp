@@ -8,15 +8,24 @@
 #include "objects/mesh/cube/Cube.cpp"
 #include "objects/mesh/sphere/Sphere.cpp"
 #include <objects/light/Sun.h>
+#include <viewport/scene/SceneManager.h>
 
 #include "UIOption.h"
-#include "UISceneManager.h"
 
 
+/**
+ * Searches for a button with a given label in a given list of UIOptions
+ * and set its onClick function to a given function parameter
+ *
+ * @param list The list in which to recursively look for the UIOption button
+ * @param label The label of the button to look for
+ * @param onClickAction The onClick function to be passed to the button
+ * @return True if successful, false otherwise
+ */
 bool UI::setOnClickForOptionButton(	// NOLINT(*-no-recursion)
-	const std::shared_ptr<UIOptionList>& list,
-	const std::string& label,
-	const std::function<void()>& onClickAction
+	const shared_ptr<UIOptionList>& list,
+	const string& label,
+	const function<void()>& onClickAction
 ) {
 	if (!list) return false;
 
@@ -30,9 +39,9 @@ bool UI::setOnClickForOptionButton(	// NOLINT(*-no-recursion)
 	for (const auto& innerOption : list->options) {
 		if (!innerOption) continue;
 		const auto button =
-			  std::holds_alternative<UIOption>(*innerOption)
-			? std::get<UIOption>(*innerOption).button
-			: std::get<UIOptionList>(*innerOption).button;
+			  holds_alternative<UIOption>(*innerOption)
+			? get<UIOption>(*innerOption).button
+			: get<UIOptionList>(*innerOption).button;
 
 		if (button && button->label == label) {
 			button->onClick = onClickAction;
@@ -41,9 +50,9 @@ bool UI::setOnClickForOptionButton(	// NOLINT(*-no-recursion)
 	}
 
 	// Recursively check all nested UIOptionLists
-	if (std::ranges::any_of(list->options, [&](const auto& nestedList) {
-		if (std::holds_alternative<UIOptionList>(*nestedList)) {
-			const auto nestedOptionList = std::make_shared<UIOptionList>(std::get<UIOptionList>(*nestedList));
+	if (ranges::any_of(list->options, [&](const auto& nestedList) {
+		if (holds_alternative<UIOptionList>(*nestedList)) {
+			const auto nestedOptionList = make_shared<UIOptionList>(get<UIOptionList>(*nestedList));
 			return setOnClickForOptionButton(nestedOptionList, label, onClickAction);
 		}
 		return false;
@@ -53,12 +62,12 @@ bool UI::setOnClickForOptionButton(	// NOLINT(*-no-recursion)
 }
 
 
-void UI::setOptionButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) {
-	std::shared_ptr<Scene> foreground;
+void UI::setOptionButtonOnClickEvents(const shared_ptr<UIOptionList>& tab) {
+	shared_ptr<Scene> foreground;
 	for (const auto& scene : SceneManager::scenes) {
 		if (scene->name == "Foreground") foreground = scene;
 	}
-	if (!foreground) std::cerr << "Foreground Scene not found" << std::endl;
+	if (!foreground) cerr << "Foreground Scene not found" << endl;
 
 
 	setOnClickForOptionButton(tab, "Exit", [] {
@@ -67,26 +76,26 @@ void UI::setOptionButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) 
 
 	setOnClickForOptionButton(tab, "Cube", [foreground] {
 		foreground->addObject(
-			std::make_shared<Cube>(
+			make_shared<Cube>(
 				"Cube",
 				Vector3(0.0f, 0.0f, 0.0f),
 				1.0f,
 				Colors::WHITE,
-				std::shared_ptr<Texture>{}
+				shared_ptr<Texture>{}
 			)
 		);
 	});
 
 	setOnClickForOptionButton(tab, "Sphere", [foreground] {
 		foreground->addObject(
-			std::make_shared<Sphere>(
+			make_shared<Sphere>(
 				"Sphere",
 				Vector3(0.0f, 0.0f, 0.0f),
 				0.5f,
 				64,
 				32,
 				Colors::WHITE,
-				std::shared_ptr<Texture>{}
+				shared_ptr<Texture>{}
 			)
 		);
 	});
@@ -96,9 +105,9 @@ void UI::setOptionButtonOnClickEvents(const std::shared_ptr<UIOptionList>& tab) 
 	});
 
 	setOnClickForOptionButton(tab, "Sun", [foreground] {
-		std::array lightPos = {-2.0f, -3.0f, -6.0f, 0.0f};
+		array lightPos = {-2.0f, -3.0f, -6.0f, 0.0f};
 		foreground->addLight(
-			std::make_shared<Sun>(
+			make_shared<Sun>(
 				"Sun",
 				GL_LIGHT2,
 				lightPos

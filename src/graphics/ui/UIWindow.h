@@ -1,12 +1,14 @@
 #pragma once
 
+#include <graphics/color/Colors.h>
+
 #include "UI.h"
 #include "UIElement.h"
 
 class UIWindow final : public UIElement {
 public:
 	UIWindow(
-		const std::string& label,
+		const string& label,
 		const Dim sx,
 		const Dim sy
 	) :	  UIElement(label, sx, sy) {}

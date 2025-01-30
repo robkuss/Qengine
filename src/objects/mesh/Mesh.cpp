@@ -32,7 +32,7 @@ void Mesh::applyTransformation(const Mode& selectionMode, const Mode& transformM
 
 void Mesh::initializeTriangles() {
 	for (int i = 0; i + 2 < faceIndices.size(); i += 3) {
-		triangles.push_back(std::make_shared<Triangle>(
+		triangles.push_back(make_shared<Triangle>(
 			vertices[faceIndices[i]],
 			vertices[faceIndices[i + 1]],
 			vertices[faceIndices[i + 2]]
@@ -47,11 +47,11 @@ void Mesh::buildVertexToEdgeMap() {
 
 	// Use shared_ptr to store the vertices in the map
 	for (const auto& v : vertices) {
-		for (const auto& e: edgeToFaceMap | std::views::keys) {
+		for (const auto& e: edgeToFaceMap | views::keys) {
 			if (e.v0 == v || e.v1 == v) {
 				// Store the shared pointer to the vertex in the map
 				if (!vertexToEdgeMap.contains(v)) {
-					vertexToEdgeMap[v] = std::vector {e};
+					vertexToEdgeMap[v] = vector {e};
 				} else {
 					vertexToEdgeMap[v].push_back(e);
 				}
@@ -74,7 +74,7 @@ void Mesh::buildEdgeToFaceMap() {
 }
 
 /** Helper function to add an edge to the map */
-void Mesh::addEdgeToMap(const Edge& e, const std::shared_ptr<Triangle>& t) {
+void Mesh::addEdgeToMap(const Edge& e, const shared_ptr<Triangle>& t) {
 	if (const auto it = edgeToFaceMap.find(e); it == edgeToFaceMap.end()) {
 		// If edge is not found, initialize the vector with the triangle
 		edgeToFaceMap[e] = {t};

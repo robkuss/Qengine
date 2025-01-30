@@ -5,11 +5,14 @@
 class UIBulletPoint final : public UIButtonElement {
 public:
 	explicit UIBulletPoint(
-		const std::string& label
-	) : UIButtonElement(label) {}
+		const string& label
+	) : UIButtonElement(label, INVIS_BUTTON_COLORS) {}
 
 	void render(const float xpos, const float ypos) override {
-		button->render(xpos, ypos);
+		button->sx = Dim(static_cast<float>(*UI::width) - xpos - 2 * unit, DimType::Pixels);
+		button->sy = UNIT;
+
+		button->render(xpos + unit / 3.0f, ypos - unit / 2.0f);
 
 		glPointSize(5.0f);
 		color3f(Colors::TEXT_COLOR);
@@ -27,7 +30,7 @@ public:
 		);
 	}
 
-	void setOnClickAction(const std::function<void()>& onClickAction) const {
+	void setOnClickAction(const function<void()>& onClickAction) const {
 		button->onClick = onClickAction;
 	}
 };

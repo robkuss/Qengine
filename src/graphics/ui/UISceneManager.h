@@ -13,7 +13,7 @@ public:
 	static void render(float xpos, float ypos);
 	static void update();
 
-	void addBulletPoint(const std::string &label, const std::string &parentLabel);
+	void addBulletPoint(const string &label, const string &parentLabel);
 
 private:
 	friend class UI;
@@ -21,6 +21,6 @@ private:
 	static Dim sx;
 	static Dim sy;
 
-	static std::shared_ptr<UIWindow> window;
-	static std::shared_ptr<UIBulletTreeNode> bpTree;
+	static shared_ptr<UIWindow> window;
+	static shared_ptr<UIBulletTreeNode> bpTree;
 };

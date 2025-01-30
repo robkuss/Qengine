@@ -135,7 +135,7 @@ void Camera::zoom(const double yoffset) {
 
 	// Update the camera distance with the scroll input
 	camDist -= static_cast<float>(yoffset) * zoomSpeed;
-	camDist = std::clamp(camDist, CAMERA_DISTANCE_MIN, CAMERA_DISTANCE_MAX);
+	camDist = clamp(camDist, CAMERA_DISTANCE_MIN, CAMERA_DISTANCE_MAX);
 
 	// Apply zoom
 	updatePosition();

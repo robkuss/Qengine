@@ -1,5 +1,7 @@
 #pragma once
 
+using namespace std;
+
 #include <string>
 
 enum class ModeType {
@@ -40,13 +42,13 @@ public:
 
     bool operator==(const Mode & mode) const = default;
 
-    [[nodiscard]] std::string modeToString() const;
-    [[nodiscard]] std::string subModeToString() const;
-    [[nodiscard]] std::string modeTypeToString() const;
+    [[nodiscard]] string modeToString() const;
+    [[nodiscard]] string subModeToString() const;
+    [[nodiscard]] string modeTypeToString() const;
 };
 
 // Function to convert ModeEnum to string
-inline std::string Mode::modeToString() const {
+inline string Mode::modeToString() const {
     switch (this->mode) {
         case NONE:    return "NONE";
         case OBJECT:  return "OBJECT";
@@ -62,7 +64,7 @@ inline std::string Mode::modeToString() const {
 }
 
 // Function to convert SubMode to string
-inline std::string Mode::subModeToString() const {
+inline string Mode::subModeToString() const {
     switch (this->subMode) {
         case SubMode::NONE: return "NONE";
         case SubMode::X:    return "X";
@@ -72,7 +74,7 @@ inline std::string Mode::subModeToString() const {
     }
 }
 
-inline std::string Mode::modeTypeToString() const {
+inline string Mode::modeTypeToString() const {
     switch (this->type) {
         case ModeType::NONE:      return "NONE";
         case ModeType::VIEW:      return "VIEW";

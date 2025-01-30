@@ -1,22 +1,24 @@
 #pragma once
 
+#include <graphics/color/Colors.h>
+
 #include "UI.h"
 
 class UIBar final : public UIElement {
 public:
 	// Constructor
 	UIBar(
-		std::vector<std::shared_ptr<UIOptionList>> tabs,
-		const std::string& label,
+		vector<shared_ptr<UIOptionList>> tabs,
+		const string& label,
 		const Dim sx,
 		const Dim sy
 	) :   UIElement(label, sx, sy),
-		  tabs(std::move(tabs)) {}
+		  tabs(move(tabs)) {}
 
 	void render(float xpos, float ypos) override;
 
 private:
-	std::vector<std::shared_ptr<UIOptionList>> tabs;
+	vector<shared_ptr<UIOptionList>> tabs;
 };
 
 

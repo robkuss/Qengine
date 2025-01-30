@@ -19,9 +19,9 @@ struct Vertex {
 
 	// Equality operator without floating-point tolerance
 	bool operator==(const Vertex& other) const {
-		return std::abs(position.x - other.position.x) == 0 &&
-			   std::abs(position.y - other.position.y) == 0 &&
-			   std::abs(position.z - other.position.z) == 0;
+		return abs(position.x - other.position.x) == 0 &&
+			   abs(position.y - other.position.y) == 0 &&
+			   abs(position.z - other.position.z) == 0;
 	}
 
 	// Less-than operator for consistent ordering
@@ -55,20 +55,20 @@ struct Vertex {
 
 	// Distance to another vertex
 	[[nodiscard]] float distance(const Vertex& other) const {
-		return std::sqrt(
+		return sqrt(
 			(position.x - other.position.x) * (position.x - other.position.x) +
 			(position.y - other.position.y) * (position.y - other.position.y) +
 			(position.z - other.position.z) * (position.z - other.position.z));
 	}
 };
 
-// Specialize std::hash for Vertex
+// Specialize hash for Vertex
 template <>
 struct std::hash<Vertex> {
 	size_t operator()(const Vertex& v) const noexcept {
 		// Combine the hashes of position and normal vectors
-		const size_t h1 = hash<Vector3>()(v.position);
-		const size_t h2 = hash<Vector3>()(v.normal);
+		const size_t h1 = std::hash<Vector3>()(v.position);
+		const size_t h2 = std::hash<Vector3>()(v.normal);
 
 		// Combine the two hash values using XOR and bit shifting
 		return h1 ^ h2 << 1;

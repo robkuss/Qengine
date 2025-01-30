@@ -45,7 +45,7 @@ void MeshRenderer::renderVertices(const Mesh& mesh) {
 void MeshRenderer::renderEdges(const Mesh& mesh) {
 	glLineWidth(2.0f);
 
-	for (const auto& edge : mesh.edgeToFaceMap | std::views::keys) {
+	for (const auto& edge : mesh.edgeToFaceMap | views::keys) {
 		// Highlight if either of the 2 Vertices of the Edge are currently selected
 		const auto firstColor = edge.v0->isSelected
 			? Colors::MESH_SELECT_COLOR
@@ -176,7 +176,7 @@ void MeshRenderer::renderSilhouette(const Mesh& mesh, const Mode& selectionMode,
 }
 
 bool MeshRenderer::isSilhouetteEdge(
-	const std::vector<std::shared_ptr<Triangle>>& edgeAdjFaces,
+	const vector<shared_ptr<Triangle>>& edgeAdjFaces,
 	const Vector3& camPos
 ) {
 	const auto& t1 = *edgeAdjFaces[0];

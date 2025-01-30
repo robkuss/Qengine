@@ -15,8 +15,8 @@ Matrix4::Matrix4(const float* arr) {
 	m14 = arr[3];  m24 = arr[7];  m34 = arr[11];  m44 = arr[15];
 }
 
-// Constructor with std::array
-Matrix4::Matrix4(const std::array<float, 16>& arr) {
+// Constructor with array
+Matrix4::Matrix4(const array<float, 16>& arr) {
 	m11 = arr[0];  m21 = arr[4];  m31 = arr[8];   m41 = arr[12];
 	m12 = arr[1];  m22 = arr[5];  m32 = arr[9];   m42 = arr[13];
 	m13 = arr[2];  m23 = arr[6];  m33 = arr[10];  m43 = arr[14];
@@ -24,9 +24,9 @@ Matrix4::Matrix4(const std::array<float, 16>& arr) {
 }
 
 // Constructor with initializer list
-Matrix4::Matrix4(const std::initializer_list<float> list) {
+Matrix4::Matrix4(const initializer_list<float> list) {
 	if (list.size() != 16) {
-		throw std::invalid_argument("Initializer list must have exactly 16 elements.");
+		throw invalid_argument("Initializer list must have exactly 16 elements.");
 	}
 	auto it = list.begin();
 	m11 = *it++; m21 = *it++; m31 = *it++; m41 = *it++;
@@ -192,7 +192,7 @@ Matrix4 Matrix4::rotateZ(const float a) {
 	// Calculate the determinant
 	float det = m11 * inv[0] + m12 * inv[4] + m13 * inv[8] + m14 * inv[12];
 
-	if (det > -EPSILON && det < EPSILON) throw std::runtime_error("Matrix is singular and cannot be inverted.");
+	if (det > -EPSILON && det < EPSILON) throw runtime_error("Matrix is singular and cannot be inverted.");
 
 	det = 1.0f / det;
 
@@ -207,19 +207,19 @@ Matrix4 Matrix4::rotateZ(const float a) {
 /** Extract Euler angles from a transformation matrix */
 [[nodiscard]] Vector3 Matrix4::extractEulerAngles() const {
 	// Compute sy (the magnitude of the first column vector of the 3x3 rotation submatrix)
-	const float sy = std::sqrt(m11 * m11 + m21 * m21);
+	const float sy = sqrt(m11 * m11 + m21 * m21);
 
 	// Check for singularity (gimbal lock)
 	const bool singular = sy < EPSILON;
 
 	float x, y, z; // Rotation angles (pitch, yaw, roll)
 	if (!singular) {
-		x = std::atan2(m32, m33); // Pitch (rotation around X-axis)
-		y = std::atan2(-m31, sy); // Yaw (rotation around Y-axis)
-		z = std::atan2(m21, m11); // Roll (rotation around Z-axis)
+		x = atan2(m32, m33); // Pitch (rotation around X-axis)
+		y = atan2(-m31, sy); // Yaw (rotation around Y-axis)
+		z = atan2(m21, m11); // Roll (rotation around Z-axis)
 	} else {
-		x = std::atan2(-m23, m22); // Alternate calculation for pitch in singular case
-		y = std::atan2(-m31, sy);  // Yaw remains the same
+		x = atan2(-m23, m22); // Alternate calculation for pitch in singular case
+		y = atan2(-m31, sy);  // Yaw remains the same
 		z = 0;							 // Roll is indeterminate
 	}
 

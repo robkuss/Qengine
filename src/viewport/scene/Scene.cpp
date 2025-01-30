@@ -3,26 +3,27 @@
 #include "Scene.h"
 
 #include <iostream>
-#include <memory>
+
 
 #include <graphics/MeshRenderer.h>
 #include <graphics/ui/UISceneManager.h>
 #include <math/ray/Ray.h>
 #include <viewport/Camera.h>
+#include <viewport/scene/SceneManager.h>
 
 
-void Scene::addObject(const std::shared_ptr<Object>& obj) {
+void Scene::addObject(const shared_ptr<Object>& obj) {
 	sceneObjects.emplace_back(obj);
 	UISceneManager::update();
 }
 
-void Scene::removeObject(const std::shared_ptr<Object>& obj) {
-	sceneObjects.erase(std::ranges::find(sceneObjects, obj));
+void Scene::removeObject(const shared_ptr<Object>& obj) {
+	sceneObjects.erase(ranges::find(sceneObjects, obj));
 	UISceneManager::update();
 }
 
 
-void Scene::render() {
+void Scene::render() const {
 	if (fixedPosition) {
 		// Load view matrix for background
 		SceneManager::activeCamera->loadFixedViewMatrix();
@@ -67,14 +68,14 @@ void Scene::render() {
 }
 
 void Scene::addLight(
-	const std::shared_ptr<Light>& light,
+	const shared_ptr<Light>& light,
 	const Color& diffuse,
 	const Color& ambient,
 	const Color& specular
 ) {
 	// If this GL_LIGHT has already been set, return
-	if (std::ranges::any_of(lights, [&](const auto& l) { return l->macro == light->macro; })) {
-		std::cerr << "Light " << light->macro << " has already been set" << std::endl;
+	if (ranges::any_of(lights, [&](const auto& l) { return l->macro == light->macro; })) {
+		cerr << "Light " << light->macro << " has already been set" << endl;
 		return;
 	}
 

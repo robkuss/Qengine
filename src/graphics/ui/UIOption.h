@@ -10,7 +10,7 @@
 class UIOption final : public UIButtonElement {
 public:
 	explicit UIOption(
-		const std::string& label,
+		const string& label,
 		const float x,
 		const float y,
 		const Dim sx,
@@ -36,14 +36,14 @@ public:
 /** A UIOptionList is a list of UIOption variants */
 class UIOptionList final : public UIButtonElement {
 public:
-	const std::vector<std::shared_ptr<UIOptionVariant>> options;
+	const vector<shared_ptr<UIOptionVariant>> options;
 	mutable bool isOpen;
 	bool isTabRoot;
 
 	explicit UIOptionList(
-		const std::string& label,
+		const string& label,
 		const bool isTabRoot,
-		const std::vector<std::shared_ptr<UIOptionVariant>>& options,
+		const vector<shared_ptr<UIOptionVariant>>& options,
 		const float x,
 		const float y,
 		const Dim sx,
@@ -95,13 +95,13 @@ public:
 		if (isOpen) {
 			// Render each Option in the List recursively
 			for (const auto& option : options) {
-				if (std::holds_alternative<UIOption>(*option)) {
-					auto isOption = std::get<UIOption>(*option);
+				if (holds_alternative<UIOption>(*option)) {
+					auto isOption = get<UIOption>(*option);
 					isOption.render(isOption.x + xpos, isOption.y + ypos);
 				}
 
-				if (std::holds_alternative<UIOptionList>(*option))
-					std::get<UIOptionList>(*option).render(xpos, ypos);
+				if (holds_alternative<UIOptionList>(*option))
+					get<UIOptionList>(*option).render(xpos, ypos);
 			}
 		}
 	}
@@ -115,13 +115,13 @@ public:
 		return innerOptionList.isOpen;
 	}
 
-	static bool isMouseInOptionList(const std::vector<std::shared_ptr<UIOptionVariant>>& optionList) {
-		return std::ranges::any_of(optionList, [](const auto& option) {
-			if (std::holds_alternative<UIOption>(*option))
-				return isMouseHere(std::get<UIOption>(*option));
+	static bool isMouseInOptionList(const vector<shared_ptr<UIOptionVariant>>& optionList) {
+		return ranges::any_of(optionList, [](const auto& option) {
+			if (holds_alternative<UIOption>(*option))
+				return isMouseHere(get<UIOption>(*option));
 
-			if (std::holds_alternative<UIOptionList>(*option))
-				return isMouseHere(std::get<UIOptionList>(*option));
+			if (holds_alternative<UIOptionList>(*option))
+				return isMouseHere(get<UIOptionList>(*option));
 
 			return false;
 		});
@@ -143,11 +143,11 @@ public:
 		}
 
 		for (const auto& option : options) {
-			if (std::holds_alternative<UIOption>(*option))
-				std::get<UIOption>(*option).checkButtonPressed();
+			if (holds_alternative<UIOption>(*option))
+				get<UIOption>(*option).checkButtonPressed();
 
-			if (std::holds_alternative<UIOptionList>(*option))
-				std::get<UIOptionList>(*option).checkButtonPressed();
+			if (holds_alternative<UIOptionList>(*option))
+				get<UIOptionList>(*option).checkButtonPressed();
 		}
 	}
 

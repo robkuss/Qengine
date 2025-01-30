@@ -1,9 +1,8 @@
 #pragma once
 
-#include <string>
-#include <utility>
+using namespace std;
+
 #include <variant>
-#include <vector>
 
 #include "math/vector/Vector2.h"
 
@@ -30,7 +29,7 @@ constexpr int uiFontSize		= unit / 2;
 class UIOption;
 class UIOptionList;
 
-using UIOptionVariant = std::variant<UIOption, UIOptionList>;
+using UIOptionVariant = variant<UIOption, UIOptionList>;
 
 
 enum class DimType {
@@ -54,27 +53,27 @@ struct Dim {
 
 class UIElement {
 public:
-	std::string label;		// Name of (or text on) the element
+	string label;		// Name of (or text on) the element
 	Dim sx{};				// Width
 	Dim sy{};				// Height
 
 	float x = 0.0f;
 	float y = 0.0f;
 
-	std::vector<Vector2> vertices{};
+	vector<Vector2> vertices{};
 
 	explicit UIElement(
-		std::string label
-	) : label(std::move(label)) {
+		string label
+	) : label(move(label)) {
 
 		vertices.resize(4);
 	}
 
 	UIElement(
-		std::string label,
+		string label,
 		const Dim sx,
 		const Dim sy
-	) : label(std::move(label)),
+	) : label(move(label)),
 		sx(sx),
 		sy(sy) {
 

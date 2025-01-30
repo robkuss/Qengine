@@ -12,16 +12,17 @@
 #include "graphics/ui/UI.h"
 
 #include "scene/Scene.h"
+#include "scene/SceneManager.h"
 
 
-Viewport::Viewport(const std::string& title, const int width, const int height)
+Viewport::Viewport(const string& title, const int width, const int height)
 	: title(title), width(width), height(height) {
 	glfwSetErrorCallback([](int, const char *description) {
-		std::cerr << "GLFW Error: " << description << std::endl;
+		cerr << "GLFW Error: " << description << endl;
 	});
 
 	if (!glfwInit()) {
-		throw std::runtime_error("Failed to initialize GLFW");
+		throw runtime_error("Failed to initialize GLFW");
 	}
 
 	glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
@@ -31,7 +32,7 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 	window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 	if (!window) {
 		glfwTerminate();
-		throw std::runtime_error("Failed to open window");
+		throw runtime_error("Failed to open window");
 	}
 	centerWindow();
 
@@ -64,9 +65,9 @@ Viewport::Viewport(const std::string& title, const int width, const int height)
 	glBlendFunc(GL_ONE, GL_ZERO);
 
 	// Other setup
-	viewport	 = std::make_shared<std::array<int, 4>>();
-	activeCamera = std::make_shared<Camera>();
-	mouseRay	 = std::make_shared<Ray>(rayStart, rayEnd);
+	viewport	 = make_shared<array<int, 4>>();
+	activeCamera = make_shared<Camera>();
+	mouseRay	 = make_shared<Ray>(rayStart, rayEnd);
 
 	glViewport(0, 0, width, height);	// Initialize viewport
 	glGetIntegerv(GL_VIEWPORT, viewport->data());
@@ -89,21 +90,21 @@ void Viewport::start() {
 	SceneManager::mouseRay		= mouseRay;
 
 	// Create Scenes
-	const auto foreground = std::make_shared<Scene>("Foreground");
-	const auto background = std::make_shared<Scene>("Background");
+	const auto foreground = make_shared<Scene>("Foreground");
+	const auto background = make_shared<Scene>("Background");
 
 	// Add Scenes to the SceneManager
 	SceneManager::addScene(background);
 	SceneManager::addScene(foreground);
 
 	// Load Textures
-	const auto noTexture	= std::shared_ptr<Texture>{};
-	const auto thmTexture	= std::make_shared<Texture>("../resources/textures/thm2k.png");
-	const auto earthTexture = std::make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
-	const auto starsTexture = std::make_shared<Texture>("../resources/textures/cubemap8k.jpg");
+	const auto noTexture	= shared_ptr<Texture>{};
+	const auto thmTexture	= make_shared<Texture>("../resources/textures/thm2k.png");
+	const auto earthTexture = make_shared<Texture>("../resources/textures/earth_diffuse.jpg");
+	const auto starsTexture = make_shared<Texture>("../resources/textures/cubemap8k.jpg");
 
 	// Add Default Cube to Scene
-	const auto cube = std::make_shared<Cube>(
+	const auto cube = make_shared<Cube>(
 		"THM Cube",
 		Vector3(0.0f, 1.5f, 0.0f),
 		1.0f,
@@ -113,7 +114,7 @@ void Viewport::start() {
 	foreground->addObject(cube);
 
 	// Add Earth to Scene
-	const auto earth = std::make_shared<Sphere>(
+	const auto earth = make_shared<Sphere>(
 		"Earth",
 		Vector3(0.0f, -2.0f, 0.0f),
 		1.0f,
@@ -124,7 +125,7 @@ void Viewport::start() {
 	);
 	foreground->addObject(earth);
 
-	const auto skybox = std::make_shared<Skybox>(
+	const auto skybox = make_shared<Skybox>(
 		"Skybox",
 		Colors::WHITE,
 		starsTexture
@@ -142,16 +143,16 @@ void Viewport::start() {
 	clearColor(Colors::BG_COLOR);	// Background color
 
 	// Initialize lighting
-	std::array lightPos = {2.0f, 3.0f, 6.0f, 0.0f};
+	array lightPos = {2.0f, 3.0f, 6.0f, 0.0f};
 	foreground->addLight(
-		std::make_shared<Light>("Sun", GL_LIGHT1, lightPos),
+		make_shared<Light>("Sun", GL_LIGHT1, lightPos),
 		Colors::LIGHT_SUN,
 		Colors::LIGHT_AMBIENT,
 		Colors::WHITE
 	);
 
 	background->addLight(
-		std::make_shared<Light>("Sky Light", GL_LIGHT1, lightPos),
+		make_shared<Light>("Sky Light", GL_LIGHT1, lightPos),
 		Colors::BLACK,
 		Colors::SKY,
 		Colors::BLACK

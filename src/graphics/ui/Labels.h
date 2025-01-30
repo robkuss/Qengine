@@ -2,22 +2,22 @@
 
 // Node structure for holding labels
 struct LabelNode {
-	std::string label;
-	std::vector<std::shared_ptr<LabelNode>> children;
+	string label;
+	vector<shared_ptr<LabelNode>> children;
 
-	explicit LabelNode(std::string label) : label(std::move(label)) {}
+	explicit LabelNode(string label) : label(move(label)) {}
 };
 
 // Helper function to create a node with children
-inline std::shared_ptr<LabelNode> cn(const std::string& label, const std::initializer_list<std::shared_ptr<LabelNode>> children = {}) {
-	auto node = std::make_shared<LabelNode>(label);
+inline shared_ptr<LabelNode> cn(const string& label, const initializer_list<shared_ptr<LabelNode>> children = {}) {
+	auto node = make_shared<LabelNode>(label);
 	node->children.insert(node->children.end(), children.begin(), children.end());
 	return node;
 }
 
 
 // Initialize labels for UIElements
-const auto uiStructure = std::vector{
+const auto uiStructure = vector{
 	cn("File", {
 		cn("New"), cn("Open"), cn("Save"), cn("Save As"), cn("Exit")
 	}),

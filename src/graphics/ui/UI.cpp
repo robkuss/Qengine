@@ -20,8 +20,8 @@ float UI::bottomLineY;
 
 bool UI::unsavedChanges = false;
 
-std::vector<const Vector2*> UI::vertexPointers = std::vector<const Vector2*>();
-std::map<int, std::vector<std::shared_ptr<UIElement>>> UI::layers = std::map<int, std::vector<std::shared_ptr<UIElement>>>();
+vector<const Vector2*> UI::vertexPointers = vector<const Vector2*>();
+map<int, vector<shared_ptr<UIElement>>> UI::layers = map<int, vector<shared_ptr<UIElement>>>();
 
 
 void UI::setup(int* w, int* h) {
@@ -32,10 +32,10 @@ void UI::setup(int* w, int* h) {
 	Text();
 
 	// Initialize highest-level UIOptionLists
-	auto tabs = std::vector<std::shared_ptr<UIOptionList>>();
+	auto tabs = vector<shared_ptr<UIOptionList>>();
 
 	// Iterate through labels for each UITab and create elements
-	for (const auto& [i, labelList] : std::views::enumerate(uiStructure)) {
+	for (const auto& [i, labelList] : views::enumerate(uiStructure)) {
 		// Initialize dimensions
 		const auto tabX  = firstTabX + static_cast<float>(i) * tabWidth;
 		constexpr auto tabY  = tabPadding;
@@ -45,15 +45,15 @@ void UI::setup(int* w, int* h) {
 		constexpr auto optSY = UNIT;
 
 		// Dynamically and recursively create UIOptionList from the labels
-		auto options = std::vector<std::shared_ptr<UIOptionVariant>>();
-		for (const auto& [j, label] : std::views::enumerate(labelList->children)) {
-			options.push_back(std::make_shared<UIOptionVariant>(
+		auto options = vector<shared_ptr<UIOptionVariant>>();
+		for (const auto& [j, label] : views::enumerate(labelList->children)) {
+			options.push_back(make_shared<UIOptionVariant>(
 				createOptionListRecursively(j, label, tabX, tabY, optSX, optSY)
 			));
 		}
 
 		// Dynamically create UITab from the UIOptionList
-		const auto tab = std::make_shared<UIOptionList>(
+		const auto tab = make_shared<UIOptionList>(
 			labelList->label, true, options, tabX, tabY, tabSX, tabSY
 		);
 
@@ -67,7 +67,7 @@ void UI::setup(int* w, int* h) {
 	}
 
 	// Create UIBar from the UITabs
-	const auto bar = std::make_shared<UIBar>(
+	const auto bar = make_shared<UIBar>(
 		tabs,
 		"UIBar",
 		PC_100,
@@ -80,7 +80,7 @@ void UI::setup(int* w, int* h) {
 
 UIOptionVariant UI::createOptionListRecursively(	// NOLINT(*-no-recursion)
 	const long long index,
-	const std::shared_ptr<LabelNode>& label,
+	const shared_ptr<LabelNode>& label,
 	const float x,
 	const float y,
 	const Dim sx,
@@ -91,28 +91,28 @@ UIOptionVariant UI::createOptionListRecursively(	// NOLINT(*-no-recursion)
 
 	// Base case: leaf node (single UIOption)
 	if (label->children.empty()) {
-		return *std::make_shared<UIOption>(label->label, x, newY, sx, sy);
+		return *make_shared<UIOption>(label->label, x, newY, sx, sy);
 	}
 
 	// Recursive case: parent node (UIOptionList)
-	auto options = std::vector<std::shared_ptr<UIOptionVariant>>();
-	for (const auto& [i, child] : std::views::enumerate(label->children)) {
+	auto options = vector<shared_ptr<UIOptionVariant>>();
+	for (const auto& [i, child] : views::enumerate(label->children)) {
 		const auto optionX = x + sx.value;
 		const auto optionY = y + static_cast<float>(index) * sy.value;
 
 		// Recursive call for child
-		options.push_back(std::make_shared<UIOptionVariant>(
+		options.push_back(make_shared<UIOptionVariant>(
 			createOptionListRecursively(i, child, optionX, optionY, sx, sy)
 		));
 	}
 
 	// Create and return a UIOptionList
-	return *std::make_shared<UIOptionList>(
+	return *make_shared<UIOptionList>(
 		label->label, false, options, x, newY, sx, sy
 	);
 }
 
-void UI::addElement(const std::shared_ptr<UIElement>& element, const int layer) {
+void UI::addElement(const shared_ptr<UIElement>& element, const int layer) {
 	for (const auto& vertex : element->vertices) {
 		vertexPointers.push_back(&vertex);
 	}
@@ -165,7 +165,7 @@ void UI::render() {
 
 
 	// Render elements
-	for (const auto &elementsOnLayer: layers | std::views::values) {
+	for (const auto &elementsOnLayer: layers | views::values) {
 		for (const auto& element : elementsOnLayer) {
 			element->render(0.0f, 0.0f);
 		}
@@ -190,9 +190,9 @@ void UI::render() {
 
 
 void UI::checkButtonPressed() {
-	for (const auto &elementsOnLayer: layers | std::views::values) {
+	for (const auto &elementsOnLayer: layers | views::values) {
 		for (const auto& element : elementsOnLayer) {
-			if (const auto buttonElement = std::dynamic_pointer_cast<const UIButtonElement>(element)) {
+			if (const auto buttonElement = dynamic_pointer_cast<const UIButtonElement>(element)) {
 				buttonElement->checkButtonPressed();
 			}
 		}

@@ -4,7 +4,7 @@
 
 #include "math/matrix/Matrix4.h"
 
-Vector2 project(const Vector3& worldPoint, const std::array<int, 4>* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
+Vector2 project(const Vector3& worldPoint, const array<int, 4>* viewport, const array<float, 16>& viewMatrix, const array<float, 16>& projMatrix) {
 	// TODO Make this better
 	auto clip = Vector4(
        viewMatrix[0] * worldPoint.x + viewMatrix[4] * worldPoint.y + viewMatrix[8] * worldPoint.z + viewMatrix[12],
@@ -14,12 +14,12 @@ Vector2 project(const Vector3& worldPoint, const std::array<int, 4>* viewport, c
 	);
 
 	// Step 2: Apply the projection matrix (this transforms from camera space to clip space)
-	clip.x = projMatrix[0] * clip.x + projMatrix[4] * clip.y + projMatrix[8] * clip.z + projMatrix[12] * clip.w;
-	clip.y = projMatrix[1] * clip.x + projMatrix[5] * clip.y + projMatrix[9] * clip.z + projMatrix[13] * clip.w;
+	clip.x = projMatrix[0] * clip.x + projMatrix[4] * clip.y + projMatrix[8]  * clip.z + projMatrix[12] * clip.w;
+	clip.y = projMatrix[1] * clip.x + projMatrix[5] * clip.y + projMatrix[9]  * clip.z + projMatrix[13] * clip.w;
 	clip.z = projMatrix[2] * clip.x + projMatrix[6] * clip.y + projMatrix[10] * clip.z + projMatrix[14] * clip.w;
 	clip.w = projMatrix[3] * clip.x + projMatrix[7] * clip.y + projMatrix[11] * clip.z + projMatrix[15] * clip.w;
 
-	if (std::abs(clip.w) < EPSILON) throw std::runtime_error("Cannot project point: w component is zero.");
+	if (abs(clip.w) < EPSILON) throw runtime_error("Cannot project point: w component is zero.");
 	const float ndcX = clip.x / clip.w;
 	const float ndcY = clip.y / clip.w;
 
@@ -29,7 +29,7 @@ Vector2 project(const Vector3& worldPoint, const std::array<int, 4>* viewport, c
 	return {screenX, screenY};
 }
 
-Vector3 unproject(const Vector2& screenPoint, const std::array<int, 4>* viewport, const std::array<float, 16>& viewMatrix, const std::array<float, 16>& projMatrix) {
+Vector3 unproject(const Vector2& screenPoint, const array<int, 4>* viewport, const array<float, 16>& viewMatrix, const array<float, 16>& projMatrix) {
 	// Convert mouse coordinates to normalized device coordinates (NDC)
 	const auto x = static_cast<float>(2.0 * screenPoint.x / (*viewport)[2] - 1.0);
 	const auto y = static_cast<float>(1.0 - 2.0 * screenPoint.y / (*viewport)[3]);

@@ -3,18 +3,20 @@
 #include "../ui/UI.h"
 
 #include <iostream>
+#include <graphics/color/Colors.h>
+
 
 // Function to initialize FreeType and load the font
 Text::Text() {
     // Initialize the FreeType library
     if (FT_Init_FreeType(&library)) {
-        std::cerr << "ERROR: Could not initialize FreeType library" << std::endl;
+        cerr << "ERROR: Could not initialize FreeType library" << endl;
         exit(-1);
     }
 
     // Load the font face
     if (FT_New_Face(library, fontPath, 0, &font)) {
-        std::cerr << "ERROR: Could not load font " << fontPath << std::endl;
+        cerr << "ERROR: Could not load font " << fontPath << endl;
         exit(-1);
     }
 
@@ -26,7 +28,7 @@ Text::Text() {
     for (unsigned char c = 0; c < 128; c++) {
         // Load character glyph
         if (FT_Load_Char(font, c, FT_LOAD_RENDER)) {
-            std::cerr << "ERROR: Failed to load Glyph " << c << std::endl;
+            cerr << "ERROR: Failed to load Glyph " << c << endl;
             continue;
         }
 
@@ -61,7 +63,7 @@ Text::Text() {
             font->glyph->bitmap_top,
             font->glyph->advance.x
         };
-        characters.insert(std::pair<char, Character>(c, character));
+        characters.insert(pair<char, Character>(c, character));
     }
     glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -99,7 +101,7 @@ float Text::line(const int lineNumber, const int textSize) {
  * @param textSize font size for this particular text
  * @param color the color that the text will be drawn in
  */
-void Text::renderText(const std::string& text, TextMode textMode, const float x, const float y, const int textSize, const Color color) {
+void Text::renderText(const string& text, TextMode textMode, const float x, const float y, const int textSize, const Color color) {
     // Save OpenGL state
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
 
@@ -124,7 +126,7 @@ void Text::renderText(const std::string& text, TextMode textMode, const float x,
         char c = text[i];
         auto it = characters.find(c);
         if (it == characters.end()) {
-            std::cerr << "Character " << c << " not found in the map" << std::endl;
+            cerr << "Character " << c << " not found in the map" << endl;
             continue;
         }
         auto&[textureID, sizeX, sizeY, bearingX, bearingY, advance] = it->second;
@@ -168,15 +170,15 @@ void Text::renderText(const std::string& text, TextMode textMode, const float x,
  * Set a non-fatal error text to be displayed at the bottom of the screen.
  * The text will disappear after 3 seconds.
  */
-void Text::setErrorText(const std::string& text) {
+void Text::setErrorText(const string& text) {
     nonFatalErrorText = text;
 
     if (!errorTimerRunning) {
         errorTimerRunning = true;
 
         // Launch a thread to reset the errorText after 3 seconds
-        std::thread([this] {
-            std::this_thread::sleep_for(std::chrono::seconds(3));
+        thread([this] {
+            this_thread::sleep_for(chrono::seconds(3));
             nonFatalErrorText = "";
             errorTimerRunning = false;
         }).detach(); // Detach the thread so it runs independently

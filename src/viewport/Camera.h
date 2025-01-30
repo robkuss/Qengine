@@ -2,6 +2,8 @@
 
 #include <math/ray/Ray.h>
 
+using namespace std;
+
 
 // Constants
 const auto CAMERA_POSITION_INIT			= Vector3(10.0f, 0, 0);		// Default camera position
@@ -23,8 +25,8 @@ public:
 	Camera(const Vector3 &camPos, const Vector3 &lookAt, const Vector3 &up);
 	~Camera();
 
-	std::array<GLfloat, 16> viewMatrix{};
-	std::array<GLfloat, 16> projMatrix{};
+	array<GLfloat, 16> viewMatrix{};
+	array<GLfloat, 16> projMatrix{};
 
 	Vector3 camPos		= CAMERA_POSITION_INIT;
 	Vector3 lookAt		= LOOK_AT_POINT_INIT;

@@ -1,47 +1,37 @@
 #pragma once
 
-#include <functional>
-
 #include "Input.h"
 
 
 class Button final : public Input {
 public:
 	// The function that is called when the button is clicked
-	std::function<void()> onClick;
+	function<void()> onClick;
 
 	// Button with text label
 	Button(
-		const std::string& label,
+		const string& label,
 		const int textSize,
 		const TextMode textMode,
-		const std::vector<Color>& colors,
+		const vector<Color>& colors,
 		const Dim sx,
 		const Dim sy
 	) : Input(label, textSize, textMode, colors, sx, sy) {}
 
 	// Button with no text label
 	Button(
-		const std::vector<Color>& colors,
+		const vector<Color>& colors,
 		const Dim sx,
 		const Dim sy
 	) : Input(colors, sx, sy) {}
 
 	// Default
-	Button() : Input(BUTTON_COLORS) {}
+	explicit Button(
+		const vector<Color>& colors
+	) : Input(colors) {}
 
 
 	void render(float xpos, float ypos) override;
-
-	void click() const {
-		onClick();
-	}
-
-	bool setOnClickForButton(
-		std::shared_ptr<UIOptionList> list,
-		const std::string& label,
-		const std::function<void()>& onClickAction
-	);
 };
 
 

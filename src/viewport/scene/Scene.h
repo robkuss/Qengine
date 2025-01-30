@@ -1,12 +1,10 @@
 #pragma once
 
-#include <memory>
-#include <utility>
 #include <vector>
 
-#include "SceneManager.h"
 #include "objects/light/Light.h"
 
+using namespace std;
 
 class Color;
 class Ray;
@@ -15,20 +13,20 @@ class Mesh;
 struct Vertex;
 
 
-class Scene {
+class Scene final {
 public:
-	std::string name;
+	string name;
 
 	// Constructor & Destructor
-	explicit Scene(std::string name) : name(std::move(name)) {}
-	virtual ~Scene() = default;
+	explicit Scene(string name) : name(move(name)) {}
+	~Scene() = default;
 
-	virtual void render();
+	void render() const;
 
-	void addObject(const std::shared_ptr<Object>& obj);
-	void removeObject(const std::shared_ptr<Object>& obj);
+	void addObject(const shared_ptr<Object>& obj);
+	void removeObject(const shared_ptr<Object>& obj);
 
-	void addLight(const std::shared_ptr<Light> &light, const Color &diffuse, const Color &ambient, const Color &specular);
+	void addLight(const shared_ptr<Light> &light, const Color &diffuse, const Color &ambient, const Color &specular);
 
 	void enableDepthIsolation();
 	void enableFixedPosition();
@@ -41,8 +39,8 @@ private:
 	friend class UISceneManager;
 
 	// Objects
-	std::vector<std::shared_ptr<Object>> sceneObjects;	// Scene Objects (as shared pointers to prevent object slicing)
-	std::vector<std::shared_ptr<Light>> lights;			// Scene Lights
+	vector<shared_ptr<Object>> sceneObjects;	// Scene Objects (as shared pointers to prevent object slicing)
+	vector<shared_ptr<Light>> lights;			// Scene Lights
 
 	bool depthIsolation = false;
 	bool fixedPosition  = false;

@@ -1,13 +1,24 @@
 #pragma once
 
+#include <graphics/color/Colors.h>
+#include <viewport/scene/SceneManager.h>
+
 #include "../UI.h"
 
 
-const auto BUTTON_COLORS = std::vector{
+const auto BUTTON_COLORS = vector{
 	Colors::BUTTON_REG_FILL,
 	Colors::BUTTON_REG_OUTLINE,
 	Colors::BUTTON_HIGH_FILL,
 	Colors::BUTTON_HIGH_OUTLINE,
+	Colors::BUTTON_DEACT_FILL
+};
+
+const auto INVIS_BUTTON_COLORS = vector{
+	Colors::UI_COLOR_2,
+	Colors::UI_COLOR_2,
+	Colors::BUTTON_REG_FILL,
+	Colors::BUTTON_REG_FILL,
 	Colors::BUTTON_DEACT_FILL
 };
 
@@ -16,10 +27,10 @@ class Input : public UIElement {
 public:
 	// Input with text label
 	Input(
-	 	const std::string& label,
+	 	const string& label,
 		const int textSize,
 		const TextMode textMode,
-		const std::vector<Color>& colors,
+		const vector<Color>& colors,
 		const Dim sx,
 		const Dim sy
 	) :   UIElement(label, sx, sy),
@@ -29,7 +40,7 @@ public:
 
 	// Input with no text label
 	Input(
-		const std::vector<Color>& colors,
+		const vector<Color>& colors,
 		const Dim sx,
 		const Dim sy
 	) :   UIElement("", sx, sy),
@@ -38,7 +49,7 @@ public:
 
 	// Default
 	explicit Input(
-		const std::vector<Color>& colors
+		const vector<Color>& colors
 	) :   UIElement(""),
 		  rf(colors[0]), ro(colors[1]), hf(colors[2]), ho(colors[3]), df(colors[4]),
 		  activated(true) {}
@@ -56,7 +67,7 @@ public:
 
 	void render(float xpos, float ypos) override;
 
-	[[nodiscard]] std::string getText() const {
+	[[nodiscard]] string getText() const {
 		return text;
 	}
 
@@ -66,7 +77,7 @@ public:
 
 protected:
 	Color rf, ro, hf, ho, df;		// Regular, highlight and deactivated Colors (f = fill, o = outline)
-	std::string text;				// Label text for the input
+	string text;				// Label text for the input
 	int textSize{};					// Font size of the text
 	TextMode textMode{};			// Left, right, or center
 	bool activated{};				// Determines if the input is activated or not

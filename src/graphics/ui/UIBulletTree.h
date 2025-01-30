@@ -2,20 +2,21 @@
 
 #include "UIBulletPoint.h"
 
+using namespace std;
 
 struct UIBulletTreeNode {
-	std::shared_ptr<UIBulletPoint> bp;
-	std::vector<std::shared_ptr<UIBulletTreeNode>> children;
+	shared_ptr<UIBulletPoint> bp;
+	vector<shared_ptr<UIBulletTreeNode>> children;
 
 	// Constructor to initialize with a bullet point
-	explicit UIBulletTreeNode(const std::shared_ptr<UIBulletPoint>& bulletPoint)
+	explicit UIBulletTreeNode(const shared_ptr<UIBulletPoint>& bulletPoint)
 		: bp(bulletPoint) {}
 
 
 	void addBulletPoint( // NOLINT(*-no-recursion)
-		const std::string& label,
-		const std::string& parentLabel,
-		const std::function<void()>& onClickAction
+		const string& label,
+		const string& parentLabel,
+		const function<void()>& onClickAction
 	) {
 		// If the parentLabel matches the current node's label, add the new node to its children
 		if (bp->label == parentLabel) {
@@ -24,12 +25,13 @@ struct UIBulletTreeNode {
 				if (child->bp->label == label) return;
 			}
 
-			auto newBulletPoint = std::make_shared<UIBulletPoint>(label);
-			const auto newNode = std::make_shared<UIBulletTreeNode>(newBulletPoint);
-			children.push_back(newNode);
+			const auto newBulletPoint = make_shared<UIBulletPoint>(label);
 
 			// Set onClick event for the bullet point's button
 			newBulletPoint->setOnClickAction(onClickAction);
+
+			const auto newNode = make_shared<UIBulletTreeNode>(newBulletPoint);
+			children.push_back(newNode);
 
 			return;
 		}

@@ -8,17 +8,17 @@
 
 class UIButtonElement : public UIElement {
 public:
-	std::shared_ptr<Button> button;	// Button field associated with this element
+	shared_ptr<Button> button;	// Button field associated with this element
 
 	// UIButtonElement with default button and dimensions
 	UIButtonElement(
-		const std::string& label,
+		const string& label,
 		const Dim sx,
 		const Dim sy
 	) : UIElement(label, sx, sy) {
 
 		// Make the associated Button
-		button = std::make_shared<Button>(
+		button = make_shared<Button>(
 			label,
 			uiFontSize,
 			TextMode::LEFT,
@@ -30,18 +30,19 @@ public:
 
 	// UIButtonElement with explicit button and dimensions
 	UIButtonElement(
-		const std::string& label,
+		const string& label,
 		const Dim sx,
 		const Dim sy,
-		const std::shared_ptr<Button>& button
+		const shared_ptr<Button>& button
 	) : UIElement(label, sx, sy),
 		button(button) {}
 
 	// UIButtonElement without explicit button or dimensions
 	explicit UIButtonElement(
-		const std::string& label
+		const string& label,
+		const vector<Color>& colors
 	) : UIElement(label),
-		button(std::make_shared<Button>()) {}
+		button(make_shared<Button>(colors)) {}
 
 
 	void render(const float xpos, const float ypos) override {

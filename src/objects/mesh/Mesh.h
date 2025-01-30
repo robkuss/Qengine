@@ -19,16 +19,16 @@ enum class ShadingMode {
 
 class Mesh : public Object {
 public:
-	std::vector<std::shared_ptr<Vertex>> vertices		= {};
-	std::vector<std::shared_ptr<Triangle>> triangles	= {};
-	std::vector<int> faceIndices						= {};
+	vector<shared_ptr<Vertex>> vertices		= {};
+	vector<shared_ptr<Triangle>> triangles	= {};
+	vector<int> faceIndices					= {};
 
-	std::shared_ptr<Texture> texture					= nullptr;
-	ShadingMode shadingMode								= ShadingMode::FLAT;
+	shared_ptr<Texture> texture				= nullptr;
+	ShadingMode shadingMode					= ShadingMode::FLAT;
 	Color color;
 
 	// Constructor & Destructor
-	Mesh(const std::string& name, const Color& color, const std::shared_ptr<Texture>& texture) : Object{name}, texture(texture), color(color) {}
+	Mesh(const string& name, const Color& color, const shared_ptr<Texture>& texture) : Object{name}, texture(texture), color(color) {}
 	~Mesh() override = default;
 
 	void buildEdgeToFaceMap();
@@ -40,26 +40,26 @@ public:
 	void updateNormals() const;
 
 	void setShadingMode(ShadingMode shadingMode);
-	void setMaterial(const Color &diffuse, const Color &specular, const Color &emission, const Color &ambient, const float shininess);
+	void setMaterial(const Color &diffuse, const Color &specular, const Color &emission, const Color &ambient, float shininess);
 
 protected:
-	Color diffuse  = Colors::WHITE;
-	Color specular = Colors::WHITE;
-	Color emission = Colors::BLACK;
-	Color ambient  = Colors::WHITE;
-	float shininess   = 30.0f;
+	Color diffuse   = Colors::WHITE;
+	Color specular  = Colors::WHITE;
+	Color emission  = Colors::BLACK;
+	Color ambient   = Colors::WHITE;
+	float shininess = 30.0f;
 
 private:
 	friend class MeshRenderer;
 
 	// adjacency information
-	std::unordered_map<Edge, std::vector<std::shared_ptr<Triangle>>> edgeToFaceMap;
-	std::unordered_map<std::shared_ptr<Vertex>, std::vector<Edge>> vertexToEdgeMap;
+	unordered_map<Edge, vector<shared_ptr<Triangle>>> edgeToFaceMap;
+	unordered_map<shared_ptr<Vertex>, vector<Edge>> vertexToEdgeMap;
 
 	virtual void initializeVertices()    = 0;
 	virtual void initializeFaceIndices() = 0;
 
-	void addEdgeToMap(const Edge &e, const std::shared_ptr<Triangle> &t);
+	void addEdgeToMap(const Edge &e, const shared_ptr<Triangle> &t);
 
 	void setColor(const Color &color);
 
