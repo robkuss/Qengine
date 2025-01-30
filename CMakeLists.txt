@@ -39,13 +39,13 @@ add_executable(Qengine
 	src/graphics/ui/UISceneManager.cpp
 	src/graphics/ui/ButtonOnClickEvents.cpp
 	src/graphics/text/Text.cpp
+	src/graphics/material/texture/Texture.cpp
 
 	src/objects/mesh/Mesh.cpp
 
 	src/math/Util.cpp
 	src/math/matrix/Matrix4.cpp
 	src/math/geometry/Triangle.cpp
-		src/graphics/material/texture/Texture.cpp
 )
 
 # Define static linking

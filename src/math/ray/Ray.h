@@ -2,11 +2,8 @@
 
 #include <algorithm>
 
-#include <math/Util.h>
-#include <math/geometry/Triangle.h>
-#include <objects/mesh/Mesh.h>
+#include "math/Util.h"
 
-class Vector3;
 
 class Ray {
 public:

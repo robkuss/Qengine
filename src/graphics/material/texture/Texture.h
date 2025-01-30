@@ -1,10 +1,11 @@
 #pragma once
 
+using namespace std;
+
+#include <string>
+
 #define GLFW_INCLUDE_GLEXT
 #include <GL/glew.h>
-
-using namespace std;
-#include <string>
 
 
 class Texture {

@@ -1,9 +1,9 @@
 #include "Text.h"
 
-#include "../ui/UI.h"
-
 #include <iostream>
-#include <graphics/color/Colors.h>
+
+#include "graphics/color/Colors.h"
+#include "graphics/ui/UI.h"
 
 
 // Function to initialize FreeType and load the font

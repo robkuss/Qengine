@@ -1,13 +1,17 @@
 #pragma once
 
+using namespace std;
+
 #include <array>
 
+class Vector3;
 class Vector4;
+
 
 class Matrix4 {
 public:
-	Matrix4() = default;								// Default Constructor
-	explicit Matrix4(const float* arr);					// Constructor with array
+	Matrix4() = default;							// Default Constructor
+	explicit Matrix4(const float* arr);				// Constructor with array
 	explicit Matrix4(const array<float, 16>& arr);	// Constructor with array
 	Matrix4(initializer_list<float> list);			// Constructor with initializer list
 

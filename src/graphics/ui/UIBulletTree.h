@@ -1,10 +1,12 @@
 #pragma once
 
-#include "UIBulletPoint.h"
-
 using namespace std;
 
-struct UIBulletTreeNode {
+#include "UIBulletPoint.h"
+
+
+class UIBulletTreeNode {
+public:
 	shared_ptr<UIBulletPoint> bp;
 	vector<shared_ptr<UIBulletTreeNode>> children;
 

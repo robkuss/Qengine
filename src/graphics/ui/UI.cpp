@@ -3,12 +3,10 @@
 #include <ranges>
 
 #include "Labels.h"
-
 #include "UIBar.h"
 #include "UIOption.h"
 #include "UISceneManager.h"
-
-#include "../text/Debug.h"
+#include "graphics/text/Debug.h"
 
 
 int *UI::width, *UI::height;
@@ -77,6 +75,11 @@ void UI::setup(int* w, int* h) {
 	// Add UIBar to the UI Scene
 	addElement(bar, 0);
 }
+
+void UI::cleanup() {
+	Text::destruct();
+}
+
 
 UIOptionVariant UI::createOptionListRecursively(	// NOLINT(*-no-recursion)
 	const long long index,

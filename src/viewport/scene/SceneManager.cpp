@@ -4,7 +4,6 @@
 
 #include "Scene.h"
 #include "viewport/Camera.h"
-#include "graphics/ui/UI.h"
 #include "objects/mesh/skybox/Skybox.cpp"
 
 // Constants
@@ -18,9 +17,9 @@ inline Vector3 lastTransform		= Vector3::ZERO;
 
 
 // Pointers from Viewport
-shared_ptr<array<int, 4>> SceneManager::viewport			= nullptr;
-shared_ptr<Camera> SceneManager::activeCamera				= nullptr;
-shared_ptr<Ray> SceneManager::mouseRay						= nullptr;
+shared_ptr<array<int, 4>> SceneManager::viewport	= nullptr;
+shared_ptr<Camera> SceneManager::activeCamera		= nullptr;
+shared_ptr<Ray> SceneManager::mouseRay				= nullptr;
 
 // Scene Management
 vector<shared_ptr<Scene>> SceneManager::scenes				= vector<shared_ptr<Scene>>();
@@ -60,9 +59,6 @@ void SceneManager::cleanupScenes() {
 		).begin(),
 		scenes.end()
 	);
-
-	// Also cleanup Text TODO should probably be somewhere else
-	Text::destruct();
 }
 
 
@@ -114,7 +110,6 @@ Vector3 SceneManager::mouseWorld() {
 }
 
 
-
 // Scene rendering
 
 void SceneManager::renderScenes() {
@@ -127,11 +122,11 @@ void SceneManager::renderScenes() {
 // Object and Vertex operations that apply across all Scenes, e.g. selection
 
 /**
- * Handles the selection of [Object]s in the scene based on the current mouse position.
+ * Handles the selection of Objects in the scene based on the current mouse position.
  *
  * This function retrieves the mouse Ray using the current mouse coordinates and checks for
- * intersections with any [Mesh] in the scene. If a Mesh is intersected, it is selected
- * by the [SceneManager]. Additionally, the Ray's origin and calculated endpoint are logged
+ * intersections with any Mesh in the scene. If a Mesh is intersected, it is selected
+ * by the SceneManager. Additionally, the Ray's origin and calculated endpoint are logged
  * for debugging purposes.
  *
  * @see getMouseRay for the ray computation logic.

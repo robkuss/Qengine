@@ -1,19 +1,17 @@
 #pragma once
 
-#define GLFW_INCLUDE_GLEXT
-
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+
+#include <array>
 
 #include "math/vector/Vector3.h"
 #include "math/ray/Ray.h"
 #include "Camera.h"
 #include "graphics/ui/UI.h"
 
-#include <array>
-
-
+#define GLFW_INCLUDE_GLEXT
 // #define DRAW_MOUSE_RAY
 
 using namespace std;

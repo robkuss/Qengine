@@ -4,12 +4,10 @@
 #include <memory>
 #include <ranges>
 
-#include <objects/Object.h>
-#include <viewport/scene/SceneManager.h>
-
+#include "objects/Object.h"
+#include "objects/light/Light.h"
 #include "UIBulletTree.h"
 #include "UIWindow.h"
-
 
 Dim UISceneManager::sx = Dim(400.0f, DimType::Pixels);
 Dim UISceneManager::sy = PC_100;
@@ -73,7 +71,7 @@ void UISceneManager::update() {
 		bpTree->addBulletPoint(scene->name, bpTree->bp->label, []{});
 
 		for (const auto& object : scene->sceneObjects) {
-			bpTree->addBulletPoint(object->name, scene->name, [object]{  });
+			bpTree->addBulletPoint(object->name, scene->name, [object]{ SceneManager::selectObject(object); });
 		}
 
 		for (const auto& light : scene->lights) {

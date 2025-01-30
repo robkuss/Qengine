@@ -7,6 +7,7 @@
 #include "objects/mesh/cube/Cube.cpp"
 #include "objects/mesh/sphere/Sphere.cpp"
 #include "objects/mesh/skybox/Skybox.cpp"
+#include "objects/light/Light.h"
 
 #include "graphics/material/texture/Texture.h"
 #include "graphics/ui/UI.h"
@@ -81,6 +82,7 @@ Viewport::~Viewport() {
 	glfwTerminate();
 
 	SceneManager::cleanupScenes();
+	UI::cleanup();
 }
 
 void Viewport::start() {

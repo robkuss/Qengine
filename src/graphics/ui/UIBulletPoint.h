@@ -2,6 +2,7 @@
 
 #include "UIButtonElement.h"
 
+
 class UIBulletPoint final : public UIButtonElement {
 public:
 	explicit UIBulletPoint(

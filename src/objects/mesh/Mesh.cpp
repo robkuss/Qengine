@@ -3,8 +3,8 @@
 #include <vector>
 #include <ranges>
 
-#include <math/Util.h>
-#include <viewport/scene/Mode.h>
+#include "math/Util.h"
+#include "math/matrix/Matrix4.h"
 
 
 /** Mesh-side transformation

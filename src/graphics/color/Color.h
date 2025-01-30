@@ -5,6 +5,7 @@
 #define APIENTRY __stdcall
 #include <GL/glew.h>
 
+
 class Color {
 public:
 	Color(const int r, const int g, const int b, const int a = 255)

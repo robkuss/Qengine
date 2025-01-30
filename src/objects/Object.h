@@ -1,14 +1,15 @@
 #pragma once
 
+using namespace std;
+
 #include <utility>
 #include <string>
 
-#include <math/vector/Vector3.h>
-#include <math/matrix/Matrix4.h>
+#include "math/vector/Vector3.h"
 
-using namespace std;
-
+class Matrix4;
 class Mode;
+
 
 class Object {
 public:

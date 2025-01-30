@@ -2,11 +2,6 @@
 
 #include "Camera.h"
 
-#include <math/Util.h>
-#include <math/matrix/Matrix4.h>
-
-#include <GLFW/glfw3.h>
-
 
 Camera::Camera()
 	: camPos(CAMERA_POSITION_INIT), lookAt(LOOK_AT_POINT_INIT), up(UP_VECTOR_INIT) {

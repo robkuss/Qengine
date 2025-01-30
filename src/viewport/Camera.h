@@ -1,8 +1,10 @@
 #pragma once
 
-#include <math/ray/Ray.h>
-
 using namespace std;
+
+#include <array>
+
+#include "math/ray/Ray.h"
 
 
 // Constants

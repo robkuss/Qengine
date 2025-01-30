@@ -1,9 +1,7 @@
 #pragma once
 
-#include <graphics/color/Colors.h>
-#include <viewport/scene/SceneManager.h>
-
-#include "../UI.h"
+#include "viewport/scene/SceneManager.h"
+#include "graphics/color/Colors.h"
 
 
 const auto BUTTON_COLORS = vector{

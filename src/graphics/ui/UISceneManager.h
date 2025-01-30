@@ -4,8 +4,8 @@
 
 #include "UIWindow.h"
 
-struct UIBulletTreeNode;
 class UIWindow;
+class UIBulletTreeNode;
 
 
 class UISceneManager {

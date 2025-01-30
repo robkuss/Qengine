@@ -4,6 +4,7 @@
 
 #include "Vertex.h"
 
+
 struct Triangle {
 	shared_ptr<Vertex> v0, v1, v2;
 

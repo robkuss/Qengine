@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../Mesh.h"
+#include "objects/mesh/Mesh.h"
+#include "math/matrix/Matrix4.h"
 
 class Skybox final : public Mesh {
 public:

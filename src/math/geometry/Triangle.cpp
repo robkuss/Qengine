@@ -1,6 +1,7 @@
 #include "Triangle.h"
 
-#include <math/Util.h>
+#include "math/Util.h"
+
 
 /** Calculate the normal of a Triangle */
 Vector3 Triangle::faceNormal() const {

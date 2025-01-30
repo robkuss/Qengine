@@ -1,14 +1,12 @@
 #pragma once
 
-#include <objects/mesh/Mesh.h>
-#include <viewport/scene/Mode.h>
-
+#include "objects/mesh/Mesh.h"
 #include "vector/Vector3.h"
 #include "vector/Vector4.h"
+#include "viewport/scene/Mode.h"
 
 class UIOptionBase;
 class UITab;
-
 class Object;
 
 

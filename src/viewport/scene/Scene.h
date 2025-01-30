@@ -1,15 +1,17 @@
 #pragma once
 
-#include <vector>
-
-#include "objects/light/Light.h"
-
 using namespace std;
+
+#include <vector>
+#include <string>
+#include <memory>
 
 class Color;
 class Ray;
 class Object;
 class Mesh;
+class Light;
+
 struct Vertex;
 
 

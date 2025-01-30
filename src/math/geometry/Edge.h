@@ -5,6 +5,7 @@
 
 #include "Vertex.h"
 
+
 struct Edge {
 	shared_ptr<Vertex> v0, v1;
 

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <objects/mesh/Mesh.h>
+#include "objects/mesh/Mesh.h"
 
 
 class MeshRenderer {

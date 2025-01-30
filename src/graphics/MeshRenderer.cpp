@@ -6,11 +6,12 @@
 
 #include <GL/gl.h>
 
-#include <viewport/scene/Mode.h>
+#include "viewport/scene/Mode.h"
 #include "material/texture/Texture.h"
 #include "color/Colors.h"
 
 bool MeshRenderer::toggleDiffuse = false;
+
 
 /** Reinterpret Vertex as GLfloat* */
 void vertex3fv(const Vertex& v) {

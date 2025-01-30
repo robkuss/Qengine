@@ -6,7 +6,6 @@ using namespace std;
 
 #include "math/vector/Vector2.h"
 
-
 #define PC_100 (Dim(1.0f, DimType::Percent))		// 100%
 #define PC_50  (Dim(0.5f, DimType::Percent))		// 50%
 #define PC_25  (Dim(0.25f, DimType::Percent))		// 25%

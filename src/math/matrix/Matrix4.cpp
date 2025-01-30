@@ -1,10 +1,9 @@
-#pragma once
+#include "Matrix4.h"
 
 #include <array>
 #include <cmath>
 
-#include <math/Util.h>
-#include <math/vector/Vector4.h>
+#include "math/Util.h"
 
 
 // Constructor with array

@@ -1,11 +1,9 @@
 #pragma once
 
+using namespace std;
+
 #include <iomanip>
 #include <sstream>
-#include <stdexcept>
-#include <cmath>
-
-using namespace std;
 
 
 class Vector3 {

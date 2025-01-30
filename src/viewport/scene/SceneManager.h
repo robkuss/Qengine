@@ -1,20 +1,22 @@
 #pragma once
 
+using namespace std;
+
 #include <array>
 #include <memory>
 #include <vector>
 
-#include <viewport/scene/Mode.h>
-#include "math/geometry/Vertex.h"
-
-using namespace std;
+#include "Mode.h"
 
 class Scene;
-class UI;
-class Object;
 class Camera;
+class Object;
 class Mesh;
 class Ray;
+class Vector2;
+class Vector3;
+
+struct Vertex;
 
 
 class SceneManager {

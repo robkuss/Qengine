@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Node structure for holding labels
 struct LabelNode {
 	string label;

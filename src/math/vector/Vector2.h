@@ -1,7 +1,10 @@
 #pragma once
 
+using namespace std;
+
 #include <stdexcept>
 #include <cmath>
+
 
 class Vector2 {
 public:

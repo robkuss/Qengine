@@ -2,8 +2,9 @@
 
 #include <cmath>
 
-#include <math/vector/Vector3.h>
-#include <math/vector/Vector2.h>
+#include "math/vector/Vector2.h"
+#include "math/vector/Vector3.h"
+
 
 struct Vertex {
 	Vector3 position;

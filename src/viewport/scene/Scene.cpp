@@ -1,15 +1,12 @@
-#define GLFW_INCLUDE_GLEXT
-
 #include "Scene.h"
 
 #include <iostream>
 
-
-#include <graphics/MeshRenderer.h>
-#include <graphics/ui/UISceneManager.h>
-#include <math/ray/Ray.h>
-#include <viewport/Camera.h>
-#include <viewport/scene/SceneManager.h>
+#include "graphics/MeshRenderer.h"
+#include "graphics/ui/UISceneManager.h"
+#include "viewport/Camera.h"
+#include "viewport/scene/SceneManager.h"
+#include "objects/light/Light.h"
 
 
 void Scene::addObject(const shared_ptr<Object>& obj) {

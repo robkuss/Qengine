@@ -1,11 +1,10 @@
 #pragma once
 
+using namespace std;
+
 #include <iostream>
 
-#include <viewport/Viewport.h>
-#include <viewport/Camera.h>
-#include <viewport/scene/Scene.h>
-#include <viewport/scene/SceneManager.h>
+#include "viewport/Viewport.h"
 
 // Options
 #define DEBUG	// For on-screen debug text
@@ -13,14 +12,15 @@
 constexpr float debugTextSize	= 24;
 const Color debugTextColor		= Colors::TEXT_COLOR;
 
+
 class Debug {
 public:
 	static void drawDebugText() {
-		std::shared_ptr<Scene> foreground;
+		shared_ptr<Scene> foreground;
 		for (const auto& scene : SceneManager::scenes) {
 			if (scene->name == "Foreground") foreground = scene;
 		}
-		if (!foreground) std::cerr << "Foreground Scene not found" << std::endl;
+		if (!foreground) cerr << "Foreground Scene not found" << endl;
 
 		const auto camera = SceneManager::activeCamera;
 		const auto cube = foreground->sceneObjects[0];
@@ -32,13 +32,13 @@ public:
 		}
 
 		for (int i = 0; i <= 11; i++) {
-			std::ostringstream out;
+			ostringstream out;
 
 			switch (i) {
 				case 0:  out << "FPS: " << fps; break;
 				case 1:  out << "Camera Pos: " << camera->camPos.toString(); break;
-				case 2:  out << "Camera Rot: " << std::fixed << std::setprecision(1) << camera->rotH << " / " << camera->rotV; break;
-				case 3:  out << "Zoom: " << std::fixed << std::setprecision(3) << camera->camDist; break;
+				case 2:  out << "Camera Rot: " << fixed << setprecision(1) << camera->rotH << " / " << camera->rotV; break;
+				case 3:  out << "Zoom: " << fixed << setprecision(3) << camera->camDist; break;
 				case 4:  out << "Mouse Screen: " << *SceneManager::mouseX  << " / " << *SceneManager::mouseY; break;
 				case 5:  out << "Mouse World: "  << mouseWorld.toString(); break;
 				case 6:	 out << "Mode: " << SceneManager::selectionMode.modeToString();

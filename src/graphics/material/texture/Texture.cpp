@@ -1,12 +1,9 @@
 #include "Texture.h"
 
-
-
+#include <stdexcept>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../libs/stb_image.h"
-
-#include <stdexcept>
 
 
 Texture::Texture(const string &filename) : filename(filename) { // NOLINT(*-pro-type-member-init)

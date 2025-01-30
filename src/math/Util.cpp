@@ -1,8 +1,7 @@
 #include "Util.h"
 
-#include <graphics/ui/UIOption.h>
-
 #include "math/matrix/Matrix4.h"
+
 
 Vector2 project(const Vector3& worldPoint, const array<int, 4>* viewport, const array<float, 16>& viewMatrix, const array<float, 16>& projMatrix) {
 	// TODO Make this better

@@ -1,16 +1,13 @@
+#include "UI.h"
+
 #include <algorithm>
 #include <iostream>
 
-#include "UI.h"
-
+#include "UIOption.h"
 #include "math/Util.h"
-
 #include "objects/mesh/cube/Cube.cpp"
 #include "objects/mesh/sphere/Sphere.cpp"
-#include <objects/light/Sun.h>
-#include <viewport/scene/SceneManager.h>
-
-#include "UIOption.h"
+#include "objects/light/Sun.h"
 
 
 /**
