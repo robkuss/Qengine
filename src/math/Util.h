@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "objects/mesh/Mesh.h"
 #include "vector/Vector3.h"
 #include "vector/Vector4.h"

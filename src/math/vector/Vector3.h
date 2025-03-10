@@ -4,6 +4,7 @@ using namespace std;
 
 #include <iomanip>
 #include <sstream>
+#include <cmath>
 
 
 class Vector3 {

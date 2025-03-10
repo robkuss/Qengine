@@ -3,7 +3,12 @@
 #include "math/matrix/Matrix4.h"
 
 
-Vector2 project(const Vector3& worldPoint, const array<int, 4>* viewport, const array<float, 16>& viewMatrix, const array<float, 16>& projMatrix) {
+Vector2 project(
+	const Vector3& worldPoint,
+	const array<int, 4>* viewport,
+	const array<float, 16>& viewMatrix,
+	const array<float, 16>& projMatrix
+) {
 	// TODO Make this better
 	auto clip = Vector4(
        viewMatrix[0] * worldPoint.x + viewMatrix[4] * worldPoint.y + viewMatrix[8] * worldPoint.z + viewMatrix[12],
@@ -28,15 +33,27 @@ Vector2 project(const Vector3& worldPoint, const array<int, 4>* viewport, const 
 	return {screenX, screenY};
 }
 
-Vector3 unproject(const Vector2& screenPoint, const array<int, 4>* viewport, const array<float, 16>& viewMatrix, const array<float, 16>& projMatrix) {
+Vector3 unproject(
+	const Vector2& screenPoint,
+	const array<int, 4>* viewport,
+	const array<float, 16>& viewMatrix,
+	const array<float, 16>& projMatrix
+) {
 	// Convert mouse coordinates to normalized device coordinates (NDC)
 	const auto x = static_cast<float>(2.0 * screenPoint.x / (*viewport)[2] - 1.0);
 	const auto y = static_cast<float>(1.0 - 2.0 * screenPoint.y / (*viewport)[3]);
 
-	const auto viewSpace = Vector4(x, y, 1.0f, 1.0f);									// Create a vector in clip space
-	const auto clipSpace = Matrix4(projMatrix).invert() * viewSpace;					// Transform from clip space to view space by applying the inverse of the projection matrix
-	const auto unprojectedClipSpace = Vector4(clipSpace.x, clipSpace.y, -1.0f, 0.0f);	// Set the Z to -1 for proper unprojection and W to 0 for direction vector in the case of a ray
-	const auto worldSpace = Matrix4(viewMatrix).invert() * unprojectedClipSpace;		// Transform from clip space to world space by applying the inverse of the view matrix
+	// Create a vector in clip space
+	const auto viewSpace = Vector4(x, y, 1.0f, 1.0f);
+
+	// Transform from clip space to view space by applying the inverse of the projection matrix
+	const auto clipSpace = Matrix4(projMatrix).invert() * viewSpace;
+
+	// Set the Z to -1 for proper unprojection and W to 0 for direction vector in the case of a ray
+	const auto unprojectedClipSpace = Vector4(clipSpace.x, clipSpace.y, -1.0f, 0.0f);
+
+	// Transform from clip space to world space by applying the inverse of the view matrix
+	const auto worldSpace = Matrix4(viewMatrix).invert() * unprojectedClipSpace;
 
 	return {worldSpace.x, worldSpace.y, worldSpace.z};
 }

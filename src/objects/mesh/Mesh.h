@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <vector>
 
 #include "objects/Object.h"
 #include "math/geometry/Edge.h"

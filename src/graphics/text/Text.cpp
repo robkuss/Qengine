@@ -1,6 +1,7 @@
 #include "Text.h"
 
 #include <iostream>
+#include <thread>
 
 #include "graphics/color/Colors.h"
 #include "graphics/ui/UI.h"

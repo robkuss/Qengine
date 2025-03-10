@@ -1,8 +1,8 @@
+using namespace std;
+
 #include <iostream>
 
 #include "viewport/Viewport.h"
-
-using namespace std;
 
 constexpr auto TITLE         = "Qengine";
 constexpr int DEFAULT_WIDTH  = 1920;

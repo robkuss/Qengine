@@ -72,7 +72,7 @@ void Scene::addLight(
 ) {
 	// If this GL_LIGHT has already been set, return
 	if (ranges::any_of(lights, [&](const auto& l) { return l->macro == light->macro; })) {
-		cerr << "Light " << light->macro << " has already been set" << endl;
+		cerr << "Light " << light->macro << " has already been set for this scene" << endl;
 		return;
 	}
 
